@@ -156,6 +156,9 @@ details[open]>.workflow-summary::before{transform:rotate(90deg)}
 .carryover-flow::before{content:'';display:inline-block;width:0;height:0;border-left:5px solid transparent;border-right:5px solid transparent;border-top:6px solid var(--green)}
 @media(min-width:700px){.carryover-flow{display:none}}
 
+/* ── Save hint ── */
+.save-hint{font-size:.8rem;color:var(--text-mid);text-align:center;margin:20px 0 4px;letter-spacing:.02em}
+
 /* ── Photo banner ── */
 .photo-banner{width:100%;height:200px;background-size:cover;background-position:center;position:relative}
 .photo-banner::after{content:'';position:absolute;inset:0;background:linear-gradient(to bottom,var(--bg) 0%,transparent 15%,transparent 85%,var(--bg) 100%)}
@@ -176,6 +179,7 @@ details[open]>.workflow-summary::before{transform:rotate(90deg)}
 </header>
 <div class="photo-banner" style="background-image:url('https://images.unsplash.com/photo-1498837167922-ddd27525d352?w=1400&fit=crop&q=80&auto=format')"></div>
 <main class="container">
+  <p class="save-hint">💡 チェック内容はブラウザに自動保存。次に開いてもそのまま使えます。</p>
   <div class="step-label"><span class="step-num">1</span><span class="step-text">手持ちの調味料をチェック</span></div>
   <section class="section" id="seasoning-section">
     <h2>🧂 手持ちの調味料</h2>
