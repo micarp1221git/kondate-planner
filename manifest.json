@@ -1,0 +1,24 @@
+{
+  "name": "献立まるっとプランナー",
+  "short_name": "献立プランナー",
+  "description": "3日分の献立をまるっとおまかせ。手持ちの食材と調味料から、作り置き・繰り越し・味変つきの献立を自動提案。",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#FAF7F4",
+  "theme_color": "#C85A35",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "icon-192.svg",
+      "sizes": "192x192",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icon-512.svg",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
