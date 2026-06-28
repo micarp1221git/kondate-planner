@@ -91,7 +91,7 @@ body{font-family:var(--sans);line-height:1.75;color:var(--text);background:var(-
 .day3 .day-label{background:#5B7EC2}
 .day-label small{font-family:var(--sans);font-weight:400;opacity:.8;margin-left:8px;font-size:.74rem}
 .day-body{padding:18px 20px}
-.menu-row{margin-bottom:14px;padding-bottom:14px;border-bottom:1px solid var(--border)}
+.menu-row{margin-bottom:14px;padding-bottom:14px;border-bottom:1px solid var(--border);position:relative}
 .menu-row:last-child{margin-bottom:0;padding-bottom:0;border-bottom:none}
 .menu-cat{font-size:.72rem;color:var(--text-light);margin-bottom:3px;text-transform:uppercase;letter-spacing:.08em}
 .menu-name{font-size:.9rem;font-weight:600}
@@ -171,6 +171,17 @@ details[open]>.workflow-summary::before{transform:rotate(90deg)}
 .photo-banner{width:100%;height:200px;background-size:cover;background-position:center;position:relative}
 .photo-banner::after{content:'';position:absolute;inset:0;background:linear-gradient(to bottom,var(--bg) 0%,transparent 15%,transparent 85%,var(--bg) 100%)}
 @media(min-width:700px){.photo-banner{height:260px}}
+
+/* ── Favorites ── */
+.fav-btn{display:block;width:100%;max-width:300px;margin:12px auto 0;padding:10px;background:transparent;color:var(--primary);border:1.5px solid var(--primary);border-radius:8px;font-size:.85rem;cursor:pointer;transition:all .2s}
+.fav-btn:hover{background:var(--primary-light)}
+.fav-heart{position:absolute;top:10px;right:10px;background:none;border:none;font-size:1.2rem;cursor:pointer;opacity:.5;transition:opacity .2s}
+.fav-heart.active{opacity:1}
+.fav-heart:hover{opacity:1}
+.fav-section{margin-top:24px}
+.fav-item{display:flex;justify-content:space-between;align-items:center;padding:10px 14px;background:var(--surface);border-radius:6px;margin-bottom:6px;font-size:.85rem}
+.fav-item button{background:none;border:none;color:var(--text-light);cursor:pointer;font-size:.8rem}
+.fav-item button:hover{color:var(--primary)}
 </style>
 </head>
 <body>
@@ -232,244 +243,17 @@ details[open]>.workflow-summary::before{transform:rotate(90deg)}
     <span class="btn-text">3日分の献立を出す</span>
     <span class="btn-loading"><span class="spinner"></span>献立を考え中…</span>
   </button>
+  <button class="fav-btn" id="fav-btn" onclick="showFavorites()" style="display:none">
+    ❤️ お気に入り (<span id="fav-count">0</span>)
+  </button>
   <div id="results" class="results hidden"></div>
 </main>
 <footer class="footer">
   <p>手持ちの食材と調味料から、3日分の献立を自動で組み立てます。</p>
 </footer>
 <script>
-const D = {
-  "_meta":{
-    "bento_ids":["wa-teriyaki","wa-soboro","wa-tsukune","wa-chickennanban","yo-hamburg","wa-nikudume","chu-suzu","wa-shogayaki","chu-chashu","asia-bulgogi","yo-hirekatsu","chu-mekajiki-amazu","wa-sawara-saikyo","wa-karei-karaage","chu-ebi-chili","s-kinpira","s-potesara","s-ninjin-shirishiri","s-moyashi-namul","s-harusame","s-mugen-cabbage","s-hijiki","s-ajitama","s-gomoku-mame","s-carot-rape","s-pickles","s-kinoko-marine","s-broccoli-okaka","s-broccoli-egg-salad"]
-  },
-  "main":[
-    {"id":"wa-teriyaki","name":"鶏の照り焼き","genre":"和","protein":"鶏もも","method":"焼く","seasonings":["醤油","みりん","酒"],"ingredients":["鶏もも肉"],"batch":true,"carryover":[{n:"照り焼き丼",h:"ごはんにのせてタレかけ直す"},{n:"照り焼きサンド",h:"パンにレタス+マヨと挟む"},{n:"サラダのせ",h:"切ってサラダにのせる"}],"toriwake":{"kodomo":"そのまま","otona":"七味・山椒"}},
-    {"id":"wa-chikuzen","name":"筑前煮","genre":"和","protein":"鶏もも","method":"煮る","seasonings":["醤油","みりん","酒","だし"],"ingredients":["鶏もも肉","にんじん","きのこ","こんにゃく"],"batch":true,"carryover":[{n:"卵とじ",h:"温め直して溶き卵でとじる"},{n:"炊き込みご飯の具",h:"具を刻んでお米と一緒に炊く"}],"toriwake":{"kodomo":"そのまま","otona":"七味"}},
-    {"id":"wa-oyako","name":"親子煮(親子丼の素)","genre":"和","protein":"鶏もも","method":"煮る","seasonings":["醤油","みりん","だし"],"ingredients":["鶏もも肉","玉ねぎ","たまご"],"batch":true,"serve":"ごはんにかけて親子丼に","carryover":[{n:"親子丼",h:"ごはんにのせるだけ"},{n:"うどんの具",h:"うどんに汁ごとかける"}],"toriwake":{"kodomo":"そのまま","otona":"七味・三つ葉"}},
-    {"id":"yo-garlic-chicken","name":"鶏もものガーリックソテー","genre":"洋","protein":"鶏もも","method":"焼く","seasonings":["塩","こしょう","にんにく"],"ingredients":["鶏もも肉"],"batch":true,"carryover":[{n:"サラダのせ",h:"切ってサラダにのせる"},{n:"トマト煮込み",h:"トマト缶で10分煮込む"},{n:"サンド",h:"パンに挟んでレタスと"}],"toriwake":{"kodomo":"そのまま","otona":"黒こしょう・レモン"}},
-    {"id":"chu-suzu","name":"鶏の甘酢炒め(酢鶏)","genre":"中","protein":"鶏もも","method":"炒める","seasonings":["醤油","酢","砂糖","ケチャップ"],"ingredients":["鶏もも肉","玉ねぎ","にんじん"],"batch":true,"carryover":[{n:"甘酢丼",h:"ごはんにのせるだけ"},{n:"お弁当おかず",h:"そのまま詰める"}],"toriwake":{"kodomo":"そのまま","otona":"ラー油・黒酢"}},
-    {"id":"asia-tandoori","name":"タンドリーチキン風","genre":"アジアン","protein":"鶏もも","method":"焼く","seasonings":["塩","カレー粉","にんにく"],"ingredients":["鶏もも肉","ヨーグルト"],"batch":true,"carryover":[{n:"サンド",h:"パンにレタスと挟む"},{n:"カレーサラダ",h:"切ってサラダにのせる"}],"toriwake":{"kodomo":"マイルド","otona":"チリ・追いカレー粉"}},
-    {"id":"yo-chickenmarine","name":"鶏むねのトマトマリネ焼き","genre":"洋","protein":"鶏むね","method":"焼く","seasonings":["塩","こしょう","酢","オリーブ油"],"ingredients":["鶏むね肉","トマト","玉ねぎ"],"batch":true,"carryover":[{n:"サラダ",h:"ほぐしてサラダにのせる"},{n:"サンド",h:"パンに挟む"},{n:"トマト煮込み",h:"トマト缶で10分煮込む"}],"toriwake":{"kodomo":"そのまま","otona":"オリーブ油・黒こしょう・レモン"}},
-    {"id":"chu-mushidori","name":"蒸し鶏(よだれ鶏)","genre":"中","protein":"鶏むね","method":"蒸す","seasonings":["醤油","酢","ごま油"],"ingredients":["鶏むね肉","もやし","長ねぎ"],"batch":true,"carryover":[{n:"棒棒鶏",h:"きゅうり千切り+ごまダレかける"},{n:"中華スープ",h:"蒸し汁ごとスープに"},{n:"鶏サラダ",h:"割いてサラダにのせる"}],"toriwake":{"kodomo":"ごまだれ","otona":"ラー油・花椒"}},
-    {"id":"wa-chickennanban","name":"チキン南蛮","genre":"和","protein":"鶏むね","method":"揚げる","seasonings":["醤油","酢","砂糖","マヨネーズ"],"ingredients":["鶏むね肉","たまご"],"batch":true,"carryover":[{n:"南蛮丼",h:"ごはんにのせてタルタルかける"},{n:"サンド",h:"パンに挟んでタルタルと"}],"toriwake":{"kodomo":"タルタル多め","otona":"黒こしょう・タバスコ"}},
-    {"id":"chu-chili-chicken","name":"鶏むねのチリソース","genre":"中","protein":"鶏むね","method":"炒める","seasonings":["ケチャップ","砂糖","鶏ガラ","ごま油"],"ingredients":["鶏むね肉","玉ねぎ"],"batch":true,"carryover":[{n:"チリ丼",h:"ごはんにのせるだけ"},{n:"卵とじ",h:"温め直して溶き卵でとじる"}],"toriwake":{"kodomo":"そのまま","otona":"豆板醤・ラー油"}},
-    {"id":"wa-soboro","name":"鶏そぼろ","genre":"和","protein":"鶏ひき","method":"炒める","seasonings":["醤油","みりん","酒"],"ingredients":["鶏ひき肉","たまご"],"batch":true,"serve":"ごはんにのせてそぼろ丼に","carryover":[{n:"三色丼",h:"卵そぼろ+青菜とごはんにのせる"},{n:"オムレツ",h:"卵に混ぜて焼く"},{n:"混ぜご飯",h:"温かいごはんに混ぜる"}],"toriwake":{"kodomo":"そのまま","otona":"生姜・七味"}},
-    {"id":"wa-tsukune","name":"鶏つくね","genre":"和","protein":"鶏ひき","method":"焼く","seasonings":["醤油","みりん","酒"],"ingredients":["鶏ひき肉","長ねぎ","たまご"],"batch":true,"carryover":[{n:"つくね丼",h:"ごはんにのせてタレかけ直す"},{n:"スープに入れる",h:"だし汁に入れて煮る"}],"toriwake":{"kodomo":"タレ","otona":"七味・卵黄"}},
-    {"id":"asia-gapao","name":"ガパオ(タイ風そぼろ)","genre":"アジアン","protein":"鶏ひき","method":"炒める","seasonings":["ナンプラー","オイスター","醤油"],"ingredients":["鶏ひき肉","玉ねぎ","たまご"],"batch":true,"carryover":[{n:"ガパオ丼",h:"ごはんにのせて目玉焼きを添える"},{n:"オムレツ包み",h:"卵で包んでオムレツに"}],"toriwake":{"kodomo":"そのまま(甘め)","otona":"唐辛子・ナンプラー"}},
-    {"id":"wa-tebamoto-amakara","name":"手羽元のさっぱり煮","genre":"和","protein":"手羽元","method":"煮る","seasonings":["醤油","酢","みりん"],"ingredients":["手羽元","たまご"],"batch":true,"carryover":[{n:"煮汁で大根煮",h:"煮汁に大根入れて15分煮る"},{n:"うどん",h:"煮汁にうどんを入れて煮込む"}],"toriwake":{"kodomo":"そのまま","otona":"黒こしょう・からし"}},
-    {"id":"asia-samgyetang","name":"手羽元の参鶏湯風スープ","genre":"アジアン","protein":"手羽元","method":"煮る","seasonings":["鶏ガラ","塩","にんにく"],"ingredients":["手羽元","長ねぎ"],"batch":true,"carryover":[{n:"雑炊",h:"スープにごはん+卵を入れて煮る"},{n:"スープごはん",h:"ごはんにスープをかける"}],"toriwake":{"kodomo":"そのまま","otona":"こしょう・ごま油・キムチ"}},
-    {"id":"wa-shogayaki","name":"豚の生姜焼き","genre":"和","protein":"豚ロース","method":"焼く","seasonings":["醤油","みりん","酒"],"ingredients":["豚ロース薄切り","玉ねぎ","生姜"],"batch":true,"carryover":[{n:"豚丼",h:"ごはんにのせるだけ"},{n:"野菜炒めに追加",h:"野菜と一緒に炒め直す"},{n:"サンド",h:"パンにレタスと挟む"}],"toriwake":{"kodomo":"そのまま","otona":"おろしにんにく・黒こしょう"}},
-    {"id":"chu-chashu","name":"煮豚(チャーシュー)","genre":"中","protein":"豚ロース","method":"煮る","seasonings":["醤油","酒","砂糖","ごま油"],"ingredients":["豚ロースブロック","長ねぎ","生姜"],"batch":true,"carryover":[{n:"チャーシュー丼",h:"スライスしてごはんにのせタレかける"},{n:"ラーメンの具",h:"スライスしてラーメンにのせる"},{n:"炒飯",h:"角切りにして炒飯に混ぜる"}],"toriwake":{"kodomo":"そのまま","otona":"からし・黒こしょう"}},
-    {"id":"yo-roastpork","name":"ローストポーク","genre":"洋","protein":"豚ロース","method":"焼く","seasonings":["塩","こしょう","にんにく"],"ingredients":["豚ロースブロック"],"batch":true,"carryover":[{n:"サンド",h:"スライスしてパンに挟む"},{n:"サラダ",h:"スライスしてサラダにのせる"},{n:"ポトフ",h:"野菜と一緒にコンソメで煮る"}],"toriwake":{"kodomo":"そのまま","otona":"粒マスタード・黒こしょう"}},
-    {"id":"wa-butabara-daikon","name":"豚バラ大根","genre":"和","protein":"豚バラ","method":"煮る","seasonings":["醤油","みりん","酒","だし"],"ingredients":["豚バラ","大根"],"batch":true,"carryover":[{n:"卵とじ",h:"温め直して溶き卵でとじる"},{n:"うどん",h:"汁ごとうどんにかける"}],"toriwake":{"kodomo":"そのまま","otona":"七味・からし"}},
-    {"id":"chu-hoikoro","name":"回鍋肉","genre":"中","protein":"豚バラ","method":"炒める","seasonings":["味噌","醤油","酒","ごま油"],"ingredients":["豚バラ","キャベツ","ピーマン"],"batch":true,"carryover":[{n:"回鍋肉丼",h:"ごはんにのせるだけ"},{n:"焼きそばの具",h:"焼きそば麺と炒め合わせる"}],"toriwake":{"kodomo":"そのまま","otona":"豆板醤・にんにく"}},
-    {"id":"chu-bara-moyashi","name":"豚バラともやし炒め","genre":"中","protein":"豚バラ","method":"炒める","seasonings":["醤油","酒","鶏ガラ","ごま油"],"ingredients":["豚バラ","もやし","にら"],"batch":false,"carryover":[{n:"焼きそば",h:"焼きそば麺と炒め合わせる"},{n:"卵とじ",h:"温め直して溶き卵でとじる"}],"toriwake":{"kodomo":"そのまま","otona":"ラー油・にんにく"}},
-    {"id":"yo-hirekatsu","name":"ヒレカツ","genre":"洋","protein":"豚ヒレ","method":"揚げる","seasonings":["塩","こしょう","ソース"],"ingredients":["豚ヒレ","たまご","パン粉"],"batch":true,"carryover":[{n:"カツ丼",h:"だし+醤油+みりんで卵とじ→ごはんへ"},{n:"カツサンド",h:"ソースかけてパンに挟む"}],"toriwake":{"kodomo":"ソース","otona":"からし・黒こしょう"}},
-    {"id":"yo-hire-sote","name":"豚ヒレのソテー","genre":"洋","protein":"豚ヒレ","method":"焼く","seasonings":["塩","こしょう","バター"],"ingredients":["豚ヒレ","きのこ"],"batch":true,"carryover":[{n:"サンド",h:"パンにマスタードと挟む"},{n:"サラダ",h:"スライスしてサラダにのせる"}],"toriwake":{"kodomo":"そのまま","otona":"粒マスタード・黒こしょう"}},
-    {"id":"wa-nikujaga","name":"肉じゃが","genre":"和","protein":"豚こま","method":"煮る","seasonings":["醤油","みりん","酒","だし"],"ingredients":["豚こま","じゃがいも","玉ねぎ","にんじん"],"batch":true,"carryover":[{n:"卵とじ",h:"温め直して溶き卵でとじる"},{n:"カレーリメイク",h:"カレールーを足して煮る"},{n:"コロッケ",h:"潰して成形→パン粉つけて揚げる"}],"toriwake":{"kodomo":"そのまま","otona":"七味"}},
-    {"id":"chu-komawa-miso","name":"豚こまとキャベツの味噌炒め","genre":"中","protein":"豚こま","method":"炒める","seasonings":["味噌","醤油","酒","ごま油"],"ingredients":["豚こま","キャベツ","玉ねぎ"],"batch":false,"carryover":[{n:"丼",h:"ごはんにのせるだけ"},{n:"焼きそば",h:"焼きそば麺と炒め合わせる"}],"toriwake":{"kodomo":"そのまま","otona":"豆板醤・にんにく"}},
-    {"id":"asia-bulgogi","name":"プルコギ","genre":"アジアン","protein":"豚こま","method":"炒める","seasonings":["コチュジャン","醤油","砂糖","ごま油"],"ingredients":["豚こま","玉ねぎ","にんじん","にら"],"batch":true,"carryover":[{n:"プルコギ丼",h:"ごはんにのせるだけ"},{n:"チーズ焼き",h:"チーズのせてトースターで焼く"},{n:"ビビンバ",h:"ナムル+卵とごはんにのせる"}],"toriwake":{"kodomo":"そのまま(甘辛)","otona":"コチュジャン追い・にんにく"}},
-    {"id":"wa-gyudon","name":"牛丼の素","genre":"和","protein":"牛こま","method":"煮る","seasonings":["醤油","みりん","酒","だし"],"ingredients":["牛こま","玉ねぎ"],"batch":true,"serve":"ごはんにかけて牛丼に","carryover":[{n:"牛丼",h:"ごはんにのせるだけ"},{n:"肉うどん",h:"うどんに汁ごとかける"},{n:"卵とじ",h:"温め直して溶き卵でとじる"}],"toriwake":{"kodomo":"そのまま","otona":"七味・紅生姜"}},
-    {"id":"wa-nikudofu","name":"肉豆腐","genre":"和","protein":"牛こま","method":"煮る","seasonings":["醤油","みりん","酒","だし"],"ingredients":["牛こま","豆腐","長ねぎ"],"batch":true,"carryover":[{n:"卵とじ",h:"温め直して溶き卵でとじる"},{n:"うどん",h:"汁ごとうどんにかける"}],"toriwake":{"kodomo":"そのまま","otona":"七味・山椒"}},
-    {"id":"chu-mabo","name":"麻婆豆腐","genre":"中","protein":"ひき肉","method":"炒める","seasonings":["醤油","酒","ごま油","鶏ガラ","味噌"],"ingredients":["豚ひき肉","豆腐","長ねぎ"],"batch":true,"carryover":[{n:"麻婆丼",h:"ごはんにのせるだけ"},{n:"麻婆春雨",h:"戻した春雨を加えて炒める"},{n:"麻婆なす",h:"素揚げしたなすにかける"}],"toriwake":{"kodomo":"そのまま(辛味なし)","otona":"ラー油・豆板醤"}},
-    {"id":"yo-hamburg","name":"ハンバーグ","genre":"洋","protein":"ひき肉","method":"焼く","seasonings":["塩","こしょう","ケチャップ","ソース"],"ingredients":["合いびき肉","玉ねぎ","たまご","パン粉"],"batch":true,"carryover":[{n:"煮込みハンバーグ",h:"トマト缶+コンソメで10分煮る"},{n:"ロコモコ",h:"ごはんにのせて目玉焼き+ソース"},{n:"ハンバーグサンド",h:"パンに挟んでソースかける"}],"toriwake":{"kodomo":"ケチャップソース","otona":"黒こしょう・粒マスタード"}},
-    {"id":"yo-meatsauce","name":"ミートソース","genre":"洋","protein":"ひき肉","method":"煮る","seasonings":["塩","こしょう","コンソメ","ケチャップ"],"ingredients":["合いびき肉","玉ねぎ","にんじん","トマト缶"],"batch":true,"serve":"茹でたパスタにかけて","carryover":[{n:"パスタ",h:"茹でたパスタにかけるだけ"},{n:"グラタン",h:"マカロニにかけてチーズで焼く"},{n:"オムレツがけ",h:"オムレツにかける"}],"toriwake":{"kodomo":"そのまま","otona":"粉チーズ・タバスコ"}},
-    {"id":"wa-nikudume","name":"ピーマンの肉詰め","genre":"和","protein":"ひき肉","method":"焼く","seasonings":["醤油","みりん","ケチャップ"],"ingredients":["合いびき肉","ピーマン","玉ねぎ"],"batch":true,"carryover":[{n:"丼",h:"崩してごはんにのせタレかける"},{n:"スープ煮込み",h:"トマト缶+コンソメで10分煮込む"}],"toriwake":{"kodomo":"ケチャップ","otona":"黒こしょう・からし"}},
-    {"id":"asia-keema","name":"キーマカレー","genre":"アジアン","protein":"ひき肉","method":"炒める","seasonings":["カレー粉","塩","ケチャップ","にんにく"],"ingredients":["合いびき肉","玉ねぎ","にんじん","たまご"],"batch":true,"carryover":[{n:"キーマ丼",h:"ごはんにのせるだけ"},{n:"オムカレー",h:"オムレツにかける"},{n:"チーズ焼き",h:"チーズのせてトースターで焼く"}],"toriwake":{"kodomo":"甘口","otona":"チリ・ガラムマサラ"}},
-    {"id":"wa-atsuage-nimono","name":"厚揚げと野菜の煮物","genre":"和","protein":"豆腐","method":"煮る","seasonings":["醤油","みりん","だし"],"ingredients":["厚揚げ","白菜","にんじん","きのこ"],"batch":true,"carryover":[{n:"卵とじ",h:"温め直して溶き卵でとじる"},{n:"うどんの具",h:"汁ごとうどんにかける"}],"toriwake":{"kodomo":"そのまま","otona":"七味・生姜"}},
-    {"id":"wa-tofu-hamburg","name":"豆腐ハンバーグ","genre":"和","protein":"豆腐","method":"焼く","seasonings":["醤油","みりん","だし"],"ingredients":["豆腐","鶏ひき肉","玉ねぎ","たまご"],"batch":true,"carryover":[{n:"丼",h:"ごはんにのせてタレかける"},{n:"あんかけアレンジ",h:"だし+片栗粉であんを作りかける"}],"toriwake":{"kodomo":"そのまま","otona":"おろし・七味"}},
-    {"id":"yo-omelet","name":"具だくさんオムレツ","genre":"洋","protein":"卵","method":"焼く","seasonings":["塩","こしょう","バター"],"ingredients":["たまご","玉ねぎ","きのこ","じゃがいも"],"batch":false,"carryover":[{n:"サンド",h:"パンに挟んでケチャップ"},{n:"サラダ添え",h:"切り分けてサラダと盛る"}],"toriwake":{"kodomo":"ケチャップ","otona":"黒こしょう・タバスコ"}},
-    {"id":"yo-tomato-chicken","name":"鶏もものトマト煮込み","genre":"洋","protein":"鶏もも","method":"煮る","seasonings":["塩","こしょう","コンソメ","にんにく"],"ingredients":["鶏もも肉","トマト缶","玉ねぎ","きのこ"],"batch":true,"carryover":[{n:"パスタソース",h:"パスタに絡める"},{n:"チーズ焼き",h:"チーズのせてトースターで焼く"},{n:"トマトスープ",h:"水で伸ばしてスープに"}],"toriwake":{"kodomo":"そのまま","otona":"黒こしょう・タバスコ"}},
-    {"id":"asia-chapchae","name":"チャプチェ(春雨炒め)","genre":"アジアン","protein":"豚こま","method":"炒める","seasonings":["醤油","砂糖","ごま油","にんにく"],"ingredients":["豚こま","春雨","にんじん","にら","玉ねぎ"],"batch":true,"carryover":[{n:"ビビンバ",h:"ごはんにのせて卵+コチュジャン"},{n:"卵とじ",h:"温め直して溶き卵でとじる"}],"toriwake":{"kodomo":"そのまま","otona":"コチュジャン・ラー油"}},
-    {"id":"chu-mabo-harusame","name":"麻婆春雨","genre":"中","protein":"ひき肉","method":"炒める","seasonings":["醤油","酒","ごま油","鶏ガラ"],"ingredients":["豚ひき肉","春雨","にら","長ねぎ"],"batch":true,"carryover":[{n:"麻婆丼",h:"ごはんにのせるだけ"},{n:"スープに追加",h:"中華スープに入れて煮る"}],"toriwake":{"kodomo":"そのまま(辛味なし)","otona":"豆板醤・ラー油"}},
-    {"id":"asia-somen-champuru","name":"そうめんチャンプルー","genre":"アジアン","protein":"ツナ","method":"炒める","seasonings":["醤油","鶏ガラ","ごま油"],"ingredients":["そうめん","ツナ缶","にら","にんじん","たまご"],"batch":false,"carryover":[{n:"お弁当",h:"そのまま詰めるだけ"}],"toriwake":{"kodomo":"そのまま","otona":"黒こしょう・ラー油"}},
-    {"id":"wa-nyumen","name":"にゅうめん(温そうめん)","genre":"和","protein":"卵","method":"煮る","seasonings":["だし","醤油","みりん"],"ingredients":["そうめん","たまご","油揚げ","小松菜"],"batch":false,"carryover":[{n:"翌朝の軽食",h:"温め直すだけ"}],"toriwake":{"kodomo":"そのまま","otona":"七味・生姜"}},
-    {"id":"wa-buri-teriyaki","name":"ブリの照り焼き","genre":"和","protein":"魚","method":"焼く","seasonings":["醤油","みりん","酒"],"ingredients":["ブリ切り身"],"batch":true,"carryover":[{n:"ブリ丼",h:"ごはんにのせてタレかける"},{n:"ほぐしておにぎり",h:"ほぐして混ぜごはん→おにぎりに"}],"toriwake":{"kodomo":"そのまま","otona":"七味・おろし生姜"}},
-    {"id":"wa-mekajiki-nitsuke","name":"メカジキの煮付け","genre":"和","protein":"魚","method":"煮る","seasonings":["醤油","みりん","酒","だし"],"ingredients":["メカジキ","生姜"],"batch":true,"carryover":[{n:"卵とじ",h:"ほぐして煮汁で卵とじ"},{n:"煮汁で大根煮",h:"煮汁に大根入れて15分煮る"}],"toriwake":{"kodomo":"そのまま","otona":"七味・山椒"}},
-    {"id":"wa-tachiuo-shioyaki","name":"太刀魚の塩焼き","genre":"和","protein":"魚","method":"焼く","seasonings":["塩"],"ingredients":["太刀魚"],"batch":false,"carryover":[{n:"ほぐして混ぜご飯",h:"ほぐしてごはんに混ぜる"},{n:"お茶漬け",h:"ほぐしてだし汁をかける"}],"toriwake":{"kodomo":"そのまま","otona":"すだち・七味"}},
-    {"id":"yo-sake-meuniere","name":"鮭のムニエル","genre":"洋","protein":"魚","method":"焼く","seasonings":["塩","こしょう","バター"],"ingredients":["鮭切り身"],"batch":true,"carryover":[{n:"ほぐしてパスタ",h:"ほぐしてパスタに和える"},{n:"サラダ",h:"ほぐしてサラダにのせる"},{n:"チャウダー",h:"ほぐして牛乳+コンソメで煮る"}],"toriwake":{"kodomo":"そのまま","otona":"黒こしょう・レモン"}},
-    {"id":"chu-mekajiki-amazu","name":"メカジキの甘酢あん","genre":"中","protein":"魚","method":"炒める","seasonings":["醤油","酢","砂糖","ケチャップ"],"ingredients":["メカジキ","玉ねぎ","ピーマン"],"batch":true,"carryover":[{n:"甘酢丼",h:"ごはんにのせるだけ"},{n:"お弁当",h:"そのまま詰める"}],"toriwake":{"kodomo":"そのまま","otona":"ラー油・黒酢"}},
-    {"id":"yo-tara-acquapazza","name":"タラのアクアパッツァ","genre":"洋","protein":"魚","method":"煮る","seasonings":["塩","こしょう","にんにく"],"ingredients":["タラ切り身","トマト","きのこ"],"batch":false,"carryover":[{n:"スープパスタ",h:"パスタを入れて煮る"},{n:"リゾット",h:"ごはんを入れてチーズ足す"}],"toriwake":{"kodomo":"そのまま","otona":"黒こしょう・オリーブ油"}},
-    {"id":"asia-kajiki-curry","name":"カジキのカレーソテー","genre":"アジアン","protein":"魚","method":"焼く","seasonings":["塩","カレー粉","にんにく"],"ingredients":["メカジキ","玉ねぎ"],"batch":true,"carryover":[{n:"カレーサンド",h:"ほぐしてパンに挟む"},{n:"サラダ",h:"ほぐしてサラダにのせる"}],"toriwake":{"kodomo":"マイルド","otona":"チリ・追いカレー粉"}},
-    {"id":"wa-sawara-saikyo","name":"サワラの西京焼き","genre":"和","protein":"魚","method":"焼く","seasonings":["味噌","みりん","酒"],"ingredients":["サワラ切り身"],"batch":true,"carryover":[{n:"ほぐして混ぜご飯",h:"ほぐしてごはんに混ぜる"},{n:"お弁当",h:"そのまま詰める"}],"toriwake":{"kodomo":"そのまま","otona":"山椒・すだち"}},
-    {"id":"wa-karei-karaage","name":"カレイの竜田揚げ","genre":"和","protein":"魚","method":"揚げる","seasonings":["醤油","酒","片栗粉"],"ingredients":["カレイ切り身(骨なし)"],"batch":true,"carryover":[{n:"甘酢あんかけ",h:"甘酢あん(酢+砂糖+醤油+片栗粉)をかける"},{n:"南蛮漬け",h:"酢+醤油+砂糖の南蛮液に漬ける"}],"toriwake":{"kodomo":"そのまま","otona":"レモン・七味"}},
-    {"id":"wa-saba-misoni","name":"サバの味噌煮(骨取り)","genre":"和","protein":"魚","method":"煮る","seasonings":["味噌","砂糖","酒","みりん"],"ingredients":["骨取りサバ","生姜"],"batch":true,"carryover":[{n:"ほぐして混ぜご飯",h:"ほぐしてごはんに混ぜる"}],"toriwake":{"kodomo":"そのまま","otona":"七味・山椒"}},
-    {"id":"chu-ebi-chili","name":"えびチリ","genre":"中","protein":"魚介","method":"炒める","seasonings":["ケチャップ","砂糖","鶏ガラ","ごま油"],"ingredients":["むきえび","玉ねぎ","長ねぎ"],"batch":true,"carryover":[{n:"えびチリ丼",h:"ごはんにのせるだけ"},{n:"卵とじ",h:"温め直して溶き卵でとじる"}],"toriwake":{"kodomo":"そのまま(辛味なし)","otona":"豆板醤・ラー油"}},
-    {"id":"yo-hotate-butter","name":"ホタテときのこのバター焼き","genre":"洋","protein":"魚介","method":"焼く","seasonings":["塩","こしょう","バター","醤油"],"ingredients":["ホタテ","きのこ","玉ねぎ"],"batch":false,"carryover":[{n:"パスタ",h:"パスタに和えてバター足す"},{n:"リゾット",h:"ごはんとチーズ足して煮る"}],"toriwake":{"kodomo":"そのまま","otona":"黒こしょう・レモン"}},
-    {"id":"wa-tai-houiru","name":"鯛(白身魚)のホイル蒸し","genre":"和","protein":"魚","method":"蒸す","seasonings":["塩","酒","ポン酢"],"ingredients":["鯛切り身","きのこ","玉ねぎ"],"batch":false,"carryover":[{n:"ほぐしてスープ",h:"ほぐして汁ごとスープに"},{n:"雑炊",h:"ほぐして汁+ごはんで雑炊に"}],"toriwake":{"kodomo":"そのまま","otona":"ポン酢・柚子こしょう"}},
-    {"id":"yo-wiener-potee","name":"ウィンナーポトフ","genre":"洋","protein":"ウィンナー","method":"煮る","seasonings":["コンソメ","塩","こしょう"],"ingredients":["ウィンナー","じゃがいも","にんじん","キャベツ","玉ねぎ"],"batch":true,"carryover":[{n:"カレーリメイク",h:"カレールーを足して煮る"},{n:"スープパスタ",h:"パスタを入れて煮る"}],"toriwake":{"kodomo":"そのまま","otona":"粒マスタード・黒こしょう"}}
-  ],
-  "side":[
-    {"id":"s-goma-horenso","name":"ほうれん草のごま和え","genre":"和","makeahead":true,"seasonings":["醤油","砂糖","すりごま"],"ingredients":["ほうれん草"]},
-    {"id":"s-komatsuna-nibitashi","name":"小松菜と油揚げの煮浸し","genre":"和","makeahead":true,"seasonings":["だし","醤油","みりん"],"ingredients":["小松菜","油揚げ"]},
-    {"id":"s-kinpira","name":"きんぴらにんじん","genre":"和","makeahead":true,"seasonings":["醤油","みりん","ごま油"],"ingredients":["にんじん"]},
-    {"id":"s-ninjin-shirishiri","name":"にんじんしりしり","genre":"和","makeahead":true,"seasonings":["醤油","だし"],"ingredients":["にんじん","たまご"]},
-    {"id":"s-potesara","name":"ポテトサラダ","genre":"洋","makeahead":true,"seasonings":["マヨネーズ","塩","こしょう"],"ingredients":["じゃがいも","にんじん","玉ねぎ"]},
-    {"id":"s-jaga-butter","name":"じゃがバター/粉ふきいも","genre":"洋","makeahead":false,"seasonings":["塩","バター"],"ingredients":["じゃがいも"]},
-    {"id":"s-moyashi-namul","name":"もやしのナムル","genre":"アジアン","makeahead":true,"seasonings":["ごま油","塩","にんにく","すりごま"],"ingredients":["もやし"]},
-    {"id":"s-nira-namul","name":"にらと卵の炒めもの","genre":"中","makeahead":false,"seasonings":["鶏ガラ","ごま油","醤油"],"ingredients":["にら","たまご"]},
-    {"id":"s-chingen-oyster","name":"ちんげん菜のオイスター炒め","genre":"中","makeahead":false,"seasonings":["オイスター","ごま油"],"ingredients":["ちんげん菜"]},
-    {"id":"s-hakusai-asazuke","name":"白菜の塩昆布和え","genre":"和","makeahead":true,"seasonings":["塩昆布","ごま油"],"ingredients":["白菜"]},
-    {"id":"s-kyabetsu-shiokombu","name":"キャベツの塩昆布和え","genre":"和","makeahead":true,"seasonings":["塩昆布","ごま油"],"ingredients":["キャベツ"]},
-    {"id":"s-kinoko-butter","name":"きのこのバター醤油","genre":"和","makeahead":true,"seasonings":["醤油","バター"],"ingredients":["きのこ"]},
-    {"id":"s-tofu-shiraae","name":"豆腐の白和え","genre":"和","makeahead":true,"seasonings":["醤油","砂糖","すりごま"],"ingredients":["豆腐","ほうれん草","にんじん"]},
-    {"id":"s-harusame","name":"春雨サラダ","genre":"中","makeahead":true,"seasonings":["醤油","酢","砂糖","ごま油"],"ingredients":["春雨","にんじん","たまご"]},
-    {"id":"s-aburaage-komatsuna","name":"油揚げと白菜のさっと煮","genre":"和","makeahead":true,"seasonings":["だし","醤油","みりん"],"ingredients":["白菜","油揚げ"]},
-    {"id":"s-mugen-cabbage","name":"無限キャベツ","genre":"万能","makeahead":true,"seasonings":["鶏ガラ","ごま油"],"ingredients":["キャベツ","ツナ缶"]},
-    {"id":"s-tuna-komatsuna","name":"ツナと小松菜の和え","genre":"和","makeahead":true,"seasonings":["醤油","ごま油"],"ingredients":["小松菜","ツナ缶"]},
-    {"id":"s-harusame-itame","name":"春雨の中華炒め","genre":"中","makeahead":true,"seasonings":["醤油","オイスター","ごま油"],"ingredients":["春雨","にんじん","にら"]},
-    {"id":"s-hijiki","name":"ひじき煮","genre":"和","makeahead":true,"staple":true,"seasonings":["醤油","みりん","だし","砂糖"],"ingredients":["ひじき","にんじん","油揚げ","大豆"]},
-    {"id":"s-ajitama","name":"味玉(味付け卵)","genre":"和","makeahead":true,"staple":true,"seasonings":["醤油","みりん"],"ingredients":["たまご"]},
-    {"id":"s-gomoku-mame","name":"大豆と野菜の五目煮","genre":"和","makeahead":true,"staple":true,"seasonings":["醤油","みりん","だし","砂糖"],"ingredients":["大豆","にんじん","こんにゃく","きのこ"]},
-    {"id":"s-kinoko-marine","name":"きのこのマリネ","genre":"洋","makeahead":true,"staple":true,"seasonings":["酢","オリーブ油","塩"],"ingredients":["きのこ","玉ねぎ"]},
-    {"id":"s-carot-rape","name":"キャロットラペ","genre":"洋","makeahead":true,"staple":true,"seasonings":["酢","オリーブ油","塩"],"ingredients":["にんじん"]},
-    {"id":"s-pickles","name":"きゅうりとにんじんのピクルス","genre":"洋","makeahead":true,"staple":true,"seasonings":["酢","砂糖","塩"],"ingredients":["きゅうり","にんじん","大根"]},
-    {"id":"s-broccoli-okaka","name":"ブロッコリーのおかか和え","genre":"和","makeahead":true,"seasonings":["醤油","かつお節"],"ingredients":["ブロッコリー"]},
-    {"id":"s-wiener-broccoli","name":"ウィンナーとブロッコリーのソテー","genre":"洋","makeahead":false,"seasonings":["塩","こしょう","にんにく"],"ingredients":["ウィンナー","ブロッコリー"]},
-    {"id":"s-broccoli-egg-salad","name":"ブロッコリーとゆで卵のサラダ","genre":"洋","makeahead":true,"seasonings":["マヨネーズ","塩","こしょう"],"ingredients":["ブロッコリー","たまご"]}
-  ],
-  "soup":[
-    {"id":"sp-tonjiru","name":"豚汁","genre":"和","batch":true,"seasonings":["味噌","だし"],"ingredients":["豚こま","にんじん","玉ねぎ","豆腐"]},
-    {"id":"sp-wakame-miso","name":"わかめと豆腐の味噌汁","genre":"和","batch":false,"seasonings":["味噌","だし"],"ingredients":["わかめ","豆腐"]},
-    {"id":"sp-hakusai-aburaage","name":"白菜と油揚げの味噌汁","genre":"和","batch":false,"seasonings":["味噌","だし"],"ingredients":["白菜","油揚げ"]},
-    {"id":"sp-kinoko-miso","name":"きのこの味噌汁","genre":"和","batch":false,"seasonings":["味噌","だし"],"ingredients":["きのこ","玉ねぎ"]},
-    {"id":"sp-tamago","name":"卵スープ","genre":"中","batch":false,"seasonings":["鶏ガラ","ごま油"],"ingredients":["たまご","長ねぎ"]},
-    {"id":"sp-moyashi-tofu","name":"もやしと豆腐の中華スープ","genre":"中","batch":false,"seasonings":["鶏ガラ","ごま油"],"ingredients":["もやし","豆腐","にら"]},
-    {"id":"sp-corn","name":"中華コーンスープ","genre":"中","batch":false,"seasonings":["鶏ガラ"],"ingredients":["コーン缶","たまご"]},
-    {"id":"sp-minestrone","name":"ミネストローネ","genre":"洋","batch":true,"seasonings":["コンソメ","塩"],"ingredients":["トマト缶","玉ねぎ","にんじん","じゃがいも"]},
-    {"id":"sp-cabbage-consomme","name":"キャベツのコンソメスープ","genre":"洋","batch":false,"seasonings":["コンソメ","塩","こしょう"],"ingredients":["キャベツ","玉ねぎ","にんじん"]},
-    {"id":"sp-harusame-soup","name":"春雨スープ","genre":"アジアン","batch":false,"seasonings":["鶏ガラ","ごま油","ナンプラー"],"ingredients":["春雨","もやし","にら"]},
-    {"id":"sp-tomato","name":"トマトスープ","genre":"洋","batch":true,"seasonings":["コンソメ","塩"],"ingredients":["トマト缶","玉ねぎ","キャベツ"]}
-  ],
-  "single":[
-    {"id":"tan-oyakodon","name":"親子丼","genre":"和","type":"丼","seasonings":["醤油","みりん","だし"],"ingredients":["鶏もも肉","玉ねぎ","たまご"],"toriwake":{"kodomo":"そのまま","otona":"七味・三つ葉"}},
-    {"id":"tan-butadon","name":"豚丼(生姜焼き丼)","genre":"和","type":"丼","seasonings":["醤油","みりん"],"ingredients":["豚ロース薄切り","玉ねぎ"],"toriwake":{"kodomo":"そのまま","otona":"黒こしょう・紅生姜"}},
-    {"id":"tan-gyudon","name":"牛丼","genre":"和","type":"丼","seasonings":["醤油","みりん","だし","砂糖"],"ingredients":["牛こま","玉ねぎ"],"toriwake":{"kodomo":"そのまま","otona":"七味・紅生姜・温玉"}},
-    {"id":"tan-sansyoku","name":"三色そぼろ丼","genre":"和","type":"丼","seasonings":["醤油","みりん","酒"],"ingredients":["鶏ひき肉","たまご","ほうれん草"],"toriwake":{"kodomo":"そのまま","otona":"生姜・刻み海苔"}},
-    {"id":"tan-chahan","name":"チャーハン","genre":"中","type":"飯","seasonings":["鶏ガラ","醤油","ごま油"],"ingredients":["たまご","長ねぎ"],"toriwake":{"kodomo":"そのまま","otona":"ラー油・こしょう"}},
-    {"id":"tan-omurice","name":"オムライス","genre":"洋","type":"飯","seasonings":["ケチャップ","塩","こしょう"],"ingredients":["たまご","玉ねぎ","鶏もも肉"],"toriwake":{"kodomo":"ケチャップ","otona":"タバスコ・黒こしょう"}},
-    {"id":"tan-yakisoba","name":"焼きそば","genre":"中","type":"麺","seasonings":["ソース","醤油"],"ingredients":["焼きそば麺","キャベツ","にんじん","豚こま"],"toriwake":{"kodomo":"そのまま","otona":"紅生姜・からし・青のり"}},
-    {"id":"tan-bibimbap","name":"ビビンバ","genre":"アジアン","type":"丼","seasonings":["コチュジャン","ごま油","醤油"],"ingredients":["もやし","ほうれん草","にんじん","牛こま","たまご"],"toriwake":{"kodomo":"そのまま(甘辛)","otona":"コチュジャン追い"}},
-    {"id":"tan-tacorice","name":"タコライス","genre":"アジアン","type":"飯","seasonings":["ケチャップ","ソース","カレー粉"],"ingredients":["合いびき肉","トマト"],"toriwake":{"kodomo":"そのまま","otona":"タバスコ・チリ"}},
-    {"id":"tan-curry","name":"カレーライス","genre":"アジアン","type":"飯","seasonings":["カレールー"],"ingredients":["豚こま","じゃがいも","にんじん","玉ねぎ"],"toriwake":{"kodomo":"甘口","otona":"ガラムマサラ・福神漬け"}},
-    {"id":"tan-tenshinhan","name":"天津飯","genre":"中","type":"飯","seasonings":["鶏ガラ","酢","醤油","砂糖"],"ingredients":["たまご","長ねぎ"],"toriwake":{"kodomo":"そのまま","otona":"酢・ラー油"}},
-    {"id":"tan-gapaorice","name":"ガパオライス","genre":"アジアン","type":"飯","seasonings":["ナンプラー","オイスター"],"ingredients":["鶏ひき肉","ピーマン","玉ねぎ","たまご"],"toriwake":{"kodomo":"そのまま(甘め)","otona":"唐辛子・バジル"}},
-    {"id":"tan-kamatama","name":"釜玉うどん","genre":"和","type":"麺","seasonings":["醤油","だし"],"ingredients":["うどん","たまご","長ねぎ"],"toriwake":{"kodomo":"そのまま","otona":"七味・天かす"}},
-    {"id":"tan-napolitan","name":"ナポリタン","genre":"洋","type":"麺","seasonings":["ケチャップ","塩","こしょう","バター"],"ingredients":["パスタ","ウィンナー","ピーマン","玉ねぎ"],"toriwake":{"kodomo":"そのまま","otona":"タバスコ・粉チーズ"}}
-  ]
-};
-
-// ===== SEASONING GROUPS =====
-
-const R={
-"wa-teriyaki":{c:"鶏もも→一口大",s:"醤油:みりん:酒=1:1:1",t:"油で皮目中火3分→返して2分→タレ煮からめ",m:15,w:0},
-"wa-chikuzen":{c:"鶏もも一口大・にんじん乱切り・こんにゃく手でちぎる",s:"醤油:みりん:酒:だし=1:1:1:3",t:"鶏炒め→野菜追加→だし+調味料で落とし蓋15分",m:25,w:15},
-"wa-oyako":{c:"鶏もも一口大・玉ねぎ薄切り",s:"醤油:みりん:だし=1:1:3",t:"だし+調味料で玉ねぎ鶏煮る→溶き卵回し入れ半熟で火止める",m:15,w:5},
-"yo-garlic-chicken":{c:"鶏もも→厚み均一に開く",s:"塩こしょう+にんにくすりおろし",t:"皮目から中火5分→返して3分→仕上げ強火で皮パリッと",m:15,w:0},
-"chu-suzu":{c:"鶏もも一口大・玉ねぎくし切り・にんじん乱切り",s:"醤油:酢:砂糖:ケチャップ=1:1:1:1",t:"鶏に片栗粉→揚げ焼き→野菜炒め→タレ絡める",m:20,w:0},
-"asia-tandoori":{c:"鶏もも→大きめ一口大",s:"ヨーグルト+カレー粉+塩+にんにく(30分漬け)",t:"漬け込み後フライパンで両面焼く",m:40,w:30},
-"yo-chickenmarine":{c:"鶏むね→そぎ切り・トマト角切り・玉ねぎ薄切り",s:"塩こしょう+酢+オリーブ油",t:"鶏に塩こしょう→焼く→野菜とマリネ液で和える",m:15,w:0},
-"chu-mushidori":{c:"鶏むね→厚み均一に開く・長ねぎ千切り",s:"醤油:酢:ごま油=1:1:1",t:"鶏に酒ふりラップ600W4分→冷めたら割く→タレかける",m:15,w:5},
-"wa-chickennanban":{c:"鶏むね→そぎ切り",s:"南蛮酢=醤油:酢:砂糖=1:1:1 / タルタル=ゆで卵+マヨ",t:"鶏塩こしょう→溶き卵→揚げ焼き→南蛮酢→タルタル",m:25,w:0},
-"chu-chili-chicken":{c:"鶏むね一口大・玉ねぎみじん",s:"ケチャップ:砂糖:鶏ガラ=2:1:小1",t:"鶏に片栗粉→焼く→玉ねぎ炒め→チリソース絡め",m:15,w:0},
-"wa-soboro":{c:"なし",s:"醤油:みりん:酒=1:1:1",t:"肉を菜箸4本でほぐし炒め→調味料入れ汁気飛ばす/卵そぼろ別に",m:10,w:0},
-"wa-tsukune":{c:"長ねぎみじん",s:"醤油:みりん:酒=1:1:1",t:"ひき肉+ねぎ+卵+片栗粉混ぜ→小判型→両面焼き→タレ絡め",m:20,w:0},
-"asia-gapao":{c:"玉ねぎみじん",s:"ナンプラー:オイスター:醤油=1:1:0.5",t:"にんにく炒め→ひき肉→玉ねぎ→調味料→目玉焼き別で",m:15,w:0},
-"wa-tebamoto-amakara":{c:"たまご茹でておく",s:"醤油:酢:みりん=1:1:1+水1カップ",t:"手羽元焼き色→調味液で落とし蓋20分→ゆで卵追加5分",m:35,w:20},
-"asia-samgyetang":{c:"長ねぎ斜め切り",s:"鶏ガラ+塩+にんにく",t:"手羽元+水+にんにく→沸騰後アク取り弱火30分→塩調味",m:40,w:30},
-"wa-shogayaki":{c:"玉ねぎ薄切り・生姜すりおろし",s:"醤油:みりん:酒=1:1:1+生姜",t:"豚に小麦粉薄く→強火で焼く→玉ねぎ→タレ絡め",m:10,w:0},
-"chu-chashu":{c:"長ねぎ青い部分・生姜スライス",s:"醤油:酒:砂糖=2:2:1+水2カップ",t:"豚塊を全面焼く→調味液+ねぎ+生姜で落とし蓋40分",m:50,w:40},
-"yo-roastpork":{c:"肉に塩こしょう+にんにくすりこむ",s:"塩+こしょう+にんにく",t:"全面焼き色→フライパン弱火蓋して20分(またはオーブン180℃30分)",m:40,w:30},
-"wa-butabara-daikon":{c:"大根2cm厚いちょう切り・豚バラ3cm幅",s:"醤油:みりん:酒:だし=1:1:1:4",t:"大根下ゆで5分→豚炒め→大根+調味液で落とし蓋15分",m:30,w:15},
-"chu-hoikoro":{c:"キャベツざく切り・ピーマン乱切り・豚バラ4cm幅",s:"味噌:醤油:酒:砂糖=1:1:1:0.5",t:"豚先に炒め出す→野菜強火→豚戻し→味噌ダレ絡め",m:10,w:0},
-"chu-bara-moyashi":{c:"にら4cm幅",s:"醤油:酒:鶏ガラ=1:1:小1",t:"豚バラ炒め→もやし+にら強火→調味料→ごま油",m:8,w:0},
-"yo-hirekatsu":{c:"豚ヒレ→2cm厚に切り叩いて伸ばす",s:"塩こしょう→小麦粉→溶き卵→パン粉",t:"衣つけ→170℃油で3分ずつ両面揚げ",m:20,w:0},
-"yo-hire-sote":{c:"豚ヒレ→1.5cmメダル切り・きのこほぐす",s:"塩こしょう+バター",t:"ヒレ塩こしょう→バター両面焼き→きのこ追加→醤油少々",m:15,w:0},
-"wa-nikujaga":{c:"じゃがいも・にんじん乱切り・玉ねぎくし切り",s:"醤油:みりん:酒:だし=1:1:1:4",t:"豚こま炒め→野菜→調味液で落とし蓋15分",m:25,w:15},
-"chu-komawa-miso":{c:"キャベツざく切り・玉ねぎ薄切り",s:"味噌:醤油:酒:砂糖=1:1:1:0.5",t:"豚こま炒め→野菜炒め→味噌ダレ絡め",m:10,w:0},
-"asia-bulgogi":{c:"玉ねぎ薄切り・にんじん千切り・にら4cm幅",s:"コチュジャン:醤油:砂糖:ごま油=1:1:1:1",t:"豚にタレ揉み込み10分→フライパンで野菜と炒め",m:15,w:0},
-"wa-gyudon":{c:"玉ねぎ薄切り",s:"醤油:みりん:酒:だし=1:1:1:3",t:"だし+調味料沸かす→玉ねぎ→牛肉5分煮る",m:10,w:5},
-"wa-nikudofu":{c:"豆腐食べやすく切る・長ねぎ斜め切り",s:"醤油:みりん:酒:だし=1:1:1:3",t:"だし+調味料沸かす→牛肉→豆腐+ねぎ弱火10分",m:15,w:10},
-"chu-mabo":{c:"豆腐1.5cm角・長ねぎみじん",s:"醤油:酒:鶏ガラ:味噌=1:1:小1:1",t:"ひき肉炒め→にんにく+ねぎ→調味料+水→豆腐3分煮→片栗粉とろみ",m:15,w:3},
-"yo-hamburg":{c:"玉ねぎみじん→レンチンorバター炒め",s:"ケチャップ:ソース=1:1",t:"肉+玉ねぎ+卵+パン粉こね→成形→両面焼き→蓋蒸し焼き5分",m:25,w:5},
-"yo-meatsauce":{c:"玉ねぎ・にんじんみじん",s:"塩こしょう+コンソメ+ケチャップ",t:"ひき肉炒め→野菜→トマト缶+調味料→弱火20分",m:30,w:20},
-"wa-nikudume":{c:"ピーマン半割り種取る・玉ねぎみじん",s:"醤油:みりん:ケチャップ=1:1:1",t:"肉ダネ作り→ピーマンに詰め→焼き→蓋蒸し焼き5分→タレ",m:20,w:5},
-"asia-keema":{c:"玉ねぎ・にんじんみじん",s:"カレー粉+塩+ケチャップ+にんにく",t:"にんにく炒め→ひき肉→野菜→カレー粉+調味料→水少量5分煮",m:15,w:5},
-"wa-atsuage-nimono":{c:"厚揚げ食べやすく・白菜ざく切り・にんじん短冊",s:"醤油:みりん:だし=1:1:4",t:"だし+調味料沸かす→厚揚げ+野菜→落とし蓋10分",m:15,w:10},
-"wa-tofu-hamburg":{c:"豆腐水切り・玉ねぎみじん",s:"醤油:みりん:だし=1:1:2",t:"豆腐+ひき肉+玉ねぎ+卵混ぜ→成形→両面焼き→タレ",m:20,w:0},
-"yo-omelet":{c:"玉ねぎ・きのこ薄切り・じゃがいも角切り",s:"塩こしょう",t:"じゃがいもレンチン→具材炒め→溶き卵流し入れ→蓋弱火5分",m:15,w:5},
-"yo-tomato-chicken":{c:"鶏もも一口大・玉ねぎ薄切り・きのこほぐす",s:"塩こしょう+コンソメ+にんにく",t:"鶏焼き色→玉ねぎ+きのこ→トマト缶+調味料→蓋15分",m:25,w:15},
-"asia-chapchae":{c:"にんじん千切り・にら4cm・玉ねぎ薄切り・春雨戻す",s:"醤油:砂糖:ごま油=2:1:1",t:"肉炒め→野菜→春雨+調味料→合わせて炒め",m:15,w:0},
-"chu-mabo-harusame":{c:"にら4cm・長ねぎみじん・春雨戻す",s:"醤油:酒:鶏ガラ=1:1:小1",t:"ひき肉炒め→ねぎ→調味料+水→春雨煮る→にら最後",m:12,w:3},
-"asia-somen-champuru":{c:"にんじん千切り・にら4cm・そうめん固めに茹で",s:"醤油+鶏ガラ+ごま油",t:"ツナ+野菜炒め→そうめん追加→調味料→卵回し入れ",m:12,w:0},
-"wa-nyumen":{c:"小松菜4cm・油揚げ短冊・そうめん茹でる",s:"だし:醤油:みりん=8:1:0.5",t:"だし沸かす→調味料→具材ひと煮立ち→溶き卵→そうめんに注ぐ",m:10,w:0},
-"wa-buri-teriyaki":{c:"ブリに塩振り10分→水気拭く",s:"醤油:みりん:酒=1:1:1",t:"フライパン両面焼き→タレ煮からめ",m:15,w:0},
-"wa-mekajiki-nitsuke":{c:"生姜薄切り",s:"醤油:みりん:酒:だし=1:1:1:2",t:"調味液煮立て→メカジキ→落とし蓋10分",m:15,w:10},
-"wa-tachiuo-shioyaki":{c:"太刀魚に塩振り10分→水気拭く",s:"塩",t:"魚焼きグリルで中火両面焼き",m:15,w:0},
-"yo-sake-meuniere":{c:"鮭に塩こしょう→小麦粉薄く",s:"バター+レモン",t:"バターで両面中火3分ずつ→仕上げバター追加",m:10,w:0},
-"chu-mekajiki-amazu":{c:"メカジキ一口大・玉ねぎくし切り・ピーマン乱切り",s:"醤油:酢:砂糖:ケチャップ=1:1:1:1",t:"メカジキ片栗粉→揚げ焼き→野菜炒め→甘酢タレ絡め",m:15,w:0},
-"yo-tara-acquapazza":{c:"トマト角切り・きのこほぐす",s:"塩こしょう+にんにく",t:"にんにくオリーブ油→タラ両面焼き→トマト+きのこ+水→蓋10分",m:15,w:10},
-"asia-kajiki-curry":{c:"メカジキ一口大・玉ねぎ薄切り",s:"塩+カレー粉+にんにく",t:"カレー粉+塩まぶし→焼く→玉ねぎ添え",m:10,w:0},
-"wa-sawara-saikyo":{c:"サワラを味噌床に漬ける(前日or30分)",s:"味噌:みりん:酒=2:1:1",t:"味噌拭き取り→グリルorフライパンで中火両面焼き",m:15,w:0},
-"wa-karei-karaage":{c:"カレイに醤油+酒で下味10分→片栗粉",s:"醤油+酒(下味)",t:"片栗粉まぶし→170℃油で3分揚げ",m:15,w:0},
-"wa-saba-misoni":{c:"生姜薄切り",s:"味噌:砂糖:酒:みりん=2:1:2:1+水1カップ",t:"水+酒+生姜煮立て→サバ→味噌溶かし落とし蓋15分",m:20,w:15},
-"chu-ebi-chili":{c:"えび背わた取り片栗粉で洗う・玉ねぎみじん・長ねぎみじん",s:"ケチャップ:砂糖:鶏ガラ=2:1:小1",t:"えび炒め→取出し→ねぎ+調味料→えび戻しからめ",m:12,w:0},
-"yo-hotate-butter":{c:"きのこほぐす・玉ねぎ薄切り",s:"バター+塩こしょう+醤油少々",t:"バターでホタテ両面焼き→きのこ+玉ねぎ→醤油",m:10,w:0},
-"wa-tai-houiru":{c:"きのこほぐす・玉ねぎ薄切り",s:"塩+酒",t:"ホイルに鯛+野菜+酒+塩→包んでフライパン蓋15分",m:18,w:15},
-"yo-wiener-potee":{c:"じゃがいも・にんじん乱切り・キャベツざく切り・玉ねぎくし切り",s:"コンソメ+塩こしょう",t:"鍋に全材料+水+コンソメ→沸騰後弱火20分",m:30,w:20},
-"s-goma-horenso":{c:"ほうれん草茹でて4cm",s:"醤油:砂糖:すりごま=1:0.5:1",t:"茹でて絞り→ごま和え衣で和える",m:8,w:0},
-"s-komatsuna-nibitashi":{c:"小松菜4cm・油揚げ短冊",s:"だし:醤油:みりん=3:1:0.5",t:"だし+調味料煮立て→油揚げ+小松菜→2分煮て冷ます",m:8,w:0},
-"s-kinpira":{c:"にんじん千切り",s:"醤油:みりん=1:1",t:"ごま油で炒め→調味料→汁気飛ばす",m:8,w:0},
-"s-ninjin-shirishiri":{c:"にんじん千切り(スライサー可)",s:"醤油+だし少々",t:"にんじん炒め→溶き卵回し入れ→醤油",m:8,w:0},
-"s-potesara":{c:"じゃがいも一口大・にんじん薄切り・玉ねぎスライス水さらし",s:"マヨネーズ+塩こしょう",t:"じゃがいも+にんじん茹でる→潰す→玉ねぎ+マヨ和え",m:15,w:10},
-"s-jaga-butter":{c:"じゃがいも一口大",s:"塩+バター",t:"茹でor蒸す→湯切り→バター+塩",m:15,w:10},
-"s-moyashi-namul":{c:"もやし洗う",s:"ごま油:塩:にんにく:すりごま",t:"もやしさっと茹で→水気切り→調味料和え",m:5,w:0},
-"s-nira-namul":{c:"にら4cm",s:"鶏ガラ+ごま油+醤油少々",t:"にら+卵をごま油で手早く炒め→調味料",m:5,w:0},
-"s-chingen-oyster":{c:"ちんげん菜縦4等分",s:"オイスター+ごま油",t:"ごま油で炒め→オイスターソース",m:5,w:0},
-"s-hakusai-asazuke":{c:"白菜一口大にちぎる",s:"塩昆布+ごま油",t:"塩昆布+ごま油→揉んで10分置く",m:12,w:10},
-"s-kyabetsu-shiokombu":{c:"キャベツ一口大にちぎる",s:"塩昆布+ごま油",t:"塩昆布+ごま油→揉んで10分置く",m:12,w:10},
-"s-kinoko-butter":{c:"きのこほぐす",s:"醤油+バター",t:"バターできのこ炒め→醤油",m:5,w:0},
-"s-tofu-shiraae":{c:"豆腐水切り・ほうれん草茹で4cm・にんじん千切り茹で",s:"醤油:砂糖:すりごま=1:0.5:1",t:"豆腐つぶし+調味料→野菜和え",m:10,w:0},
-"s-harusame":{c:"春雨戻す・にんじん千切り・卵薄焼き→千切り",s:"醤油:酢:砂糖:ごま油=1:1:0.5:0.5",t:"春雨+にんじん茹で→冷まし→錦糸卵+調味料和え",m:12,w:0},
-"s-aburaage-komatsuna":{c:"白菜ざく切り・油揚げ短冊",s:"だし:醤油:みりん=3:1:0.5",t:"だし+調味料煮立て→油揚げ+白菜3分",m:8,w:0},
-"s-mugen-cabbage":{c:"キャベツ千切り",s:"鶏ガラ+ごま油",t:"キャベツ+ツナ+鶏ガラ+ごま油→レンチン3分→混ぜ",m:5,w:0},
-"s-tuna-komatsuna":{c:"小松菜4cm",s:"醤油+ごま油",t:"小松菜茹で→ツナ+醤油+ごま油和え",m:7,w:0},
-"s-harusame-itame":{c:"春雨戻す・にんじん千切り・にら4cm",s:"醤油+オイスター+ごま油",t:"にんじん炒め→春雨+にら→調味料炒め合わせ",m:8,w:0},
-"s-hijiki":{c:"ひじき水戻し・にんじん千切り・油揚げ千切り",s:"醤油:みりん:だし:砂糖=1:1:2:0.5",t:"油で炒め→調味液で10分煮る",m:15,w:10},
-"s-ajitama":{c:"卵茹でる(半熟7分)",s:"醤油:みりん=1:1",t:"半熟卵→タレに漬け→冷蔵庫半日以上",m:10,w:0},
-"s-gomoku-mame":{c:"にんじん小角切り・こんにゃく小角切り・きのこ小さめ",s:"醤油:みりん:だし:砂糖=1:1:3:0.5",t:"全材料+調味液→落とし蓋15分煮る",m:20,w:15},
-"s-kinoko-marine":{c:"きのこほぐす・玉ねぎ薄切り",s:"酢:オリーブ油:塩=2:1:少々",t:"きのこ+玉ねぎ炒め→熱いうちにマリネ液和え→冷ます",m:10,w:0},
-"s-carot-rape":{c:"にんじん千切り(スライサー可)",s:"酢:オリーブ油:塩=2:1:少々",t:"塩もみ→マリネ液和え→10分置く",m:12,w:10},
-"s-pickles":{c:"きゅうり・にんじん・大根スティック状",s:"酢:砂糖:塩=3:1:少々+水",t:"ピクルス液沸かし→野菜入れ→冷蔵庫半日",m:10,w:0},
-"s-broccoli-okaka":{c:"ブロッコリー小房に分ける",s:"醤油+かつお節",t:"茹でて→醤油+かつお節和え",m:7,w:0},
-"s-wiener-broccoli":{c:"ブロッコリー小房・ウィンナー斜め切り",s:"塩こしょう+にんにく",t:"にんにくオリーブ油→ウィンナー+ブロッコリー炒め→塩こしょう",m:8,w:0},
-"s-broccoli-egg-salad":{c:"ブロッコリー茹でる・ゆで卵粗く刻む",s:"マヨネーズ+塩こしょう",t:"ブロッコリー+ゆで卵→マヨネーズ和え",m:12,w:0},
-"sp-tonjiru":{c:"にんじん・玉ねぎ・豆腐食べやすく",s:"味噌+だし",t:"豚こま炒め→野菜+だし+水→10分煮→味噌",m:15,w:10},
-"sp-wakame-miso":{c:"豆腐さいの目・わかめ戻す",s:"味噌+だし",t:"だし沸かす→豆腐→火止め味噌→わかめ",m:5,w:0},
-"sp-hakusai-aburaage":{c:"白菜ざく切り・油揚げ短冊",s:"味噌+だし",t:"だし+白菜煮る→油揚げ→味噌",m:8,w:3},
-"sp-kinoko-miso":{c:"きのこほぐす・玉ねぎ薄切り",s:"味噌+だし",t:"だし+玉ねぎ煮る→きのこ→味噌",m:8,w:3},
-"sp-tamago":{c:"長ねぎ小口切り",s:"鶏ガラ+塩+ごま油",t:"水+鶏ガラ沸かす→溶き卵→ねぎ+ごま油",m:5,w:0},
-"sp-moyashi-tofu":{c:"豆腐さいの目・にら2cm",s:"鶏ガラ+ごま油",t:"水+鶏ガラ沸かす→もやし+豆腐→にら→ごま油",m:7,w:0},
-"sp-corn":{c:"なし",s:"鶏ガラ",t:"水+鶏ガラ+コーン缶沸かす→溶き卵→片栗粉とろみ",m:7,w:0},
-"sp-minestrone":{c:"玉ねぎ・にんじん・じゃがいも1cm角",s:"コンソメ+塩",t:"オリーブ油で野菜炒め→水+トマト缶+コンソメ→15分煮",m:20,w:15},
-"sp-cabbage-consomme":{c:"キャベツざく切り・玉ねぎ薄切り・にんじん千切り",s:"コンソメ+塩こしょう",t:"水+コンソメ+野菜→10分煮る",m:12,w:10},
-"sp-harusame-soup":{c:"春雨短く切る・にら2cm",s:"鶏ガラ+ごま油+ナンプラー",t:"水+鶏ガラ沸かす→もやし+春雨→にら→調味料",m:7,w:0},
-"sp-tomato":{c:"玉ねぎ薄切り・キャベツざく切り",s:"コンソメ+塩",t:"オリーブ油で玉ねぎ炒め→トマト缶+キャベツ+水+コンソメ→10分",m:15,w:10},
-"tan-oyakodon":{c:"鶏もも一口大・玉ねぎ薄切り",s:"醤油:みりん:だし=1:1:3",t:"だし+調味料で玉ねぎ+鶏煮る→溶き卵→半熟で丼へ",m:12,w:0},
-"tan-butadon":{c:"玉ねぎ薄切り",s:"醤油:みりん=1:1+生姜",t:"豚焼く→玉ねぎ→タレ絡め→ごはんに",m:10,w:0},
-"tan-gyudon":{c:"玉ねぎ薄切り",s:"醤油:みりん:だし:砂糖=1:1:3:0.5",t:"だし+調味料沸かし→玉ねぎ→牛肉5分煮て丼へ",m:10,w:5},
-"tan-sansyoku":{c:"ほうれん草茹で4cm",s:"醤油:みりん:酒=1:1:1(そぼろ用)",t:"鶏そぼろ炒り→卵そぼろ別に→ほうれん草→3色盛り",m:12,w:0},
-"tan-chahan":{c:"長ねぎみじん",s:"鶏ガラ+醤油+ごま油",t:"卵炒め→ごはん強火→ねぎ+鶏ガラ+醤油→ごま油",m:8,w:0},
-"tan-omurice":{c:"玉ねぎみじん・鶏もも小さめ一口大",s:"ケチャップ+塩こしょう",t:"チキンライス作り→卵焼き包む→ケチャップ",m:15,w:0},
-"tan-yakisoba":{c:"キャベツざく切り・にんじん短冊",s:"ソース+醤油少々",t:"豚炒め→野菜→麺+水少々→ソース",m:10,w:0},
-"tan-bibimbap":{c:"もやし・ほうれん草茹で・にんじん千切り",s:"コチュジャン+ごま油+醤油",t:"ナムル各種作る→牛炒め→全部のせ→目玉焼き+コチュジャン",m:20,w:0},
-"tan-tacorice":{c:"トマト角切り",s:"ケチャップ+ソース+カレー粉",t:"ひき肉炒め→調味料→ごはんにのせトマト+レタス",m:10,w:0},
-"tan-curry":{c:"じゃがいも・にんじん乱切り・玉ねぎくし切り",s:"カレールー",t:"肉+野菜炒め→水で15分煮→ルー溶かし10分",m:35,w:25},
-"tan-tenshinhan":{c:"長ねぎみじん",s:"鶏ガラ:酢:醤油:砂糖=小1:1:1:1+水+片栗粉",t:"卵焼く→ごはんにのせ→あんかけ作りかける",m:10,w:0},
-"tan-gapaorice":{c:"玉ねぎ・ピーマンみじん",s:"ナンプラー+オイスター",t:"にんにく+ひき肉炒め→野菜→調味料→目玉焼き別→ごはんにのせ",m:12,w:0},
-"tan-kamatama":{c:"長ねぎ小口切り",s:"醤油+だし少々",t:"うどん茹で→熱いうちに卵+醤油+だし+ねぎ",m:8,w:0},
-"tan-napolitan":{c:"玉ねぎ薄切り・ピーマン輪切り・ウィンナー斜め切り",s:"ケチャップ+塩こしょう+バター",t:"パスタ茹で→具材バター炒め→パスタ+ケチャップ→バター",m:15,w:0}
-};
+let D = {};
+let R = {};
 
 const SEASONING_GROUPS = [
   {name:"基本", items:[
@@ -503,7 +287,8 @@ const ING_GROUPS = [
 const st = {
   seasonings: new Set(),
   ingredients: new Set(),
-  lastMainId: null
+  lastMainId: null,
+  favorites: new Set()
 };
 
 function pick(arr) { return arr[Math.floor(Math.random()*arr.length)]; }
@@ -523,6 +308,51 @@ function genreMatch(item, genre) {
 function saveState(){
   localStorage.setItem('kondate-s',JSON.stringify([...st.seasonings]));
   localStorage.setItem('kondate-i',JSON.stringify([...st.ingredients]));
+}
+
+function saveFavorites(){
+  localStorage.setItem('kondate-fav',JSON.stringify([...st.favorites]));
+  updateFavBtn();
+}
+
+function updateFavBtn(){
+  const btn=document.getElementById('fav-btn');
+  const count=st.favorites.size;
+  document.getElementById('fav-count').textContent=count;
+  btn.style.display=count>0?'block':'none';
+}
+
+function toggleFav(id){
+  if(st.favorites.has(id))st.favorites.delete(id);else st.favorites.add(id);
+  saveFavorites();
+  const btns=document.querySelectorAll(`.fav-heart[data-id="${id}"]`);
+  btns.forEach(b=>{b.classList.toggle('active',st.favorites.has(id));b.textContent=st.favorites.has(id)?'❤️':'🤍';});
+}
+
+function favBtn(id){
+  const active=st.favorites.has(id);
+  return `<button class="fav-heart${active?' active':''}" data-id="${id}" onclick="event.stopPropagation();toggleFav('${id}')">${active?'❤️':'🤍'}</button>`;
+}
+
+function showFavorites(){
+  const el=document.getElementById('results');
+  el.classList.remove('hidden');
+  if(st.favorites.size===0){
+    el.innerHTML=`<div class="results-header"><h2>❤️ お気に入り</h2><p>まだありません。献立を生成して 🤍 をタップしてね。</p></div>`;
+    el.scrollIntoView({behavior:'smooth',block:'start'});
+    return;
+  }
+  const allItems=[...(D.main||[]),...(D.side||[]),...(D.soup||[]),...(D.single||[])];
+  const lookup={};allItems.forEach(i=>{lookup[i.id]=i;});
+  let html=`<div class="results-header"><h2>❤️ お気に入り（${st.favorites.size}品）</h2></div><div class="fav-section">`;
+  st.favorites.forEach(id=>{
+    const item=lookup[id];
+    const name=item?item.name:id;
+    html+=`<div class="fav-item"><span>${name}</span><button onclick="toggleFav('${id}');showFavorites()">✕ 外す</button></div>`;
+  });
+  html+='</div><button class="regen-btn" onclick="generate()">🔄 献立を出す</button>';
+  el.innerHTML=html;
+  el.scrollIntoView({behavior:'smooth',block:'start'});
 }
 
 function renderSeasonings() {
@@ -639,6 +469,7 @@ function generateSingle(bentoMode,bentoIds){
       <div class="single-label">${dish.name}（${dish.type}）</div>
       <div class="single-body">
         <div class="menu-row">
+          ${favBtn(dish.id)}
           <div class="menu-cat">材料</div>
           <div class="menu-name">${dish.ingredients.join('、')}</div>
         </div>
@@ -747,6 +578,9 @@ function renderThreeDayResults(plan){
   const wf2Items=[{id:null,name:plan.day2.carryover.n,type:'carryover'},{id:plan.day2.newMain.id,name:plan.day2.newMain.name,type:'main'},{id:plan.day2.side.id,name:plan.day2.side.name,type:'side'},{id:plan.day2.soup.id,name:plan.day2.soup.name,type:d2SoupType}];
   const wf3Items=[{id:null,name:plan.day3.carryover.n,type:'carryover'},{id:plan.day3.side.id,name:plan.day3.side.name,type:'side'},{id:plan.day3.soup.id,name:plan.day3.soup.name,type:'soup'}];
 
+  const d2HintHtml=plan.day2.carryover.h?`<div class="menu-note">💡 ${plan.day2.carryover.h}</div>`:'';
+  const d3HintHtml=plan.day3.carryover.h?`<div class="menu-note">💡 ${plan.day3.carryover.h}</div>`:'';
+
   el.innerHTML=`
     <div class="results-header">
       <h2>🍽️ 3日分の献立｜${plan.genreLabel}</h2>
@@ -758,6 +592,7 @@ function renderThreeDayResults(plan){
         <div class="day-body">
           ${buildWorkflow(wf1Items,1)}
           <div class="menu-row new-dish-row">
+            ${favBtn(plan.day1.main.id)}
             <div class="menu-cat">主菜（多めに→明日へ）</div>
             <div class="menu-name">${plan.day1.main.name}</div>
             ${plan.day1.main.serve?'<div class="menu-note">🍽️ '+plan.day1.main.serve+'</div>':''}
@@ -765,11 +600,13 @@ function renderThreeDayResults(plan){
             ${recipeHtml(R[plan.day1.main.id])}
           </div>
           <div class="menu-row">
+            ${favBtn(plan.day1.side.id)}
             <div class="menu-cat">副菜</div>
             <div class="menu-name">${plan.day1.side.name}</div>
             ${recipeHtml(R[plan.day1.side.id])}
           </div>
           <div class="menu-row">
+            ${favBtn(plan.day1.soup.id)}
             <div class="menu-cat">汁物</div>
             <div class="menu-name">${plan.day1.soup.name}${plan.day1.soup.batch?'（明日の分も）':''}</div>
             ${recipeHtml(R[plan.day1.soup.id])}
@@ -784,10 +621,11 @@ function renderThreeDayResults(plan){
           <div class="menu-row carryover-row">
             <div class="menu-cat">繰り越し</div>
             <div class="menu-name">${plan.day2.carryover.n}</div>
-            <div class="menu-note">💡 ${plan.day2.carryover.h}</div>
+            ${d2HintHtml}
             <div class="toriwake">👧 ${plan.day2.carryoverFrom.toriwake.kodomo}　👨 ${plan.day2.carryoverFrom.toriwake.otona}</div>
           </div>
           <div class="menu-row new-dish-row">
+            ${favBtn(plan.day2.newMain.id)}
             <div class="menu-cat">新作（多めに→明日へ）</div>
             <div class="menu-name">${plan.day2.newMain.name}</div>
             ${plan.day2.newMain.serve?'<div class="menu-note">🍽️ '+plan.day2.newMain.serve+'</div>':''}
@@ -795,12 +633,14 @@ function renderThreeDayResults(plan){
             ${recipeHtml(R[plan.day2.newMain.id])}
           </div>
           <div class="menu-row">
+            ${favBtn(plan.day2.side.id)}
             <div class="menu-cat">副菜</div>
             <div class="menu-name">${plan.day2.side.name}</div>
             ${!plan.day2.side.makeahead?'<div class="menu-note">作りたて感プラス</div>':''}
             ${recipeHtml(R[plan.day2.side.id])}
           </div>
           <div class="menu-row">
+            ${favBtn(plan.day2.soup.id)}
             <div class="menu-cat">汁物</div>
             <div class="menu-name">${plan.day2.soup.name}${plan.day2.soupNote}</div>
             ${recipeHtml(R[plan.day2.soup.id])}
@@ -815,15 +655,17 @@ function renderThreeDayResults(plan){
           <div class="menu-row carryover-row">
             <div class="menu-cat">繰り越し</div>
             <div class="menu-name">${plan.day3.carryover.n}</div>
-            <div class="menu-note">💡 ${plan.day3.carryover.h}</div>
+            ${d3HintHtml}
             <div class="toriwake">👧 ${plan.day3.carryoverFrom.toriwake.kodomo}　👨 ${plan.day3.carryoverFrom.toriwake.otona}</div>
           </div>
           <div class="menu-row">
+            ${favBtn(plan.day3.side.id)}
             <div class="menu-cat">副菜</div>
             <div class="menu-name">${plan.day3.side.name}</div>
             ${recipeHtml(R[plan.day3.side.id])}
           </div>
           <div class="menu-row">
+            ${favBtn(plan.day3.soup.id)}
             <div class="menu-cat">汁物</div>
             <div class="menu-name">${plan.day3.soup.name}</div>
             ${recipeHtml(R[plan.day3.soup.id])}
@@ -849,11 +691,38 @@ function init(){
   if(savedS){try{JSON.parse(savedS).forEach(s=>st.seasonings.add(s));}catch(e){}}
   else{SEASONING_GROUPS.forEach(g=>g.items.forEach(i=>{if(i.on)st.seasonings.add(i.id);}));}
   if(savedI){try{JSON.parse(savedI).forEach(i=>st.ingredients.add(i));}catch(e){}}
+  const savedF=localStorage.getItem('kondate-fav');
+  if(savedF){try{JSON.parse(savedF).forEach(f=>st.favorites.add(f));}catch(e){}}
   renderSeasonings();
   renderIngredients();
   updateCount();
+  updateFavBtn();
 }
-init();
+
+async function loadData(){
+  try{
+    const [dataRes,recipeRes]=await Promise.all([
+      fetch('./data.json'),
+      fetch('./recipes.json')
+    ]);
+    D=await dataRes.json();
+    R=await recipeRes.json();
+    // Normalize carryover: flat strings → {n, h} objects
+    if(D.main){
+      D.main.forEach(m=>{
+        if(m.carryover){
+          m.carryover=m.carryover.map(c=>typeof c==='string'?{n:c,h:''}:c);
+        }
+      });
+    }
+    init();
+  }catch(e){
+    console.error('データの読み込みに失敗しました',e);
+    document.getElementById('results').classList.remove('hidden');
+    document.getElementById('results').innerHTML='<div class="error-msg">データの読み込みに失敗しました。ページを再読み込みしてください。</div>';
+  }
+}
+loadData();
 </script>
 <script>
 if('serviceWorker' in navigator){

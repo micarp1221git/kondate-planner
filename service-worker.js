@@ -1,7 +1,9 @@
-const CACHE_NAME = 'kondate-planner-v1';
+const CACHE_NAME = 'kondate-planner-v2';
 const ASSETS = [
   './',
   './index.html',
+  './data.json',
+  './recipes.json',
   './manifest.json',
   './icon-192.svg',
   './icon-512.svg'
