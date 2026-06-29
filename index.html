@@ -12,6 +12,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="献立プランナー">
 <link rel="apple-touch-icon" href="./icon-192.svg">
+<link rel="icon" href="./icon-192.svg" type="image/svg+xml">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@400;700&display=swap" rel="stylesheet">
@@ -238,6 +239,33 @@ details[open]>.workflow-summary::before{transform:rotate(90deg)}
         <span style="font-size:.75rem;color:var(--text-light);padding-left:26px;margin-top:-4px">作り置き × 冷めてもOK なメニューだけ</span>
       </label>
     </div>
+    <div class="option-row">
+      <label class="toggle-label">
+        <input type="checkbox" id="keepok-mode" onchange="onOptionChange()">
+        <span>🥡 置いといても美味しい</span>
+      </label>
+    </div>
+    <div class="option-row" style="flex-direction:column;align-items:flex-start;padding-top:0">
+      <span style="font-size:.75rem;color:var(--text-light);padding-left:26px">作り置き・冷めてもおいしい料理だけで組む</span>
+    </div>
+    <div class="option-row">
+      <label class="toggle-label">
+        <input type="checkbox" id="variety-mode" onchange="onOptionChange()">
+        <span>🎲 ちょい、いつもと違う味</span>
+      </label>
+    </div>
+    <div class="option-row" style="flex-direction:column;align-items:flex-start;padding-top:0">
+      <span style="font-size:.75rem;color:var(--text-light);padding-left:26px">最近出た料理や、いつものジャンルを避けて新鮮に</span>
+    </div>
+    <div class="option-row">
+      <label class="toggle-label">
+        <input type="checkbox" id="fav-priority" onchange="onOptionChange()">
+        <span>❤️ お気に入りを優先</span>
+      </label>
+    </div>
+    <div class="option-row" style="flex-direction:column;align-items:flex-start;padding-top:0">
+      <span style="font-size:.75rem;color:var(--text-light);padding-left:26px">保存したお気に入りがあれば優先的に出す</span>
+    </div>
   </section>
   <button class="generate-btn" id="generate-btn" onclick="generate()">
     <span class="btn-text">3日分の献立を出す</span>
@@ -273,6 +301,11 @@ const SEASONING_GROUPS = [
   ]},
   {name:"和風プラス", items:[
     {id:"すりごま",on:false},{id:"かつお節",on:false},{id:"塩昆布",on:false},{id:"ポン酢",on:false}
+  ]},
+  {name:"そのほか", items:[
+    {id:"牛乳",on:true},{id:"チーズ",on:true},{id:"粉チーズ",on:true},{id:"めんつゆ",on:true},
+    {id:"ウスターソース",on:true},{id:"レモン",on:true},{id:"塩麹",on:false},
+    {id:"キムチ",on:false},{id:"わさび",on:false},{id:"ごまだれ",on:false}
   ]}
 ];
 
@@ -294,9 +327,66 @@ const st = {
 function pick(arr) { return arr[Math.floor(Math.random()*arr.length)]; }
 function shuffle(arr) { const a=[...arr]; for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];} return a; }
 
+// ── オプション取得・保存 ──
+function getOpts(){
+  return {
+    single: document.getElementById('single-mode').checked,
+    bento: document.getElementById('bento-mode').checked,
+    keepOk: document.getElementById('keepok-mode').checked,
+    variety: document.getElementById('variety-mode').checked,
+    favPriority: document.getElementById('fav-priority').checked
+  };
+}
+function saveOpts(){
+  const o={
+    keepOk:document.getElementById('keepok-mode').checked,
+    variety:document.getElementById('variety-mode').checked,
+    favPriority:document.getElementById('fav-priority').checked
+  };
+  localStorage.setItem('kondate-opts',JSON.stringify(o));
+}
+
+// ── 履歴（いつもと違う味の判定用）──
+function loadHistory(){try{return JSON.parse(localStorage.getItem('kondate-history')||'[]');}catch(e){return [];}}
+function recordHistory(ids){
+  const genreById={};[...(D.main||[]),...(D.single||[])].forEach(m=>{genreById[m.id]=m.genre;});
+  let h=loadHistory();const ts=Date.now();
+  ids.forEach(id=>{if(id)h.push({id,genre:genreById[id]||'',ts});});
+  if(h.length>30)h=h.slice(h.length-30);
+  localStorage.setItem('kondate-history',JSON.stringify(h));
+}
+// 履歴が十分貯まっていれば、最近出たもの＋最頻ジャンルを避けた候補を返す
+function applyVariety(pool){
+  const h=loadHistory();
+  if(h.length<10)return pool; // データが少ないうちは通常通り
+  const recentIds=new Set(h.slice(-8).map(x=>x.id));
+  const gc={};h.forEach(x=>{if(x.genre)gc[x.genre]=(gc[x.genre]||0)+1;});
+  const dominant=Object.keys(gc).sort((a,b)=>gc[b]-gc[a])[0];
+  let p=pool.filter(m=>!recentIds.has(m.id)&&m.genre!==dominant);
+  if(p.length>0)return p;
+  p=pool.filter(m=>!recentIds.has(m.id));
+  return p.length>0?p:pool;
+}
+// 手順(recipes.json)が無い料理向け：データのpointを表示
+function pointNote(item){
+  if(!item||!item.point)return '';
+  return `<details class="recipe-toggle"><summary>ポイントを見る</summary><div class="recipe-body"><div class="recipe-line">${item.point}</div></div></details>`;
+}
+
+// 調味料1つが「使える」か。複合・別名トークンも解決する
+function seasoningOK(s){
+  if(st.seasonings.has(s))return true;
+  if(st.ingredients.has(s))return true; // 生姜など食材と兼用のもの
+  switch(s){
+    case '塩こしょう':return st.seasonings.has('塩')&&st.seasonings.has('こしょう');
+    case '黒こしょう':return st.seasonings.has('こしょう');
+    case 'ごまだれ or マヨ':return st.seasonings.has('マヨネーズ')||st.seasonings.has('ごまだれ');
+  }
+  return false;
+}
 function canMake(item) {
   if (!item.seasonings) return true;
-  return item.seasonings.every(s => st.seasonings.has(s));
+  return item.seasonings.every(seasoningOK);
 }
 
 function genreMatch(item, genre) {
@@ -399,9 +489,28 @@ function renderIngredients() {
   }).join('');
 }
 
+// 食材チェックリスト（ING_GROUPSに載っている＝ユーザーが申告できる食材）
+const KNOWN_ING = new Set(ING_GROUPS.flatMap(g => g.items));
+// データの食材名 → チェックリストの食材名（名前ゆれ吸収）
+const ING_ALIAS = {
+  '豚ロース':['豚ロース薄切り','豚ロースブロック'],
+  '豚バラ薄切り':['豚バラ'],'豚バラブロック':['豚バラ'],
+  'しめじ':['きのこ'],'なめこ':['きのこ'],
+  'チンゲン菜':['ちんげん菜'],
+  '鮭':['鮭切り身'],'ブリ':['ブリ切り身'],
+  'カレイ切り身':['カレイ切り身(骨なし)']
+};
+function ingredientOK(i){
+  if(st.ingredients.has(i))return true;
+  const al=ING_ALIAS[i];
+  if(al)return al.some(x=>st.ingredients.has(x));
+  // チェックリストに無い食材（主食・薬味・特殊食材など）は献立を妨げない＝常備扱い
+  if(!KNOWN_ING.has(i))return true;
+  return false;
+}
 function hasIngredients(item) {
   if (!item.ingredients) return true;
-  return item.ingredients.every(i => st.ingredients.has(i));
+  return item.ingredients.every(ingredientOK);
 }
 
 function updateCount(){
@@ -440,26 +549,31 @@ function onOptionChange(){
   const btn=document.getElementById('generate-btn');
   const t=singleMode?'今日の1品を出す':'3日分の献立を出す';
   btn.querySelector('.btn-text').textContent=t;
+  saveOpts();
 }
 
 function generate(){
   const btn=document.getElementById('generate-btn');
   btn.classList.add('loading');
   setTimeout(()=>{
-    const singleMode=document.getElementById('single-mode').checked;
-    const bentoMode=document.getElementById('bento-mode').checked;
-    const bentoIds=new Set(D._meta.bento_ids);
-    if(singleMode){generateSingle(bentoMode,bentoIds);}
-    else{generateThreeDay(bentoMode,bentoIds);}
+    const opts=getOpts();
+    const bentoIds=new Set((D._meta&&D._meta.bento_ids)||[]);
+    if(opts.single){generateSingle(opts,bentoIds);}
+    else{generateThreeDay(opts,bentoIds);}
     btn.classList.remove('loading');
   },400);
 }
 
-function generateSingle(bentoMode,bentoIds){
+function generateSingle(opts,bentoIds){
   let candidates=D.single.filter(s=>canMake(s)&&hasIngredients(s));
-  if(bentoMode)candidates=candidates.filter(s=>bentoIds.has(s.id));
+  if(opts.bento)candidates=candidates.filter(s=>bentoIds.has(s.id));
+  if(opts.keepOk){const f=candidates.filter(s=>s.keep_ok);if(f.length>0)candidates=f;}
   if(candidates.length===0){showError('この条件に合う1品メニューが見つかりませんでした。食材や調味料を増やしてみてください。');return;}
-  const dish=pick(candidates);
+  let pool=candidates;
+  if(opts.favPriority&&st.favorites.size>0){const fp=pool.filter(s=>st.favorites.has(s.id));if(fp.length>0)pool=fp;}
+  if(opts.variety){pool=applyVariety(pool);}
+  const dish=pick(pool);
+  recordHistory([dish.id]);
   const r=R[dish.id];
   const el=document.getElementById('results');
   el.classList.remove('hidden');
@@ -474,22 +588,28 @@ function generateSingle(bentoMode,bentoIds){
           <div class="menu-name">${dish.ingredients.join('、')}</div>
         </div>
         ${dish.toriwake?`<div class="toriwake">👧 子ども：${dish.toriwake.kodomo}　👨 大人：${dish.toriwake.otona}</div>`:''}
-        ${r?recipeHtml(r):''}
+        ${r?recipeHtml(r):pointNote(dish)}
       </div>
     </div>
     <button class="regen-btn" onclick="generate()">🔄 もう一回出す</button>`;
   el.scrollIntoView({behavior:'smooth',block:'start'});
 }
 
-function generateThreeDay(bentoMode,bentoIds){
+function generateThreeDay(opts,bentoIds){
   let mains=D.main.filter(m=>canMake(m)&&hasIngredients(m));
   let sides=D.side.filter(s=>canMake(s)&&hasIngredients(s));
   let soups=D.soup.filter(s=>canMake(s)&&hasIngredients(s));
-  if(bentoMode){mains=mains.filter(m=>bentoIds.has(m.id));sides=sides.filter(s=>bentoIds.has(s.id));}
+  if(opts.bento){mains=mains.filter(m=>bentoIds.has(m.id));sides=sides.filter(s=>bentoIds.has(s.id));}
+  if(opts.keepOk){
+    const fm=mains.filter(m=>m.keep_ok),fs=sides.filter(s=>s.keep_ok),fp=soups.filter(s=>s.keep_ok);
+    if(fm.length>0)mains=fm; if(fs.length>0)sides=fs; if(fp.length>0)soups=fp;
+  }
   let batchMains=mains.filter(m=>m.batch);
-  if(batchMains.length===0){showError('今ある食材と調味料で作り置きできる主菜が見つかりませんでした。食材を増やしてみてください。');return;}
+  if(batchMains.length===0){showError('今ある食材と調味料で作り置きできる主菜が見つかりませんでした。条件をゆるめてみてください。');return;}
   let day1Pool=batchMains.filter(m=>m.id!==st.lastMainId);
   if(day1Pool.length===0)day1Pool=batchMains;
+  if(opts.favPriority&&st.favorites.size>0){const favPool=day1Pool.filter(m=>st.favorites.has(m.id));if(favPool.length>0)day1Pool=favPool;}
+  if(opts.variety){day1Pool=applyVariety(day1Pool);}
   const day1Main=pick(day1Pool);
   st.lastMainId=day1Main.id;
   const day2Carryover=pick(day1Main.carryover);
@@ -498,6 +618,7 @@ function generateThreeDay(bentoMode,bentoIds){
   if(day2Pool.length===0)day2Pool=batchMains.filter(m=>m.id!==day1Main.id);
   if(day2Pool.length===0)day2Pool=batchMains;
   const day2NewMain=pick(day2Pool);
+  recordHistory([day1Main.id,day2NewMain.id]);
   const day3Carryover=pick(day2NewMain.carryover);
   const makeaheadSides=shuffle(sides.filter(s=>s.makeahead));
   const freshSides=shuffle(sides.filter(s=>!s.makeahead));
@@ -597,7 +718,7 @@ function renderThreeDayResults(plan){
             <div class="menu-name">${plan.day1.main.name}</div>
             ${plan.day1.main.serve?'<div class="menu-note">🍽️ '+plan.day1.main.serve+'</div>':''}
             <div class="toriwake">👧 ${plan.day1.main.toriwake.kodomo}　👨 ${plan.day1.main.toriwake.otona}</div>
-            ${recipeHtml(R[plan.day1.main.id])}
+            ${R[plan.day1.main.id]?recipeHtml(R[plan.day1.main.id]):pointNote(plan.day1.main)}
           </div>
           <div class="menu-row">
             ${favBtn(plan.day1.side.id)}
@@ -630,7 +751,7 @@ function renderThreeDayResults(plan){
             <div class="menu-name">${plan.day2.newMain.name}</div>
             ${plan.day2.newMain.serve?'<div class="menu-note">🍽️ '+plan.day2.newMain.serve+'</div>':''}
             <div class="toriwake">👧 ${plan.day2.newMain.toriwake.kodomo}　👨 ${plan.day2.newMain.toriwake.otona}</div>
-            ${recipeHtml(R[plan.day2.newMain.id])}
+            ${R[plan.day2.newMain.id]?recipeHtml(R[plan.day2.newMain.id]):pointNote(plan.day2.newMain)}
           </div>
           <div class="menu-row">
             ${favBtn(plan.day2.side.id)}
@@ -693,6 +814,12 @@ function init(){
   if(savedI){try{JSON.parse(savedI).forEach(i=>st.ingredients.add(i));}catch(e){}}
   const savedF=localStorage.getItem('kondate-fav');
   if(savedF){try{JSON.parse(savedF).forEach(f=>st.favorites.add(f));}catch(e){}}
+  const savedO=localStorage.getItem('kondate-opts');
+  if(savedO){try{const o=JSON.parse(savedO);
+    if(o.keepOk)document.getElementById('keepok-mode').checked=true;
+    if(o.variety)document.getElementById('variety-mode').checked=true;
+    if(o.favPriority)document.getElementById('fav-priority').checked=true;
+  }catch(e){}}
   renderSeasonings();
   renderIngredients();
   updateCount();

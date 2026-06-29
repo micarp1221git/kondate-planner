@@ -1,7 +1,7 @@
 {
   "_meta": {
     "purpose": "献立サイトのデータ基盤。料理の型マトリクス×3日分ロジックから生成。サイトはこのデータをロジックで組み合わせて表示する（毎回AIを使わない=運用コスト$0）。",
-    "version": "3.1 (2026-06-28) ズボラ向き拡充＋揚げ物を揚げ焼き方式に",
+    "version": "3.2 (2026-06-29) keep_ok（置いといても美味しい）フラグ新設＋豚ロース系4品追加",
     "genre": [
       "和",
       "洋",
@@ -86,7 +86,8 @@
       "soup": "汁物。batch=多めに作って翌日も",
       "single": "単品/丼/麺/ワンプレート。3品作る元気がない日の『これ1つでOK』メニュー"
     },
-    "note_zubora": "ペルソナ=ズボラさん。レンジ/ワンパン/放置/和えるだけ中心。揚げ物は全て『揚げ焼き（少量油・両面）』方式。pointフィールドに手間軽減のコツ"
+    "note_zubora": "ペルソナ=ズボラさん。レンジ/ワンパン/放置/和えるだけ中心。揚げ物は全て『揚げ焼き（少量油・両面）』方式。pointフィールドに手間軽減のコツ",
+    "keep_ok説明": "keep_ok=true は『置いといても（冷めても/温め直しても）美味しい・作り置き向き』。アプリの『置いといても美味しい』チェックでこのフラグの料理だけ表示する想定"
   },
   "main": [
     {
@@ -113,7 +114,8 @@
       "toriwake": {
         "kodomo": "そのまま",
         "otona": "七味・山椒"
-      }
+      },
+      "keep_ok": true
     },
     {
       "id": "wa-chikuzen",
@@ -142,7 +144,8 @@
       "toriwake": {
         "kodomo": "そのまま",
         "otona": "七味"
-      }
+      },
+      "keep_ok": true
     },
     {
       "id": "wa-oyako",
@@ -169,7 +172,8 @@
       "toriwake": {
         "kodomo": "そのまま",
         "otona": "七味・三つ葉"
-      }
+      },
+      "keep_ok": true
     },
     {
       "id": "yo-garlic-chicken",
@@ -223,7 +227,8 @@
       "toriwake": {
         "kodomo": "そのまま",
         "otona": "ラー油・黒酢"
-      }
+      },
+      "keep_ok": true
     },
     {
       "id": "asia-tandoori",
@@ -388,7 +393,8 @@
       "toriwake": {
         "kodomo": "そのまま",
         "otona": "生姜・七味"
-      }
+      },
+      "keep_ok": true
     },
     {
       "id": "wa-tsukune",
@@ -415,7 +421,8 @@
       "toriwake": {
         "kodomo": "タレ",
         "otona": "七味・卵黄"
-      }
+      },
+      "keep_ok": true
     },
     {
       "id": "asia-gapao",
@@ -442,7 +449,8 @@
       "toriwake": {
         "kodomo": "そのまま(甘め)",
         "otona": "唐辛子・ナンプラー"
-      }
+      },
+      "keep_ok": true
     },
     {
       "id": "wa-tebamoto-amakara",
@@ -468,7 +476,8 @@
       "toriwake": {
         "kodomo": "そのまま",
         "otona": "黒こしょう・からし"
-      }
+      },
+      "keep_ok": true
     },
     {
       "id": "asia-samgyetang",
@@ -495,7 +504,8 @@
       "toriwake": {
         "kodomo": "そのまま",
         "otona": "こしょう・ごま油・キムチ"
-      }
+      },
+      "keep_ok": true
     },
     {
       "id": "wa-shogayaki",
@@ -523,7 +533,8 @@
       "toriwake": {
         "kodomo": "そのまま",
         "otona": "おろしにんにく・黒こしょう"
-      }
+      },
+      "keep_ok": true
     },
     {
       "id": "chu-chashu",
@@ -552,7 +563,8 @@
       "toriwake": {
         "kodomo": "そのまま",
         "otona": "からし・黒こしょう"
-      }
+      },
+      "keep_ok": true
     },
     {
       "id": "yo-roastpork",
@@ -578,7 +590,8 @@
       "toriwake": {
         "kodomo": "そのまま",
         "otona": "粒マスタード・黒こしょう"
-      }
+      },
+      "keep_ok": true
     },
     {
       "id": "wa-butabara-daikon",
@@ -605,7 +618,8 @@
       "toriwake": {
         "kodomo": "そのまま",
         "otona": "七味・からし"
-      }
+      },
+      "keep_ok": true
     },
     {
       "id": "chu-hoikoro",
@@ -633,7 +647,8 @@
       "toriwake": {
         "kodomo": "そのまま",
         "otona": "豆板醤・にんにく"
-      }
+      },
+      "keep_ok": true
     },
     {
       "id": "chu-bara-moyashi",
@@ -745,7 +760,8 @@
       "toriwake": {
         "kodomo": "そのまま",
         "otona": "七味"
-      }
+      },
+      "keep_ok": true
     },
     {
       "id": "chu-komawa-miso",
@@ -803,7 +819,8 @@
       "toriwake": {
         "kodomo": "そのまま(甘辛)",
         "otona": "コチュジャン追い・にんにく"
-      }
+      },
+      "keep_ok": true
     },
     {
       "id": "wa-gyudon",
@@ -831,7 +848,8 @@
       "toriwake": {
         "kodomo": "そのまま",
         "otona": "七味・紅生姜"
-      }
+      },
+      "keep_ok": true
     },
     {
       "id": "wa-nikudofu",
@@ -859,7 +877,8 @@
       "toriwake": {
         "kodomo": "そのまま",
         "otona": "七味・山椒"
-      }
+      },
+      "keep_ok": true
     },
     {
       "id": "chu-mabo",
@@ -889,7 +908,8 @@
       "toriwake": {
         "kodomo": "そのまま(辛味なし)",
         "otona": "ラー油・豆板醤"
-      }
+      },
+      "keep_ok": true
     },
     {
       "id": "yo-hamburg",
@@ -949,7 +969,8 @@
       "toriwake": {
         "kodomo": "そのまま",
         "otona": "粉チーズ・タバスコ"
-      }
+      },
+      "keep_ok": true
     },
     {
       "id": "wa-nikudume",
@@ -1006,7 +1027,8 @@
       "toriwake": {
         "kodomo": "甘口",
         "otona": "チリ・ガラムマサラ"
-      }
+      },
+      "keep_ok": true
     },
     {
       "id": "wa-atsuage-nimono",
@@ -1034,7 +1056,8 @@
       "toriwake": {
         "kodomo": "そのまま",
         "otona": "七味・生姜"
-      }
+      },
+      "keep_ok": true
     },
     {
       "id": "wa-tofu-hamburg",
@@ -1120,7 +1143,8 @@
       "toriwake": {
         "kodomo": "そのまま",
         "otona": "黒こしょう・タバスコ"
-      }
+      },
+      "keep_ok": true
     },
     {
       "id": "asia-chapchae",
@@ -1150,7 +1174,8 @@
       "toriwake": {
         "kodomo": "そのまま",
         "otona": "コチュジャン・ラー油"
-      }
+      },
+      "keep_ok": true
     },
     {
       "id": "chu-mabo-harusame",
@@ -1179,7 +1204,8 @@
       "toriwake": {
         "kodomo": "そのまま(辛味なし)",
         "otona": "豆板醤・ラー油"
-      }
+      },
+      "keep_ok": true
     },
     {
       "id": "asia-somen-champuru",
@@ -1234,7 +1260,8 @@
       "toriwake": {
         "kodomo": "そのまま",
         "otona": "七味・生姜"
-      }
+      },
+      "keep_ok": true
     },
     {
       "id": "wa-buri-teriyaki",
@@ -1286,7 +1313,8 @@
       "toriwake": {
         "kodomo": "そのまま",
         "otona": "七味・山椒"
-      }
+      },
+      "keep_ok": true
     },
     {
       "id": "wa-tachiuo-shioyaki",
@@ -1363,7 +1391,8 @@
       "toriwake": {
         "kodomo": "そのまま",
         "otona": "ラー油・黒酢"
-      }
+      },
+      "keep_ok": true
     },
     {
       "id": "yo-tara-acquapazza",
@@ -1390,7 +1419,8 @@
       "toriwake": {
         "kodomo": "そのまま",
         "otona": "黒こしょう・オリーブ油"
-      }
+      },
+      "keep_ok": true
     },
     {
       "id": "asia-kajiki-curry",
@@ -1441,7 +1471,8 @@
       "toriwake": {
         "kodomo": "そのまま",
         "otona": "山椒・すだち"
-      }
+      },
+      "keep_ok": true
     },
     {
       "id": "wa-karei-karaage",
@@ -1493,7 +1524,8 @@
       "toriwake": {
         "kodomo": "そのまま",
         "otona": "七味・山椒"
-      }
+      },
+      "keep_ok": true
     },
     {
       "id": "chu-ebi-chili",
@@ -1605,7 +1637,8 @@
       "toriwake": {
         "kodomo": "そのまま",
         "otona": "粒マスタード・黒こしょう"
-      }
+      },
+      "keep_ok": true
     },
     {
       "id": "wa-karaage",
@@ -1635,7 +1668,8 @@
         "kodomo": "そのまま",
         "otona": "レモン・黒こしょう"
       },
-      "point": "油1〜2cmのフライパンで両面を返しながら。一口大・薄めに切ると火が通りやすい。片栗粉は薄くまぶす"
+      "point": "油1〜2cmのフライパンで両面を返しながら。一口大・薄めに切ると火が通りやすい。片栗粉は薄くまぶす",
+      "keep_ok": true
     },
     {
       "id": "wa-tori-renkon",
@@ -1691,7 +1725,8 @@
       "toriwake": {
         "kodomo": "そのまま",
         "otona": "黒こしょう"
-      }
+      },
+      "keep_ok": true
     },
     {
       "id": "yo-cream-stew",
@@ -1720,7 +1755,8 @@
       "toriwake": {
         "kodomo": "そのまま",
         "otona": "黒こしょう"
-      }
+      },
+      "keep_ok": true
     },
     {
       "id": "yo-chicken-katsu",
@@ -1828,7 +1864,8 @@
       "toriwake": {
         "kodomo": "そのまま",
         "otona": "七味・からし"
-      }
+      },
+      "keep_ok": true
     },
     {
       "id": "wa-toridango-nimono",
@@ -1856,7 +1893,8 @@
       "toriwake": {
         "kodomo": "そのまま",
         "otona": "七味・柚子こしょう"
-      }
+      },
+      "keep_ok": true
     },
     {
       "id": "yo-tonkatsu",
@@ -1910,7 +1948,8 @@
       "toriwake": {
         "kodomo": "そのまま",
         "otona": "七味"
-      }
+      },
+      "keep_ok": true
     },
     {
       "id": "wa-kakuni",
@@ -1940,7 +1979,8 @@
       "toriwake": {
         "kodomo": "そのまま",
         "otona": "からし"
-      }
+      },
+      "keep_ok": true
     },
     {
       "id": "wa-bara-hakusai",
@@ -1992,7 +2032,8 @@
       "toriwake": {
         "kodomo": "ごまだれ",
         "otona": "ラー油・おろし生姜"
-      }
+      },
+      "keep_ok": true
     },
     {
       "id": "wa-pork-nasu-miso",
@@ -2020,7 +2061,8 @@
       "toriwake": {
         "kodomo": "そのまま",
         "otona": "豆板醤・七味"
-      }
+      },
+      "keep_ok": true
     },
     {
       "id": "chu-pork-amazu",
@@ -2048,7 +2090,8 @@
       "toriwake": {
         "kodomo": "そのまま",
         "otona": "黒酢・ラー油"
-      }
+      },
+      "keep_ok": true
     },
     {
       "id": "chu-niku-yasai",
@@ -2134,7 +2177,8 @@
       "toriwake": {
         "kodomo": "そのまま",
         "otona": "七味・山椒"
-      }
+      },
+      "keep_ok": true
     },
     {
       "id": "yo-roll-cabbage",
@@ -2161,7 +2205,8 @@
       "toriwake": {
         "kodomo": "そのまま",
         "otona": "黒こしょう・粒マスタード"
-      }
+      },
+      "keep_ok": true
     },
     {
       "id": "yo-menchi",
@@ -2218,7 +2263,8 @@
       "toriwake": {
         "kodomo": "甘口",
         "otona": "チリ・ガラムマサラ"
-      }
+      },
+      "keep_ok": true
     },
     {
       "id": "chu-niratama",
@@ -2329,7 +2375,8 @@
       "toriwake": {
         "kodomo": "そのまま",
         "otona": "七味・柚子こしょう"
-      }
+      },
+      "keep_ok": true
     },
     {
       "id": "wa-sake-shioyaki",
@@ -2353,7 +2400,8 @@
       "toriwake": {
         "kodomo": "そのまま",
         "otona": "すだち・七味"
-      }
+      },
+      "keep_ok": true
     },
     {
       "id": "wa-sake-nanban",
@@ -2383,7 +2431,8 @@
         "kodomo": "そのまま",
         "otona": "ラー油・黒こしょう"
       },
-      "point": "少量の油で鮭を両面焼いて、南蛮だれに漬けるだけ。揚げなくてOK"
+      "point": "少量の油で鮭を両面焼いて、南蛮だれに漬けるだけ。揚げなくてOK",
+      "keep_ok": true
     },
     {
       "id": "yo-shiromi-fry",
@@ -2462,7 +2511,8 @@
       "toriwake": {
         "kodomo": "そのまま",
         "otona": "すだち・大根おろし"
-      }
+      },
+      "keep_ok": true
     },
     {
       "id": "wa-karei-nitsuke",
@@ -2488,7 +2538,8 @@
       "toriwake": {
         "kodomo": "そのまま",
         "otona": "七味"
-      }
+      },
+      "keep_ok": true
     },
     {
       "id": "chu-ebi-mayo",
@@ -2655,7 +2706,8 @@
         "kodomo": "そのまま",
         "otona": "黒こしょう・タバスコ"
       },
-      "point": "焼き目つけたら煮込むだけ。ほっとく時間で味が決まる"
+      "point": "焼き目つけたら煮込むだけ。ほっとく時間で味が決まる",
+      "keep_ok": true
     },
     {
       "id": "wa-wanpan-teriyaki",
@@ -2710,6 +2762,118 @@
         "otona": "ゆずこしょう・ラー油"
       },
       "point": "耐熱容器にキャベツと豚バラを交互に重ねて酒ふってチン"
+    },
+    {
+      "id": "wa-pork-amazu-rosu",
+      "name": "豚ロースの甘酢焼き",
+      "genre": "和",
+      "protein": "豚ロース",
+      "method": "焼く",
+      "ratio": "酢2:醤油2:砂糖1",
+      "seasonings": [
+        "酢",
+        "醤油",
+        "砂糖",
+        "片栗粉"
+      ],
+      "ingredients": [
+        "豚ロース",
+        "片栗粉"
+      ],
+      "batch": true,
+      "carryover": [
+        "甘酢丼",
+        "お弁当"
+      ],
+      "toriwake": {
+        "kodomo": "そのまま",
+        "otona": "ラー油・黒こしょう"
+      },
+      "point": "薄く片栗粉→両面焼く→甘酢を1〜2分煮絡める。南蛮風で冷めてもおいしい＝作り置き向き",
+      "keep_ok": true
+    },
+    {
+      "id": "yo-pork-chap",
+      "name": "ポークチャップ",
+      "genre": "洋",
+      "protein": "豚ロース",
+      "method": "焼く",
+      "ratio": "ケチャップ3:ウスター1:砂糖少々",
+      "seasonings": [
+        "ケチャップ",
+        "ウスターソース",
+        "砂糖"
+      ],
+      "ingredients": [
+        "豚ロース",
+        "玉ねぎ"
+      ],
+      "batch": true,
+      "carryover": [
+        "丼",
+        "サンド"
+      ],
+      "toriwake": {
+        "kodomo": "そのまま",
+        "otona": "黒こしょう・タバスコ"
+      },
+      "point": "玉ねぎを炒め→豚を焼き→ソースを絡める。子ども受け最強・運動後でも食べやすい",
+      "keep_ok": true
+    },
+    {
+      "id": "wa-pork-rosu-mushi",
+      "name": "豚ロースと玉ねぎの重ね蒸し",
+      "genre": "和",
+      "protein": "豚ロース",
+      "method": "レンジ",
+      "ratio": "酒+ポン酢 or ごまだれ",
+      "seasonings": [
+        "酒",
+        "ポン酢"
+      ],
+      "ingredients": [
+        "豚ロース",
+        "玉ねぎ",
+        "しめじ"
+      ],
+      "batch": true,
+      "carryover": [
+        "スープ",
+        "うどん"
+      ],
+      "toriwake": {
+        "kodomo": "ポン酢",
+        "otona": "ゆずこしょう・ラー油"
+      },
+      "point": "耐熱皿に玉ねぎ→豚→しめじ、酒を回しレンジ600Wで8〜10分。胃に優しい・運動後向き",
+      "keep_ok": true
+    },
+    {
+      "id": "wa-tori-shiokoji",
+      "name": "鶏ももの塩麹焼き",
+      "genre": "和",
+      "protein": "鶏もも",
+      "method": "焼く",
+      "ratio": "塩麹（鶏に大さじ2）",
+      "seasonings": [
+        "塩麹"
+      ],
+      "ingredients": [
+        "鶏もも肉",
+        "塩麹"
+      ],
+      "batch": true,
+      "carryover": [
+        "サラダ",
+        "サンド",
+        "おにぎりの具"
+      ],
+      "toriwake": {
+        "kodomo": "そのまま",
+        "otona": "黒こしょう・レモン"
+      },
+      "point": "塩麹をもみ込み半日〜一晩→皮目から焼く。冷めても柔らかい・作り置き向き",
+      "keep_ok": true
     }
   ],
   "side": [
@@ -2725,7 +2889,8 @@
       ],
       "ingredients": [
         "ほうれん草"
-      ]
+      ],
+      "keep_ok": true
     },
     {
       "id": "s-komatsuna-nibitashi",
@@ -2740,7 +2905,8 @@
       "ingredients": [
         "小松菜",
         "油揚げ"
-      ]
+      ],
+      "keep_ok": true
     },
     {
       "id": "s-kinpira",
@@ -2754,7 +2920,8 @@
       ],
       "ingredients": [
         "にんじん"
-      ]
+      ],
+      "keep_ok": true
     },
     {
       "id": "s-ninjin-shirishiri",
@@ -2768,7 +2935,8 @@
       "ingredients": [
         "にんじん",
         "たまご"
-      ]
+      ],
+      "keep_ok": true
     },
     {
       "id": "s-potesara",
@@ -2784,7 +2952,8 @@
         "じゃがいも",
         "にんじん",
         "玉ねぎ"
-      ]
+      ],
+      "keep_ok": true
     },
     {
       "id": "s-jaga-butter",
@@ -2812,7 +2981,8 @@
       ],
       "ingredients": [
         "もやし"
-      ]
+      ],
+      "keep_ok": true
     },
     {
       "id": "s-nira-namul",
@@ -2853,7 +3023,8 @@
       ],
       "ingredients": [
         "白菜"
-      ]
+      ],
+      "keep_ok": true
     },
     {
       "id": "s-kyabetsu-shiokombu",
@@ -2866,7 +3037,8 @@
       ],
       "ingredients": [
         "キャベツ"
-      ]
+      ],
+      "keep_ok": true
     },
     {
       "id": "s-kinoko-butter",
@@ -2879,7 +3051,8 @@
       ],
       "ingredients": [
         "きのこ"
-      ]
+      ],
+      "keep_ok": true
     },
     {
       "id": "s-tofu-shiraae",
@@ -2895,7 +3068,8 @@
         "豆腐",
         "ほうれん草",
         "にんじん"
-      ]
+      ],
+      "keep_ok": true
     },
     {
       "id": "s-harusame",
@@ -2912,7 +3086,8 @@
         "春雨",
         "にんじん",
         "たまご"
-      ]
+      ],
+      "keep_ok": true
     },
     {
       "id": "s-aburaage-komatsuna",
@@ -2927,7 +3102,8 @@
       "ingredients": [
         "白菜",
         "油揚げ"
-      ]
+      ],
+      "keep_ok": true
     },
     {
       "id": "s-mugen-cabbage",
@@ -2941,7 +3117,8 @@
       "ingredients": [
         "キャベツ",
         "ツナ缶"
-      ]
+      ],
+      "keep_ok": true
     },
     {
       "id": "s-tuna-komatsuna",
@@ -2955,7 +3132,8 @@
       "ingredients": [
         "小松菜",
         "ツナ缶"
-      ]
+      ],
+      "keep_ok": true
     },
     {
       "id": "s-harusame-itame",
@@ -2971,7 +3149,8 @@
         "春雨",
         "にんじん",
         "にら"
-      ]
+      ],
+      "keep_ok": true
     },
     {
       "id": "s-hijiki",
@@ -2990,7 +3169,8 @@
         "にんじん",
         "油揚げ",
         "大豆"
-      ]
+      ],
+      "keep_ok": true
     },
     {
       "id": "s-ajitama",
@@ -3004,7 +3184,8 @@
       ],
       "ingredients": [
         "たまご"
-      ]
+      ],
+      "keep_ok": true
     },
     {
       "id": "s-gomoku-mame",
@@ -3023,7 +3204,8 @@
         "にんじん",
         "こんにゃく",
         "きのこ"
-      ]
+      ],
+      "keep_ok": true
     },
     {
       "id": "s-kinoko-marine",
@@ -3039,7 +3221,8 @@
       "ingredients": [
         "きのこ",
         "玉ねぎ"
-      ]
+      ],
+      "keep_ok": true
     },
     {
       "id": "s-carot-rape",
@@ -3054,7 +3237,8 @@
       ],
       "ingredients": [
         "にんじん"
-      ]
+      ],
+      "keep_ok": true
     },
     {
       "id": "s-pickles",
@@ -3071,7 +3255,8 @@
         "きゅうり",
         "にんじん",
         "大根"
-      ]
+      ],
+      "keep_ok": true
     },
     {
       "id": "s-broccoli-okaka",
@@ -3084,7 +3269,8 @@
       ],
       "ingredients": [
         "ブロッコリー"
-      ]
+      ],
+      "keep_ok": true
     },
     {
       "id": "s-wiener-broccoli",
@@ -3114,7 +3300,8 @@
       "ingredients": [
         "ブロッコリー",
         "たまご"
-      ]
+      ],
+      "keep_ok": true
     },
     {
       "id": "s-horenso-ohitashi",
@@ -3128,7 +3315,8 @@
       "ingredients": [
         "ほうれん草",
         "かつお節"
-      ]
+      ],
+      "keep_ok": true
     },
     {
       "id": "s-nasu-nibitashi",
@@ -3143,7 +3331,8 @@
       "ingredients": [
         "なす",
         "生姜"
-      ]
+      ],
+      "keep_ok": true
     },
     {
       "id": "s-kabocha-nimono",
@@ -3158,7 +3347,8 @@
       ],
       "ingredients": [
         "かぼちゃ"
-      ]
+      ],
+      "keep_ok": true
     },
     {
       "id": "s-satsuma-remon",
@@ -3172,7 +3362,8 @@
       "ingredients": [
         "さつまいも",
         "レモン"
-      ]
+      ],
+      "keep_ok": true
     },
     {
       "id": "s-renkon-kinpira",
@@ -3187,7 +3378,8 @@
       "ingredients": [
         "れんこん",
         "にんじん"
-      ]
+      ],
+      "keep_ok": true
     },
     {
       "id": "s-su-no-mono",
@@ -3202,7 +3394,8 @@
       "ingredients": [
         "きゅうり",
         "わかめ"
-      ]
+      ],
+      "keep_ok": true
     },
     {
       "id": "s-coleslaw",
@@ -3218,7 +3411,8 @@
         "キャベツ",
         "にんじん",
         "コーン缶"
-      ]
+      ],
+      "keep_ok": true
     },
     {
       "id": "s-macaroni-salad",
@@ -3234,7 +3428,8 @@
         "きゅうり",
         "にんじん",
         "ハム"
-      ]
+      ],
+      "keep_ok": true
     },
     {
       "id": "s-daikon-salad",
@@ -3265,7 +3460,8 @@
       "ingredients": [
         "小松菜",
         "ちくわ"
-      ]
+      ],
+      "keep_ok": true
     },
     {
       "id": "s-piman-jako",
@@ -3280,7 +3476,8 @@
       "ingredients": [
         "ピーマン",
         "ちりめんじゃこ"
-      ]
+      ],
+      "keep_ok": true
     },
     {
       "id": "s-ingen-goma",
@@ -3294,7 +3491,8 @@
       ],
       "ingredients": [
         "いんげん"
-      ]
+      ],
+      "keep_ok": true
     },
     {
       "id": "s-caprese",
@@ -3356,7 +3554,8 @@
         "もやし",
         "ハム",
         "きゅうり"
-      ]
+      ],
+      "keep_ok": true
     },
     {
       "id": "s-kinoko-oroshi",
@@ -3370,7 +3569,8 @@
       "ingredients": [
         "きのこ",
         "大根おろし"
-      ]
+      ],
+      "keep_ok": true
     },
     {
       "id": "s-daigaku-imo",
@@ -3384,7 +3584,8 @@
       "ingredients": [
         "さつまいも",
         "黒ごま"
-      ]
+      ],
+      "keep_ok": true
     },
     {
       "id": "s-tofu-kimchi",
@@ -3431,7 +3632,8 @@
         "キャベツ",
         "ツナ缶"
       ],
-      "point": "ちぎって和えるだけ。作り置きOK"
+      "point": "ちぎって和えるだけ。作り置きOK",
+      "keep_ok": true
     },
     {
       "id": "s-renji-onyasai",
@@ -3446,7 +3648,8 @@
         "にんじん",
         "かぼちゃ"
       ],
-      "point": "耐熱皿に切った野菜＋ラップでチン。たれは好みで"
+      "point": "耐熱皿に切った野菜＋ラップでチン。たれは好みで",
+      "keep_ok": true
     },
     {
       "id": "s-cucumber-tataki",
@@ -3461,7 +3664,8 @@
       "ingredients": [
         "きゅうり"
       ],
-      "point": "叩いて和えるだけ。日持ちもする"
+      "point": "叩いて和えるだけ。日持ちもする",
+      "keep_ok": true
     },
     {
       "id": "s-natto-ohitashi",
@@ -3494,7 +3698,8 @@
         "にんじん",
         "玉ねぎ",
         "豆腐"
-      ]
+      ],
+      "keep_ok": true
     },
     {
       "id": "sp-wakame-miso",
@@ -3594,7 +3799,8 @@
         "玉ねぎ",
         "にんじん",
         "じゃがいも"
-      ]
+      ],
+      "keep_ok": true
     },
     {
       "id": "sp-cabbage-consomme",
@@ -3640,7 +3846,8 @@
         "トマト缶",
         "玉ねぎ",
         "キャベツ"
-      ]
+      ],
+      "keep_ok": true
     },
     {
       "id": "sp-nameko-tofu",
@@ -3701,7 +3908,8 @@
         "ごぼう",
         "豆腐",
         "こんにゃく"
-      ]
+      ],
+      "keep_ok": true
     },
     {
       "id": "sp-kakitama",
@@ -3732,7 +3940,8 @@
         "コーン缶",
         "玉ねぎ",
         "牛乳"
-      ]
+      ],
+      "keep_ok": true
     },
     {
       "id": "sp-onion-soup",
@@ -3745,7 +3954,8 @@
       ],
       "ingredients": [
         "玉ねぎ"
-      ]
+      ],
+      "keep_ok": true
     },
     {
       "id": "sp-wakame-soup",
@@ -3879,7 +4089,8 @@
       "toriwake": {
         "kodomo": "そのまま",
         "otona": "生姜・刻み海苔"
-      }
+      },
+      "keep_ok": true
     },
     {
       "id": "tan-kaisendon",
