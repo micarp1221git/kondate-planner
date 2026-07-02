@@ -183,6 +183,21 @@ details[open]>.workflow-summary::before{transform:rotate(90deg)}
 .fav-item{display:flex;justify-content:space-between;align-items:center;padding:10px 14px;background:var(--surface);border-radius:6px;margin-bottom:6px;font-size:.85rem}
 .fav-item button{background:none;border:none;color:var(--text-light);cursor:pointer;font-size:.8rem}
 .fav-item button:hover{color:var(--primary)}
+
+/* ── Menu picker（作りたいメニュー指定） ── */
+.menu-picker{position:relative;width:100%;margin-top:8px}
+.menu-picker input{width:100%;padding:10px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:16px;background:var(--surface);outline:none;font-family:var(--sans)}
+.menu-picker input:focus{border-color:var(--primary);background:#fff}
+.menu-suggestions{position:absolute;top:calc(100% + 4px);left:0;right:0;background:var(--card);border:1px solid var(--border);border-radius:8px;box-shadow:0 4px 20px rgba(0,0,0,.1);max-height:240px;overflow-y:auto;z-index:10}
+.menu-suggest-item{display:flex;justify-content:space-between;align-items:center;padding:10px 12px;font-size:.86rem;cursor:pointer;border-bottom:1px solid var(--border)}
+.menu-suggest-item:last-child{border-bottom:none}
+.menu-suggest-item:hover,.menu-suggest-item:active{background:var(--primary-light)}
+.menu-suggest-cat{font-size:.68rem;color:var(--text-light);background:var(--tag);border-radius:4px;padding:2px 6px;margin-left:8px;flex-shrink:0}
+.menu-suggest-empty{padding:10px 12px;font-size:.8rem;color:var(--text-light)}
+.menu-selected{display:flex;align-items:center;gap:8px;background:var(--primary-light);border:1.5px solid var(--primary);border-radius:8px;padding:9px 12px;font-size:.9rem;font-weight:600;margin-top:8px}
+.menu-selected .menu-suggest-cat{margin-left:0}
+.menu-selected button{margin-left:auto;background:none;border:none;color:var(--text-mid);cursor:pointer;font-size:.9rem;padding:2px 6px}
+.menu-selected button:hover{color:var(--primary)}
 </style>
 </head>
 <body>
@@ -215,6 +230,15 @@ details[open]>.workflow-summary::before{transform:rotate(90deg)}
   <div class="status-bar">今の条件で <strong id="recipe-count">0</strong> 品の主菜が作れます</div>
   <div class="step-label"><span class="step-num">3</span><span class="step-text">オプションを選んで生成</span></div>
   <section class="options-section">
+    <div class="option-row" style="flex-direction:column;align-items:stretch">
+      <span style="font-size:.88rem;font-weight:600">🎯 今日作りたいメニューがある？</span>
+      <div class="menu-picker" id="menu-picker">
+        <input type="text" id="menu-search" placeholder="メニュー名で検索（例：ポークチャップ）" autocomplete="off" oninput="onMenuSearch(this.value)" onfocus="onMenuSearch(this.value)">
+        <div id="menu-suggestions" class="menu-suggestions" style="display:none"></div>
+      </div>
+      <div id="menu-selected" class="menu-selected" style="display:none"></div>
+      <span style="font-size:.75rem;color:var(--text-light);margin-top:6px">指定したメニューを軸に、残り（副菜・汁物）を自動で組みます。空欄なら従来どおり全自動。</span>
+    </div>
     <div class="option-row">
       <label class="toggle-label">
         <input type="checkbox" id="single-mode" onchange="onOptionChange()">
@@ -321,8 +345,59 @@ const st = {
   seasonings: new Set(),
   ingredients: new Set(),
   lastMainId: null,
-  favorites: new Set()
+  favorites: new Set(),
+  requestedId: null
 };
+
+// ── 作りたいメニュー指定 ──
+function findMenuById(id){
+  const m=(D.main||[]).find(x=>x.id===id);
+  if(m)return {item:m,kind:'main'};
+  const s=(D.single||[]).find(x=>x.id===id);
+  if(s)return {item:s,kind:'single'};
+  return null;
+}
+function onMenuSearch(q){
+  const box=document.getElementById('menu-suggestions');
+  q=(q||'').trim();
+  if(!q){box.style.display='none';box.innerHTML='';return;}
+  const hits=[];
+  (D.main||[]).forEach(m=>{if(m.name.includes(q))hits.push({id:m.id,name:m.name,cat:'主菜'});});
+  (D.single||[]).forEach(s=>{if(s.name.includes(q))hits.push({id:s.id,name:s.name,cat:'1品'});});
+  if(hits.length===0){
+    box.innerHTML='<div class="menu-suggest-empty">見つかりませんでした（登録済みメニューから検索します）</div>';
+  }else{
+    box.innerHTML=hits.slice(0,8).map(h=>
+      `<div class="menu-suggest-item" onclick="selectMenu('${h.id}')"><span>${h.name}</span><span class="menu-suggest-cat">${h.cat}</span></div>`
+    ).join('');
+  }
+  box.style.display='block';
+}
+function selectMenu(id){
+  const found=findMenuById(id);
+  if(!found)return;
+  st.requestedId=id;
+  document.getElementById('menu-picker').style.display='none';
+  document.getElementById('menu-suggestions').style.display='none';
+  document.getElementById('menu-search').value='';
+  const sel=document.getElementById('menu-selected');
+  sel.innerHTML=`<span class="menu-suggest-cat">${found.kind==='main'?'主菜':'1品'}</span><span>${found.item.name}</span><button onclick="clearMenu()">✕ 外す</button>`;
+  sel.style.display='flex';
+  const btn=document.getElementById('generate-btn');
+  btn.querySelector('.btn-text').textContent=found.kind==='main'?`「${found.item.name}」を軸に献立を出す`:`「${found.item.name}」で今日はOK`;
+}
+function clearMenu(){
+  st.requestedId=null;
+  document.getElementById('menu-selected').style.display='none';
+  document.getElementById('menu-picker').style.display='';
+  onOptionChange();
+}
+document.addEventListener('click',e=>{
+  if(!e.target.closest('.menu-picker')){
+    const box=document.getElementById('menu-suggestions');
+    if(box)box.style.display='none';
+  }
+});
 
 function pick(arr) { return arr[Math.floor(Math.random()*arr.length)]; }
 function shuffle(arr) { const a=[...arr]; for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];} return a; }
@@ -545,8 +620,9 @@ function toggleIngGroup(groupName){
 }
 
 function onOptionChange(){
-  const singleMode=document.getElementById('single-mode').checked;
   const btn=document.getElementById('generate-btn');
+  if(st.requestedId){saveOpts();return;} // メニュー指定中はボタン文言を維持
+  const singleMode=document.getElementById('single-mode').checked;
   const t=singleMode?'今日の1品を出す':'3日分の献立を出す';
   btn.querySelector('.btn-text').textContent=t;
   saveOpts();
@@ -558,21 +634,29 @@ function generate(){
   setTimeout(()=>{
     const opts=getOpts();
     const bentoIds=new Set((D._meta&&D._meta.bento_ids)||[]);
-    if(opts.single){generateSingle(opts,bentoIds);}
+    const req=st.requestedId?findMenuById(st.requestedId):null;
+    if(req&&req.kind==='single'){generateSingle(opts,bentoIds,req.item);}
+    else if(req){generateThreeDay(opts,bentoIds,req.item);}
+    else if(opts.single){generateSingle(opts,bentoIds);}
     else{generateThreeDay(opts,bentoIds);}
     btn.classList.remove('loading');
   },400);
 }
 
-function generateSingle(opts,bentoIds){
-  let candidates=D.single.filter(s=>canMake(s)&&hasIngredients(s));
-  if(opts.bento)candidates=candidates.filter(s=>bentoIds.has(s.id));
-  if(opts.keepOk){const f=candidates.filter(s=>s.keep_ok);if(f.length>0)candidates=f;}
-  if(candidates.length===0){showError('この条件に合う1品メニューが見つかりませんでした。食材や調味料を増やしてみてください。');return;}
-  let pool=candidates;
-  if(opts.favPriority&&st.favorites.size>0){const fp=pool.filter(s=>st.favorites.has(s.id));if(fp.length>0)pool=fp;}
-  if(opts.variety){pool=applyVariety(pool);}
-  const dish=pick(pool);
+function generateSingle(opts,bentoIds,forcedDish){
+  let dish;
+  if(forcedDish){
+    dish=forcedDish; // 指定メニューは食材・調味料チェックを通さず必ず出す
+  }else{
+    let candidates=D.single.filter(s=>canMake(s)&&hasIngredients(s));
+    if(opts.bento)candidates=candidates.filter(s=>bentoIds.has(s.id));
+    if(opts.keepOk){const f=candidates.filter(s=>s.keep_ok);if(f.length>0)candidates=f;}
+    if(candidates.length===0){showError('この条件に合う1品メニューが見つかりませんでした。食材や調味料を増やしてみてください。');return;}
+    let pool=candidates;
+    if(opts.favPriority&&st.favorites.size>0){const fp=pool.filter(s=>st.favorites.has(s.id));if(fp.length>0)pool=fp;}
+    if(opts.variety){pool=applyVariety(pool);}
+    dish=pick(pool);
+  }
   recordHistory([dish.id]);
   const r=R[dish.id];
   const el=document.getElementById('results');
@@ -595,7 +679,7 @@ function generateSingle(opts,bentoIds){
   el.scrollIntoView({behavior:'smooth',block:'start'});
 }
 
-function generateThreeDay(opts,bentoIds){
+function generateThreeDay(opts,bentoIds,forcedMain){
   let mains=D.main.filter(m=>canMake(m)&&hasIngredients(m));
   let sides=D.side.filter(s=>canMake(s)&&hasIngredients(s));
   let soups=D.soup.filter(s=>canMake(s)&&hasIngredients(s));
@@ -604,13 +688,25 @@ function generateThreeDay(opts,bentoIds){
     const fm=mains.filter(m=>m.keep_ok),fs=sides.filter(s=>s.keep_ok),fp=soups.filter(s=>s.keep_ok);
     if(fm.length>0)mains=fm; if(fs.length>0)sides=fs; if(fp.length>0)soups=fp;
   }
+  // 副菜・汁物が食材チェックで全滅したら全データから補う（空クラッシュ防止）
+  if(sides.length===0)sides=[...D.side];
+  if(soups.length===0)soups=[...D.soup];
   let batchMains=mains.filter(m=>m.batch);
+  if(forcedMain&&batchMains.filter(m=>m.id!==forcedMain.id).length===0){
+    // 指定メニュー時、Day2用の候補が食材チェックで空なら全データから補う
+    batchMains=D.main.filter(m=>m.batch&&m.id!==forcedMain.id);
+  }
   if(batchMains.length===0){showError('今ある食材と調味料で作り置きできる主菜が見つかりませんでした。条件をゆるめてみてください。');return;}
-  let day1Pool=batchMains.filter(m=>m.id!==st.lastMainId);
-  if(day1Pool.length===0)day1Pool=batchMains;
-  if(opts.favPriority&&st.favorites.size>0){const favPool=day1Pool.filter(m=>st.favorites.has(m.id));if(favPool.length>0)day1Pool=favPool;}
-  if(opts.variety){day1Pool=applyVariety(day1Pool);}
-  const day1Main=pick(day1Pool);
+  let day1Main;
+  if(forcedMain){
+    day1Main=forcedMain; // 指定メニューは食材・調味料チェックを通さず必ず軸にする
+  }else{
+    let day1Pool=batchMains.filter(m=>m.id!==st.lastMainId);
+    if(day1Pool.length===0)day1Pool=batchMains;
+    if(opts.favPriority&&st.favorites.size>0){const favPool=day1Pool.filter(m=>st.favorites.has(m.id));if(favPool.length>0)day1Pool=favPool;}
+    if(opts.variety){day1Pool=applyVariety(day1Pool);}
+    day1Main=pick(day1Pool);
+  }
   st.lastMainId=day1Main.id;
   const day2Carryover=pick(day1Main.carryover);
   let day2Pool=batchMains.filter(m=>m.genre!==day1Main.genre&&m.id!==day1Main.id);
