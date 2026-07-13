@@ -52,11 +52,16 @@ body{font-family:var(--sans);line-height:1.75;color:var(--text);background:var(-
 .cb-label:active{transform:scale(.97)}
 .cb-label input{accent-color:var(--primary);width:16px;height:16px;cursor:pointer}
 .cb-label.checked{background:var(--primary-light);box-shadow:inset 0 0 0 1.5px var(--primary)}
-.collapsible{cursor:pointer;user-select:none}
-.toggle-icon{font-size:.7rem;transition:transform .2s;display:inline-block;margin-left:4px}
-.toggle-icon.open{transform:rotate(180deg)}
-.collapsed{max-height:0;overflow:hidden;transition:max-height .3s ease}
-.expanded{max-height:2000px;transition:max-height .4s ease}
+/* ── 折りたたみグループ ── */
+.group-details{border:1px solid var(--border);border-radius:8px;margin-bottom:10px;background:var(--card);overflow:hidden}
+.group-details:last-child{margin-bottom:0}
+.group-summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:10px;padding:12px 14px;user-select:none;background:var(--card)}
+.group-summary::-webkit-details-marker{display:none}
+.group-summary::before{content:'▶';font-size:.55rem;color:var(--text-light);transition:transform .2s;flex-shrink:0}
+details[open]>.group-summary::before{transform:rotate(90deg)}
+.group-badge{font-size:.72rem;color:var(--primary);background:var(--primary-light);border-radius:999px;padding:2px 10px;margin-left:auto;white-space:nowrap}
+.group-badge.zero{color:var(--text-light);background:var(--surface)}
+.group-body{padding:2px 12px 12px}
 
 /* ── Options ── */
 .options-section{background:var(--card);border-radius:var(--radius);padding:18px 20px;margin-top:0;box-shadow:var(--shadow)}
@@ -110,6 +115,25 @@ body{font-family:var(--sans);line-height:1.75;color:var(--text);background:var(-
 .regen-btn{display:block;width:100%;max-width:300px;margin:28px auto 0;padding:12px;background:transparent;color:var(--text-mid);border:1.5px solid var(--border);border-radius:8px;font-size:.88rem;cursor:pointer;transition:all .2s}
 .regen-btn:hover{border-color:var(--primary);color:var(--primary)}
 .regen-btn:active{transform:scale(.97)}
+
+/* ── 段階選択フロー ── */
+.btn-stack{max-width:380px;margin:32px auto}
+.btn-stack .generate-btn{margin:0 0 12px;max-width:none}
+.generate-btn.secondary{background:transparent;color:var(--primary);border:1.5px solid var(--primary);box-shadow:none;font-weight:600}
+.generate-btn.secondary:hover{background:var(--primary-light)}
+.generate-btn.secondary .spinner{border-color:rgba(200,90,53,.25);border-top-color:var(--primary)}
+.flow-progress{display:flex;justify-content:center;align-items:center;gap:8px;font-size:.8rem;color:var(--text-light);margin-bottom:14px;flex-wrap:wrap}
+.flow-progress .cur{color:var(--primary);font-weight:700}
+.flow-progress .done{color:var(--green)}
+.flow-arrow{color:var(--text-light);font-size:.7rem}
+.picked-row{display:flex;justify-content:center;gap:8px;flex-wrap:wrap;margin-bottom:16px}
+.picked-chip{font-size:.78rem;color:var(--green);background:var(--green-light);border-radius:999px;padding:4px 12px}
+.cand-grid{display:grid;gap:10px;grid-template-columns:repeat(auto-fill,minmax(160px,1fr))}
+.cand-card{background:var(--card);border:1.5px solid var(--border);border-radius:var(--radius);padding:14px;cursor:pointer;text-align:left;font-family:var(--sans);transition:border-color .2s,box-shadow .2s;animation:fadeUp .3s ease both}
+.cand-card:hover{border-color:var(--primary);box-shadow:var(--shadow)}
+.cand-card:active{transform:scale(.97)}
+.cand-name{font-size:.9rem;font-weight:600;color:var(--text)}
+.cand-meta{font-size:.72rem;color:var(--text-light);margin-top:4px;line-height:1.5}
 
 /* ── Error ── */
 .error-msg{text-align:center;padding:24px;color:var(--primary);font-size:.9rem;background:var(--primary-light);border-radius:var(--radius)}
@@ -291,10 +315,15 @@ details[open]>.workflow-summary::before{transform:rotate(90deg)}
       <span style="font-size:.75rem;color:var(--text-light);padding-left:26px">保存したお気に入りがあれば優先的に出す</span>
     </div>
   </section>
-  <button class="generate-btn" id="generate-btn" onclick="generate()">
-    <span class="btn-text">3日分の献立を出す</span>
-    <span class="btn-loading"><span class="spinner"></span>献立を考え中…</span>
-  </button>
+  <div class="btn-stack">
+    <button class="generate-btn" id="step-btn" onclick="startStepFlow()">
+      <span class="btn-text">選びながら作る（メイン → 副菜 → 汁物）</span>
+    </button>
+    <button class="generate-btn secondary" id="generate-btn" onclick="generate()">
+      <span class="btn-text">おまかせで3日分出す</span>
+      <span class="btn-loading"><span class="spinner"></span>献立を考え中…</span>
+    </button>
+  </div>
   <button class="fav-btn" id="fav-btn" onclick="showFavorites()" style="display:none">
     ❤️ お気に入り (<span id="fav-count">0</span>)
   </button>
@@ -520,16 +549,24 @@ function showFavorites(){
   el.scrollIntoView({behavior:'smooth',block:'start'});
 }
 
+// 再描画しても開いているグループはそのまま（開閉状態は保存しない・セッション内のみ）
+function openGroupsIn(container){
+  return new Set([...container.querySelectorAll('details[open]')].map(d=>d.dataset.group));
+}
+
 function renderSeasonings() {
   const container = document.getElementById('seasoning-groups');
+  const openSet = openGroupsIn(container);
   container.innerHTML = SEASONING_GROUPS.map(group => {
     const allChecked = group.items.every(i => st.seasonings.has(i.id));
-    return `<div class="group">
-      <div class="group-header">
+    const count = group.items.filter(i => st.seasonings.has(i.id)).length;
+    return `<details class="group-details" data-group="${group.name}"${openSet.has(group.name)?' open':''}>
+      <summary class="group-summary">
         <span class="group-name">${group.name}</span>
-        <button class="group-toggle" onclick="toggleGroupAll('${group.name}')">${allChecked ? '全解除' : '全選択'}</button>
-      </div>
-      <div class="checkbox-grid">
+        <span class="group-badge${count===0?' zero':''}" data-badge="s-${group.name}">選択中 ${count}</span>
+        <button class="group-toggle" onclick="event.preventDefault();event.stopPropagation();toggleGroupAll('${group.name}')">${allChecked ? '全解除' : '全選択'}</button>
+      </summary>
+      <div class="group-body"><div class="checkbox-grid">
         ${group.items.map(item => {
           const checked = st.seasonings.has(item.id);
           return `<label class="cb-label${checked?' checked':''}">
@@ -537,21 +574,24 @@ function renderSeasonings() {
             ${item.id}
           </label>`;
         }).join('')}
-      </div>
-    </div>`;
+      </div></div>
+    </details>`;
   }).join('');
 }
 
 function renderIngredients() {
   const container = document.getElementById('ingredient-groups');
+  const openSet = openGroupsIn(container);
   container.innerHTML = ING_GROUPS.map(group => {
     const allChecked = group.items.every(i => st.ingredients.has(i));
-    return `<div class="group">
-      <div class="group-header">
+    const count = group.items.filter(i => st.ingredients.has(i)).length;
+    return `<details class="group-details" data-group="${group.name}"${openSet.has(group.name)?' open':''}>
+      <summary class="group-summary">
         <span class="group-name">${group.name}</span>
-        <button class="group-toggle" onclick="toggleIngGroup('${group.name}')">${allChecked ? '全解除' : '全選択'}</button>
-      </div>
-      <div class="checkbox-grid">
+        <span class="group-badge${count===0?' zero':''}" data-badge="i-${group.name}">選択中 ${count}</span>
+        <button class="group-toggle" onclick="event.preventDefault();event.stopPropagation();toggleIngGroup('${group.name}')">${allChecked ? '全解除' : '全選択'}</button>
+      </summary>
+      <div class="group-body"><div class="checkbox-grid">
         ${group.items.map(item => {
           const checked = st.ingredients.has(item);
           return `<label class="cb-label${checked?' checked':''}">
@@ -559,9 +599,23 @@ function renderIngredients() {
             ${item}
           </label>`;
         }).join('')}
-      </div>
-    </div>`;
+      </div></div>
+    </details>`;
   }).join('');
+}
+
+// バッジ（選択中◯個）だけを更新（個別チェック時・再描画なし）
+function updateBadges(){
+  SEASONING_GROUPS.forEach(g=>{
+    const n=g.items.filter(i=>st.seasonings.has(i.id)).length;
+    const el=document.querySelector(`[data-badge="s-${g.name}"]`);
+    if(el){el.textContent=`選択中 ${n}`;el.classList.toggle('zero',n===0);}
+  });
+  ING_GROUPS.forEach(g=>{
+    const n=g.items.filter(i=>st.ingredients.has(i)).length;
+    const el=document.querySelector(`[data-badge="i-${g.name}"]`);
+    if(el){el.textContent=`選択中 ${n}`;el.classList.toggle('zero',n===0);}
+  });
 }
 
 // 食材チェックリスト（ING_GROUPSに載っている＝ユーザーが申告できる食材）
@@ -596,13 +650,13 @@ function updateCount(){
 function toggleSeasoning(id,cb){
   if(cb.checked)st.seasonings.add(id);else st.seasonings.delete(id);
   cb.closest('.cb-label').classList.toggle('checked',cb.checked);
-  updateCount();saveState();
+  updateCount();updateBadges();saveState();
 }
 
 function toggleIngredient(id,cb){
   if(cb.checked)st.ingredients.add(id);else st.ingredients.delete(id);
   cb.closest('.cb-label').classList.toggle('checked',cb.checked);
-  updateCount();saveState();
+  updateCount();updateBadges();saveState();
 }
 
 function toggleGroupAll(groupName){
@@ -621,9 +675,11 @@ function toggleIngGroup(groupName){
 
 function onOptionChange(){
   const btn=document.getElementById('generate-btn');
-  if(st.requestedId){saveOpts();return;} // メニュー指定中はボタン文言を維持
   const singleMode=document.getElementById('single-mode').checked;
-  const t=singleMode?'今日の1品を出す':'3日分の献立を出す';
+  // 1品モードでは段階選択（メイン→副菜→汁物）は使わない
+  document.getElementById('step-btn').style.display=singleMode?'none':'block';
+  if(st.requestedId){saveOpts();return;} // メニュー指定中はボタン文言を維持
+  const t=singleMode?'今日の1品を出す':'おまかせで3日分出す';
   btn.querySelector('.btn-text').textContent=t;
   saveOpts();
 }
@@ -899,6 +955,159 @@ function showError(msg) {
   el.classList.remove('hidden');
   el.innerHTML = `<div class="error-msg">${msg}</div>
     <button class="regen-btn" onclick="generate()">🔄 もう一回出す</button>`;
+  el.scrollIntoView({behavior:'smooth',block:'start'});
+}
+
+// ── 段階選択フロー（メイン → 副菜 → 汁物）──
+const flow={step:0,main:null,side:null,soup:null,cands:[],candLists:{}};
+
+// おまかせ生成と同じフィルタ（食材・調味料・お弁当・置いといてもOK）を尊重した候補プール
+function flowPools(){
+  const opts=getOpts();
+  const bentoIds=new Set((D._meta&&D._meta.bento_ids)||[]);
+  let mains=D.main.filter(m=>canMake(m)&&hasIngredients(m));
+  let sides=D.side.filter(s=>canMake(s)&&hasIngredients(s));
+  let soups=D.soup.filter(s=>canMake(s)&&hasIngredients(s));
+  if(opts.bento){mains=mains.filter(m=>bentoIds.has(m.id));sides=sides.filter(s=>bentoIds.has(s.id));}
+  if(opts.keepOk){
+    const fm=mains.filter(m=>m.keep_ok),fs=sides.filter(s=>s.keep_ok),fp=soups.filter(s=>s.keep_ok);
+    if(fm.length>0)mains=fm; if(fs.length>0)sides=fs; if(fp.length>0)soups=fp;
+  }
+  return {mains,sides,soups,opts};
+}
+
+function newCandList(step){
+  const {mains,sides,soups,opts}=flowPools();
+  let pool;
+  if(step===1){
+    pool=mains;
+    if(opts.variety)pool=applyVariety(pool);
+  }else if(step===2){
+    const match=sides.filter(s=>genreMatch(s,flow.main.genre));
+    pool=match.length>0?match:sides;
+  }else{
+    const match=soups.filter(s=>genreMatch(s,flow.main.genre));
+    pool=match.length>0?match:soups;
+  }
+  let a=shuffle(pool);
+  if(opts.favPriority&&st.favorites.size>0){
+    a=[...a.filter(x=>st.favorites.has(x.id)),...a.filter(x=>!st.favorites.has(x.id))];
+  }
+  return a.slice(0,6);
+}
+
+function startStepFlow(){
+  const {mains}=flowPools();
+  if(mains.length===0){showError('今の食材と調味料で作れるメインが見つかりませんでした。チェックを増やしてみてください。');return;}
+  flow.step=1;flow.main=null;flow.side=null;flow.soup=null;flow.candLists={};
+  flow.cands=newCandList(1);flow.candLists[1]=flow.cands;
+  renderFlowStep();
+}
+
+function selectCand(i){
+  const item=flow.cands[i];
+  if(!item)return;
+  if(flow.step===1)flow.main=item;
+  else if(flow.step===2)flow.side=item;
+  else{flow.soup=item;renderFlowResult();return;}
+  flow.step++;
+  advanceFlow();
+}
+
+function advanceFlow(){
+  const list=newCandList(flow.step);
+  if(list.length===0){
+    // 作れる候補が無い工程はスキップ（副菜なし・汁物なしで完成）
+    if(flow.step===2){flow.side=null;flow.step=3;advanceFlow();return;}
+    flow.soup=null;renderFlowResult();return;
+  }
+  flow.cands=list;flow.candLists[flow.step]=list;
+  renderFlowStep();
+}
+
+function reshuffleFlow(){
+  flow.cands=newCandList(flow.step);flow.candLists[flow.step]=flow.cands;
+  renderFlowStep();
+}
+
+function flowBack(){
+  if(flow.step<=1)return;
+  flow.step--;
+  if(flow.step===1)flow.main=null;
+  if(flow.step<=2)flow.side=null;
+  flow.cands=flow.candLists[flow.step]||newCandList(flow.step);
+  renderFlowStep();
+}
+
+function renderFlowStep(){
+  const el=document.getElementById('results');
+  el.classList.remove('hidden');
+  const names=['メイン','副菜','汁物'];
+  const prog=names.map((n,idx)=>{
+    const s=idx+1;
+    const cls=s<flow.step?'done':s===flow.step?'cur':'';
+    return `<span class="${cls}">${s<flow.step?'✓ ':''}${s}. ${n}</span>`;
+  }).join('<span class="flow-arrow">▶</span>');
+  const picked=[];
+  if(flow.main)picked.push(`<span class="picked-chip">主菜：${flow.main.name}</span>`);
+  if(flow.side)picked.push(`<span class="picked-chip">副菜：${flow.side.name}</span>`);
+  const title=flow.step===1?'メインを選ぶ':flow.step===2?'副菜を選ぶ':'汁物を選ぶ';
+  const desc=flow.step===1?'今の食材で作れるメインから、食べたいものをタップ'
+    :flow.step===2?'メインに合う副菜をタップ':'最後に汁物を選んで完成';
+  el.innerHTML=`
+    <div class="results-header"><h2>🧭 ${title}</h2><p>${desc}</p></div>
+    <div class="flow-progress">${prog}</div>
+    ${picked.length?`<div class="picked-row">${picked.join('')}</div>`:''}
+    <div class="cand-grid">
+      ${flow.cands.map((c,i)=>`
+        <button class="cand-card" onclick="selectCand(${i})">
+          <div class="cand-name">${c.name}</div>
+          <div class="cand-meta">${c.genre||''}${c.ingredients&&c.ingredients.length?'｜'+c.ingredients.slice(0,3).join('・'):''}</div>
+        </button>`).join('')}
+    </div>
+    <button class="regen-btn" onclick="reshuffleFlow()">🔄 別の候補を見る</button>
+    ${flow.step>1?'<button class="regen-btn" onclick="flowBack()">← ひとつ戻る</button>':''}`;
+  el.scrollIntoView({behavior:'smooth',block:'start'});
+}
+
+function renderFlowResult(){
+  const m=flow.main,s=flow.side,p=flow.soup;
+  recordHistory([m.id]);
+  st.lastMainId=m.id;
+  const wfItems=[{id:m.id,name:m.name,type:'main'}];
+  if(s)wfItems.push({id:s.id,name:s.name,type:'side'});
+  if(p)wfItems.push({id:p.id,name:p.name,type:'soup'});
+  const el=document.getElementById('results');
+  el.classList.remove('hidden');
+  el.innerHTML=`
+    <div class="results-header"><h2>🍽️ 今夜の献立</h2><p>自分で選んだ組み合わせ。そのまま段取りへどうぞ。</p></div>
+    <div class="single-card">
+      <div class="single-label">🧭 選んだ献立</div>
+      <div class="single-body">
+        ${buildWorkflow(wfItems,1)}
+        <div class="menu-row new-dish-row">
+          ${favBtn(m.id)}
+          <div class="menu-cat">主菜</div>
+          <div class="menu-name">${m.name}</div>
+          ${m.serve?'<div class="menu-note">🍽️ '+m.serve+'</div>':''}
+          ${m.toriwake?`<div class="toriwake">👧 ${m.toriwake.kodomo}　👨 ${m.toriwake.otona}</div>`:''}
+          ${R[m.id]?recipeHtml(R[m.id]):pointNote(m)}
+        </div>
+        ${s?`<div class="menu-row">
+          ${favBtn(s.id)}
+          <div class="menu-cat">副菜</div>
+          <div class="menu-name">${s.name}</div>
+          ${recipeHtml(R[s.id])||pointNote(s)}
+        </div>`:''}
+        ${p?`<div class="menu-row">
+          ${favBtn(p.id)}
+          <div class="menu-cat">汁物</div>
+          <div class="menu-name">${p.name}</div>
+          ${recipeHtml(R[p.id])||pointNote(p)}
+        </div>`:''}
+      </div>
+    </div>
+    <button class="regen-btn" onclick="startStepFlow()">🧭 もう一度選び直す</button>`;
   el.scrollIntoView({behavior:'smooth',block:'start'});
 }
 
