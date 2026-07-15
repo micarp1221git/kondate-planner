@@ -976,7 +976,7 @@ function flowPools(){
   return {mains,sides,soups,opts};
 }
 
-function newCandList(step){
+function newCandList(step, avoid){
   const {mains,sides,soups,opts}=flowPools();
   let pool;
   if(step===1){
@@ -992,6 +992,10 @@ function newCandList(step){
   let a=shuffle(pool);
   if(opts.favPriority&&st.favorites.size>0){
     a=[...a.filter(x=>st.favorites.has(x.id)),...a.filter(x=>!st.favorites.has(x.id))];
+  }
+  // 「別の候補を見る」で直前と同じものを避ける（プール不足時は避けた分で埋める）
+  if(avoid&&avoid.size){
+    a=[...a.filter(x=>!avoid.has(x.id)),...a.filter(x=>avoid.has(x.id))];
   }
   return a.slice(0,6);
 }
@@ -1026,7 +1030,8 @@ function advanceFlow(){
 }
 
 function reshuffleFlow(){
-  flow.cands=newCandList(flow.step);flow.candLists[flow.step]=flow.cands;
+  const avoid=new Set((flow.cands||[]).map(c=>c.id));
+  flow.cands=newCandList(flow.step, avoid);flow.candLists[flow.step]=flow.cands;
   renderFlowStep();
 }
 
