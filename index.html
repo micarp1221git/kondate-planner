@@ -102,6 +102,8 @@ details[open]>.group-summary::before{transform:rotate(90deg)}
 .menu-cat{font-size:.72rem;color:var(--text-light);margin-bottom:3px;text-transform:uppercase;letter-spacing:.08em}
 .menu-name{font-size:.9rem;font-weight:600}
 .menu-note{font-size:.76rem;color:var(--text-light);margin-top:2px}
+.nutri-badge{font-size:.8rem;color:#5c5148;background:#f6f2ea;border-radius:8px;padding:7px 10px;margin-top:10px}
+.nutri-note{display:block;font-size:.68rem;color:#a39a8f;margin-top:3px}
 .toriwake{font-size:.76rem;color:var(--green);margin-top:3px}
 .carryover-row{border-left:2px solid var(--green);padding-left:12px;margin-left:0}
 .new-dish-row{border-left:2px solid var(--primary);padding-left:12px;margin-left:0}
@@ -431,6 +433,19 @@ document.addEventListener('click',e=>{
 function pick(arr) { return arr[Math.floor(Math.random()*arr.length)]; }
 function shuffle(arr) { const a=[...arr]; for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];} return a; }
 
+// ── 3色食品群のかんたん判定（材料名からの自動判定・目安）──
+const NUTRI_RED=['鶏','豚','牛','ひき','ミンチ','ベーコン','ハム','ソーセージ','ウインナー','たまご','卵','豆腐','厚揚げ','油揚げ','大豆','ビーンズ','鮭','さば','鯖','ぶり','たら','えび','海老','いか','ツナ','しらす','ちくわ','かにかま','はんぺん','納豆','チーズ','牛乳','ヨーグルト','あさり','肉'];
+const NUTRI_GREEN=['ほうれん草','小松菜','キャベツ','レタス','白菜','ブロッコリー','トマト','きゅうり','なす','ピーマン','パプリカ','にんじん','人参','玉ねぎ','ねぎ','大根','かぶ','ごぼう','れんこん','もやし','オクラ','アスパラ','ズッキーニ','セロリ','水菜','チンゲン菜','ニラ','にら','しめじ','えのき','まいたけ','しいたけ','エリンギ','きのこ','わかめ','ひじき','海藻','豆苗','枝豆','いんげん','スナップ','とうもろこし','コーン','春菊','三つ葉','大葉','青梗菜','野菜'];
+const NUTRI_YELLOW=['ごはん','ご飯','米','麺','うどん','そば','パスタ','スパゲ','パン','じゃがいも','さつまいも','里芋','いも','餅','春雨','皮','小麦粉'];
+function nutriCount(dish,color){const list=color==='red'?NUTRI_RED:color==='green'?NUTRI_GREEN:NUTRI_YELLOW;const ings=(dish&&dish.ingredients)||[];const hits=new Set();ings.forEach(i=>{list.forEach(k=>{if(String(i).includes(k))hits.add(i);});});return hits.size;}
+function nutriBadge(dishes,riceIncluded){
+  let red=0,green=0,yellow=0;
+  dishes.forEach(d=>{if(!d)return;red+=nutriCount(d,'red');green+=nutriCount(d,'green');yellow+=nutriCount(d,'yellow');});
+  if(riceIncluded)yellow+=1;
+  const mark=(n,ok,good)=>n>=good?'◎':n>=ok?'○':'△';
+  return `<div class="nutri-badge">きょうのバランス　🔴たんぱく ${mark(red,1,2)}　🟢野菜 ${mark(green,2,3)}　🟡主食 ${mark(yellow,1,1)}<span class="nutri-note">※3色食品群のかんたん判定（材料名から自動・目安です）</span></div>`;
+}
+
 // ── オプション取得・保存 ──
 function getOpts(){
   return {
@@ -729,6 +744,7 @@ function generateSingle(opts,bentoIds,forcedDish){
         </div>
         ${dish.toriwake?`<div class="toriwake">👧 子ども：${dish.toriwake.kodomo}　👨 大人：${dish.toriwake.otona}</div>`:''}
         ${r?recipeHtml(r):pointNote(dish)}
+        ${nutriBadge([dish],false)}
       </div>
     </div>
     <button class="regen-btn" onclick="generate()">🔄 もう一回出す</button>`;
@@ -778,9 +794,13 @@ function generateThreeDay(opts,bentoIds,forcedMain){
   const usedSideIds=new Set();
   function pickSide(pool){const av=pool.filter(s=>!usedSideIds.has(s.id));if(av.length===0)return pick(pool.length>0?pool:sides);const s=av[0];usedSideIds.add(s.id);return s;}
   let d1SidePool=makeaheadSides.filter(s=>genreMatch(s,day1Main.genre));
+  if(nutriCount(day1Main,'green')===0){const gp=d1SidePool.filter(s=>nutriCount(s,'green')>0);if(gp.length>0)d1SidePool=gp;}
   const day1Side=pickSide(d1SidePool.length>0?d1SidePool:makeaheadSides.length>0?makeaheadSides:allSidesShuffled);
-  const day2Side=pickSide(freshSides.length>0?freshSides:allSidesShuffled);
+  let d2SidePool=freshSides.length>0?freshSides:allSidesShuffled;
+  if(nutriCount(day2NewMain,'green')===0){const gp=d2SidePool.filter(s=>nutriCount(s,'green')>0);if(gp.length>0)d2SidePool=gp;}
+  const day2Side=pickSide(d2SidePool);
   let d3SidePool=allSidesShuffled.filter(s=>genreMatch(s,day2NewMain.genre)&&!usedSideIds.has(s.id));
+  if(nutriCount(day2NewMain,'green')===0){const gp=d3SidePool.filter(s=>nutriCount(s,'green')>0);if(gp.length>0)d3SidePool=gp;}
   const day3Side=pickSide(d3SidePool.length>0?d3SidePool:allSidesShuffled);
   const usedSoupIds=new Set();
   function pickSoup(pool){const av=pool.filter(s=>!usedSoupIds.has(s.id));if(av.length===0)return pick(pool.length>0?pool:soups);const s=pick(av);usedSoupIds.add(s.id);return s;}
@@ -884,6 +904,7 @@ function renderThreeDayResults(plan){
             <div class="menu-name">${plan.day1.soup.name}${plan.day1.soup.batch?'（明日の分も）':''}</div>
             ${recipeHtml(R[plan.day1.soup.id])}
           </div>
+          ${nutriBadge([plan.day1.main,plan.day1.side,plan.day1.soup],true)}
         </div>
       </div>
       <div class="carryover-flow">${plan.day1.main.name} → ${plan.day2.carryover.n}</div>
@@ -918,6 +939,7 @@ function renderThreeDayResults(plan){
             <div class="menu-name">${plan.day2.soup.name}${plan.day2.soupNote}</div>
             ${recipeHtml(R[plan.day2.soup.id])}
           </div>
+          ${nutriBadge([plan.day2.carryoverFrom,plan.day2.newMain,plan.day2.side,plan.day2.soup],true)}
         </div>
       </div>
       <div class="carryover-flow">${plan.day2.newMain.name} → ${plan.day3.carryover.n}</div>
@@ -943,6 +965,7 @@ function renderThreeDayResults(plan){
             <div class="menu-name">${plan.day3.soup.name}</div>
             ${recipeHtml(R[plan.day3.soup.id])}
           </div>
+          ${nutriBadge([plan.day3.carryoverFrom,plan.day3.side,plan.day3.soup],true)}
         </div>
       </div>
     </div>
