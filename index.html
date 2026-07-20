@@ -1185,9 +1185,34 @@ async function loadData(){
 loadData();
 </script>
 <script>
-if('serviceWorker' in navigator){
+// ネイティブアプリ（Capacitor）判定。Webでは何もしない
+function isNativeApp(){
+  return !!(window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform());
+}
+
+if('serviceWorker' in navigator && !isNativeApp()){
   navigator.serviceWorker.register('./service-worker.js');
 }
+
+// ネイティブ版のみ: 毎朝7:30「今日の3品」リマインダー（ローカル通知・サーバー不要）
+async function setupDailyReminder(){
+  if(!isNativeApp()) return;
+  try{
+    const LN = window.Capacitor.Plugins.LocalNotifications;
+    if(!LN) return;
+    const perm = await LN.requestPermissions();
+    if(!perm || perm.display !== 'granted') return;
+    const pending = await LN.getPending();
+    if(pending && pending.notifications && pending.notifications.some(n => Number(n.id) === 1)) return;
+    await LN.schedule({ notifications: [{
+      id: 1,
+      title: '今日の3品、決めちゃおう 🍚',
+      body: '押すだけで3日分。夕飯の献立、いまのうちにまるっと',
+      schedule: { on: { hour: 7, minute: 30 }, allowWhileIdle: true }
+    }] });
+  }catch(e){ console.log('daily reminder skipped:', e); }
+}
+setTimeout(setupDailyReminder, 2500);
 </script>
 </body>
 </html>
