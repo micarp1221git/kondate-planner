@@ -30,6 +30,10 @@ html{font-size:106.25%}
   --serif:'Noto Serif JP',serif;
   --sans:-apple-system,BlinkMacSystemFont,'Hiragino Kaku Gothic ProN','Noto Sans JP',sans-serif;
 }
+.section.collapsed .section-desc,.section.collapsed [id$="-groups"]{display:none}
+#seasoning-section h2,#ingredient-section h2{cursor:pointer}
+#seasoning-section h2::after,#ingredient-section h2::after{content:"▾";float:right;color:var(--text-light);font-size:.8em;transition:transform .2s}
+.section.collapsed h2::after{transform:rotate(-90deg)}
 body{font-family:var(--sans);line-height:1.75;color:var(--text);background:var(--bg);-webkit-font-smoothing:antialiased;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
 .container{max-width:680px;margin:0 auto;padding:0 20px}
 
@@ -231,15 +235,14 @@ details[open]>.workflow-summary::before{transform:rotate(90deg)}
 <header class="hero">
   <div class="container">
     <h1>面倒だけど、<br>3品は諦めたくない。</h1>
-    <p class="tagline">押すだけで3日分。カンタンに、3品が叶う。</p>
+    <p class="tagline">押すだけで3日分。カンタンに3品叶う。</p>
     <div class="features">
-      <span class="feature">🔪 毎日ひと品仕込んで</span>
-      <span class="feature">🍳 昨日の繰り越しで品数UP</span>
-      <span class="feature">✨ 味も自然に変わる</span>
+      <span class="feature">🔪 新しく作るのは1日1品</span>
+      <span class="feature">🍳 繰り越しで食卓は3品</span>
+      <span class="feature">🧭 段取りも組んでくれる</span>
     </div>
   </div>
 </header>
-<div class="photo-banner" style="background-image:url('https://images.unsplash.com/photo-1498837167922-ddd27525d352?w=1400&fit=crop&q=80&auto=format')"></div>
 <main class="container">
   <p class="save-hint">💡 チェック内容はブラウザに自動保存。次に開いてもそのまま使えます。</p>
   <div class="step-label"><span class="step-num">1</span><span class="step-text">手持ちの調味料をチェック</span></div>
@@ -255,7 +258,7 @@ details[open]>.workflow-summary::before{transform:rotate(90deg)}
     <div id="ingredient-groups"></div>
   </section>
   <div class="status-bar">今の条件で <strong id="recipe-count">0</strong> 品の主菜が作れます</div>
-  <div class="step-label"><span class="step-num">3</span><span class="step-text">オプションを選んで生成</span></div>
+  <div class="step-label"><span class="step-num">3</span><span class="step-text">献立をつくる</span></div>
   <section class="options-section">
     <div class="option-row" style="flex-direction:column;align-items:stretch">
       <span style="font-size:.88rem;font-weight:600">🎯 今日作りたいメニューがある？</span>
@@ -319,12 +322,12 @@ details[open]>.workflow-summary::before{transform:rotate(90deg)}
     </div>
   </section>
   <div class="btn-stack">
-    <button class="generate-btn" id="step-btn" onclick="startStepFlow()">
-      <span class="btn-text">選びながら作る（メイン → 副菜 → 汁物）</span>
-    </button>
-    <button class="generate-btn secondary" id="generate-btn" onclick="generate()">
-      <span class="btn-text">おまかせで3日分出す</span>
+    <button class="generate-btn" id="generate-btn" onclick="generate()">
+      <span class="btn-text">おまかせで3日分つくる</span>
       <span class="btn-loading"><span class="spinner"></span>献立を考え中…</span>
+    </button>
+    <button class="generate-btn secondary" id="step-btn" onclick="startStepFlow()">
+      <span class="btn-text">自分で選んでつくる</span>
     </button>
   </div>
   <button class="fav-btn" id="fav-btn" onclick="showFavorites()" style="display:none">
@@ -342,9 +345,7 @@ let R = {};
 const SEASONING_GROUPS = [
   {name:"基本", items:[
     {id:"醤油",on:true},{id:"みりん",on:true},{id:"酒",on:true},{id:"塩",on:true},
-    {id:"こしょう",on:true},{id:"砂糖",on:true},{id:"酢",on:true},{id:"だし",on:true}
-  ]},
-  {name:"あると広がる", items:[
+    {id:"こしょう",on:true},{id:"砂糖",on:true},{id:"酢",on:true},{id:"だし",on:true},
     {id:"味噌",on:true},{id:"にんにく",on:true},{id:"片栗粉",on:true},
     {id:"マヨネーズ",on:true},{id:"ケチャップ",on:true},{id:"ソース",on:true}
   ]},
@@ -548,7 +549,7 @@ function showFavorites(){
   const el=document.getElementById('results');
   el.classList.remove('hidden');
   if(st.favorites.size===0){
-    el.innerHTML=`<div class="results-header"><h2>❤️ お気に入り</h2><p>まだありません。献立を生成して 🤍 をタップしてね。</p></div>`;
+    el.innerHTML=`<div class="results-header"><h2>❤️ お気に入り</h2><p>まだありません。献立をつくって 🤍 をタップしてね。</p></div>`;
     el.scrollIntoView({behavior:'smooth',block:'start'});
     return;
   }
@@ -660,7 +661,12 @@ function hasIngredients(item) {
 
 function updateCount(){
   const mains=D.main.filter(m=>canMake(m)&&hasIngredients(m));
-  document.getElementById('recipe-count').textContent=mains.length;
+  const bar=document.querySelector('.status-bar');
+  if(mains.length===0){
+    bar.innerHTML='チェックを入れると、作れる料理がここに増えていきます';
+  }else{
+    bar.innerHTML='今の条件で <strong id="recipe-count">'+mains.length+'</strong> 品の主菜が作れます';
+  }
 }
 
 function toggleSeasoning(id,cb){
@@ -1140,6 +1146,26 @@ function renderFlowResult(){
   el.scrollIntoView({behavior:'smooth',block:'start'});
 }
 
+function setupReturningUser(){
+  // ネイティブ版は「ブラウザ」の言葉を出さない
+  if(typeof isNativeApp==='function'&&isNativeApp()){
+    const hint=document.querySelector('.save-hint');
+    if(hint)hint.textContent='💡 チェック内容はこの端末に自動保存。次に開いてもそのまま使えます。';
+  }
+  // 2回目以降は調味料・冷蔵庫を折りたたみ、すぐ「献立をつくる」へ
+  const visited=localStorage.getItem('kondate_visited');
+  if(visited){
+    ['seasoning-section','ingredient-section'].forEach(id=>{
+      const sec=document.getElementById(id);
+      if(sec)sec.classList.add('collapsed');
+    });
+  }
+  localStorage.setItem('kondate_visited','1');
+  document.querySelectorAll('#seasoning-section h2,#ingredient-section h2').forEach(h=>{
+    h.addEventListener('click',()=>h.closest('.section').classList.toggle('collapsed'));
+  });
+}
+
 function init(){
   const savedS=localStorage.getItem('kondate-s');
   const savedI=localStorage.getItem('kondate-i');
@@ -1184,6 +1210,7 @@ async function loadData(){
   }
 }
 loadData();
+setupReturningUser();
 </script>
 <script>
 // ネイティブアプリ（Capacitor）判定。Webでは何もしない
