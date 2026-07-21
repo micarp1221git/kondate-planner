@@ -96,7 +96,13 @@ details[open]>.group-summary::before{transform:rotate(90deg)}
 .day-card:nth-child(2){animation-delay:.1s}
 .day-card:nth-child(3){animation-delay:.2s}
 @keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
-.day-label{padding:14px 18px;font-family:var(--serif);font-weight:700;font-size:.88rem;color:#fff;letter-spacing:.05em}
+.day-label{padding:14px 18px;font-family:var(--serif);font-weight:700;font-size:.88rem;color:#fff;letter-spacing:.05em;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.reroll-btn{margin-left:auto;background:rgba(255,255,255,.22);border:1px solid rgba(255,255,255,.5);color:#fff;font-size:.72rem;font-weight:600;padding:5px 10px;border-radius:999px;cursor:pointer;font-family:var(--sans)}
+.reroll-btn:active{background:rgba(255,255,255,.35)}
+.day-menu-list{background:var(--surface);border-radius:10px;padding:10px 14px;margin-bottom:14px}
+.dml-row{display:flex;gap:10px;align-items:baseline;padding:3px 0;font-size:.9rem}
+.dml-cat{flex-shrink:0;font-size:.75rem;color:var(--text-mid);width:5.4em}
+.dml-name{font-weight:600}
 .day1 .day-label{background:#C85A35}
 .day2 .day-label{background:#4A8C6F}
 .day3 .day-label{background:#5B7EC2}
@@ -821,11 +827,13 @@ function generateThreeDay(opts,bentoIds,forcedMain){
   const day3Soup=pickSoup(d3SoupPool.length>0?d3SoupPool:soups);
   const g1=day1Main.genre,g2=day2NewMain.genre;
   const genreLabel=g1===g2?g1:`${g1} → ${g2}`;
-  renderThreeDayResults({genreLabel,
+  curPlan={genreLabel,
     day1:{main:day1Main,side:day1Side,soup:day1Soup},
     day2:{carryover:day2Carryover,carryoverFrom:day1Main,newMain:day2NewMain,side:day2Side,soup:day2Soup,soupNote:day2SoupNote},
     day3:{carryover:day3Carryover,carryoverFrom:day2NewMain,side:day3Side,soup:day3Soup}
-  });
+  };
+  planCtx={batchMains,sides,soups};
+  renderThreeDayResults(curPlan);
 }
 
 function buildWorkflow(items,dayNum){
@@ -870,6 +878,48 @@ function recipeHtml(r){
   return `<details class="recipe-toggle"><summary>レシピを見る</summary><div class="recipe-body">${body}</div></details>`;
 }
 
+let curPlan=null,planCtx=null;
+
+function menuListHtml(items){
+  const icon={main:'🍖',side:'🥗',soup:'🍲',carryover:'🍳'};
+  const cat={main:'主菜',side:'副菜',soup:'汁物',carryover:'繰り越し'};
+  return `<div class="day-menu-list">${items.map(i=>`<div class="dml-row"><span class="dml-cat">${icon[i.type]||''} ${cat[i.type]||''}</span><span class="dml-name">${i.name}</span></div>`).join('')}</div>`;
+}
+
+function rerollDay(n){
+  if(!curPlan||!planCtx)return;
+  const p=curPlan,{batchMains,sides,soups}=planCtx;
+  const excl=(pool,id)=>{const f=pool.filter(x=>x.id!==id);return f.length>0?f:pool;};
+  if(n===1){
+    if(batchMains.length<2){showError('他に出せるメインが今の条件にありません。チェックを増やすと候補が増えます。');return;}
+    p.day1.main=pick(excl(batchMains.filter(m=>m.id!==p.day2.newMain.id),p.day1.main.id));
+    st.lastMainId=p.day1.main.id;
+    const ms=sides.filter(x=>x.makeahead);
+    p.day1.side=pick(excl(ms.length>0?ms:sides,p.day1.side.id));
+    const bs=soups.filter(x=>x.batch);
+    const wasCont=p.day2.soupNote&&p.day2.soupNote.includes('続き');
+    p.day1.soup=pick(excl(bs.length>0?bs:soups,p.day1.soup.id));
+    if(wasCont)p.day2.soup=p.day1.soup;
+    p.day2.carryover=pick(p.day1.main.carryover);
+    p.day2.carryoverFrom=p.day1.main;
+  }else if(n===2){
+    let pool=batchMains.filter(m=>m.genre!==p.day1.main.genre&&m.id!==p.day1.main.id&&m.id!==p.day2.newMain.id);
+    if(pool.length===0)pool=batchMains.filter(m=>m.id!==p.day1.main.id&&m.id!==p.day2.newMain.id);
+    if(pool.length===0){showError('他に出せるメインが今の条件にありません。チェックを増やすと候補が増えます。');return;}
+    p.day2.newMain=pick(pool);
+    p.day2.side=pick(excl(sides,p.day2.side.id));
+    if(!(p.day2.soupNote&&p.day2.soupNote.includes('続き'))){p.day2.soup=pick(excl(soups,p.day2.soup.id));}
+    p.day3.carryover=pick(p.day2.newMain.carryover);
+    p.day3.carryoverFrom=p.day2.newMain;
+  }else{
+    p.day3.side=pick(excl(sides,p.day3.side.id));
+    p.day3.soup=pick(excl(soups,p.day3.soup.id));
+  }
+  const g1=p.day1.main.genre,g2=p.day2.newMain.genre;
+  p.genreLabel=g1===g2?g1:`${g1} → ${g2}`;
+  renderThreeDayResults(p);
+}
+
 function renderThreeDayResults(plan){
   const el=document.getElementById('results');
   el.classList.remove('hidden');
@@ -888,8 +938,9 @@ function renderThreeDayResults(plan){
     </div>
     <div class="day-cards">
       <div class="day-card day1">
-        <div class="day-label">🔪 Day1<small>仕込み・多めに作る</small></div>
+        <div class="day-label">🔪 Day1<small>仕込み・多めに作る</small><button class="reroll-btn" onclick="rerollDay(1)">🎲 別メニュー</button></div>
         <div class="day-body">
+          ${menuListHtml(wf1Items)}
           ${buildWorkflow(wf1Items,1)}
           <div class="menu-row new-dish-row">
             ${favBtn(plan.day1.main.id)}
@@ -916,8 +967,9 @@ function renderThreeDayResults(plan){
       </div>
       <div class="carryover-flow">${plan.day1.main.name} → ${plan.day2.carryover.n}</div>
       <div class="day-card day2">
-        <div class="day-label">🍳 Day2<small>繰り越し＋もうひと品</small></div>
+        <div class="day-label">🍳 Day2<small>繰り越し＋もうひと品</small><button class="reroll-btn" onclick="rerollDay(2)">🎲 別メニュー</button></div>
         <div class="day-body">
+          ${menuListHtml(wf2Items)}
           ${buildWorkflow(wf2Items,2)}
           <div class="menu-row carryover-row">
             <div class="menu-cat">繰り越し</div>
@@ -951,8 +1003,9 @@ function renderThreeDayResults(plan){
       </div>
       <div class="carryover-flow">${plan.day2.newMain.name} → ${plan.day3.carryover.n}</div>
       <div class="day-card day3">
-        <div class="day-label">✨ Day3<small>繰り越し・ラクする日</small></div>
+        <div class="day-label">✨ Day3<small>繰り越し・ラクする日</small><button class="reroll-btn" onclick="rerollDay(3)">🎲 別メニュー</button></div>
         <div class="day-body">
+          ${menuListHtml(wf3Items)}
           ${buildWorkflow(wf3Items,3)}
           <div class="menu-row carryover-row">
             <div class="menu-cat">繰り越し</div>
