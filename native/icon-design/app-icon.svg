@@ -1,0 +1,29 @@
+<svg width="1024" height="1024" viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#F0936C"/>
+      <stop offset="1" stop-color="#D96F44"/>
+    </linearGradient>
+    <filter id="soft" x="-30%" y="-30%" width="160%" height="160%">
+      <feDropShadow dx="0" dy="14" stdDeviation="18" flood-color="#9C4A22" flood-opacity="0.28"/>
+    </filter>
+  </defs>
+  <rect width="1024" height="1024" fill="url(#bg)"/>
+  <!-- 3品（大皿1＋小鉢2） -->
+  <g filter="url(#soft)">
+    <circle cx="512" cy="360" r="205" fill="#FFFFFF"/>
+    <circle cx="330" cy="666" r="128" fill="#FFFFFF"/>
+    <circle cx="694" cy="666" r="128" fill="#FFFFFF"/>
+  </g>
+  <!-- 器のふち（ブランドカラー #E8815B） -->
+  <g fill="none" stroke="#E8815B" stroke-width="13">
+    <circle cx="512" cy="360" r="150"/>
+    <circle cx="330" cy="666" r="88"/>
+    <circle cx="694" cy="666" r="88"/>
+  </g>
+  <!-- お箸 -->
+  <g fill="#FFFFFF" filter="url(#soft)">
+    <rect x="266" y="856" width="492" height="20" rx="10"/>
+    <rect x="266" y="896" width="492" height="20" rx="10"/>
+  </g>
+</svg>

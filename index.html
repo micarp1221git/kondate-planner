@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>面倒だけど、3品は諦めたくない。| 献立まるっとプランナー</title>
 <!-- PWA -->
 <link rel="manifest" href="./manifest.json">
@@ -18,6 +18,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@400;700&display=swap" rel="stylesheet">
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{font-size:106.25%}
 :root{
   --primary:#C85A35;--primary-hover:#B04A2A;--primary-light:#FDF3EF;
   --green:#4A8C6F;--green-light:#EFF8F3;
@@ -29,7 +30,7 @@
   --serif:'Noto Serif JP',serif;
   --sans:-apple-system,BlinkMacSystemFont,'Hiragino Kaku Gothic ProN','Noto Sans JP',sans-serif;
 }
-body{font-family:var(--sans);line-height:1.75;color:var(--text);background:var(--bg);-webkit-font-smoothing:antialiased}
+body{font-family:var(--sans);line-height:1.75;color:var(--text);background:var(--bg);-webkit-font-smoothing:antialiased;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
 .container{max-width:680px;margin:0 auto;padding:0 20px}
 
 /* ── Hero ── */
