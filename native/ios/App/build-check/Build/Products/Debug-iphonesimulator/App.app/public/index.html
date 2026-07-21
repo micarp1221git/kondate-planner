@@ -1,0 +1,1218 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>面倒だけど、3品は諦めたくない。| 献立まるっとプランナー</title>
+<!-- PWA -->
+<link rel="manifest" href="./manifest.json">
+<meta name="theme-color" content="#C85A35">
+<!-- iOS対応 -->
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="献立プランナー">
+<link rel="apple-touch-icon" href="./icon-192.svg">
+<link rel="icon" href="./icon-192.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@400;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --primary:#C85A35;--primary-hover:#B04A2A;--primary-light:#FDF3EF;
+  --green:#4A8C6F;--green-light:#EFF8F3;
+  --bg:#FAF7F4;--card:#FFFFFF;--surface:#F5F1ED;
+  --text:#1A1614;--text-mid:#5C524A;--text-light:#8E847B;
+  --border:#E8E2DB;--tag:#F0EBE5;
+  --shadow:0 1px 3px rgba(0,0,0,.04),0 4px 20px rgba(0,0,0,.03);
+  --radius:10px;
+  --serif:'Noto Serif JP',serif;
+  --sans:-apple-system,BlinkMacSystemFont,'Hiragino Kaku Gothic ProN','Noto Sans JP',sans-serif;
+}
+body{font-family:var(--sans);line-height:1.75;color:var(--text);background:var(--bg);-webkit-font-smoothing:antialiased}
+.container{max-width:680px;margin:0 auto;padding:0 20px}
+
+/* ── Hero ── */
+.hero{background:var(--bg);color:var(--text);padding:56px 20px 40px;text-align:center;border-bottom:1px solid var(--border)}
+.hero h1{font-family:var(--serif);font-size:1.75rem;font-weight:700;letter-spacing:.06em;line-height:1.3;margin-bottom:10px}
+.hero .tagline{font-size:.92rem;color:var(--text-mid);margin-bottom:28px;letter-spacing:.02em}
+.features{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+.feature{background:var(--surface);border-radius:6px;padding:7px 16px;font-size:.8rem;color:var(--text-mid);white-space:nowrap;letter-spacing:.01em}
+
+/* ── Sections (調味料・食材) ── */
+.section{background:var(--card);border-radius:var(--radius);padding:24px 20px;margin-top:0;box-shadow:var(--shadow)}
+.section h2{font-family:var(--serif);font-size:1.05rem;font-weight:700;margin-bottom:6px;display:flex;align-items:center;gap:6px;letter-spacing:.03em}
+.section-desc{font-size:.8rem;color:var(--text-light);margin-bottom:16px;letter-spacing:.01em}
+.group{margin-bottom:16px}
+.group-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+.group-name{font-size:.85rem;font-weight:600;color:var(--text)}
+.group-toggle{font-size:.72rem;color:var(--primary);background:none;border:none;cursor:pointer;padding:2px 6px}
+.checkbox-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:6px}
+.cb-label{display:flex;align-items:center;gap:5px;font-size:.82rem;padding:7px 10px;border-radius:6px;background:var(--surface);cursor:pointer;user-select:none;transition:background .2s,box-shadow .2s}
+.cb-label:active{transform:scale(.97)}
+.cb-label input{accent-color:var(--primary);width:16px;height:16px;cursor:pointer}
+.cb-label.checked{background:var(--primary-light);box-shadow:inset 0 0 0 1.5px var(--primary)}
+/* ── 折りたたみグループ ── */
+.group-details{border:1px solid var(--border);border-radius:8px;margin-bottom:10px;background:var(--card);overflow:hidden}
+.group-details:last-child{margin-bottom:0}
+.group-summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:10px;padding:12px 14px;user-select:none;background:var(--card)}
+.group-summary::-webkit-details-marker{display:none}
+.group-summary::before{content:'▶';font-size:.55rem;color:var(--text-light);transition:transform .2s;flex-shrink:0}
+details[open]>.group-summary::before{transform:rotate(90deg)}
+.group-badge{font-size:.72rem;color:var(--primary);background:var(--primary-light);border-radius:999px;padding:2px 10px;margin-left:auto;white-space:nowrap}
+.group-badge.zero{color:var(--text-light);background:var(--surface)}
+.group-body{padding:2px 12px 12px}
+
+/* ── Options ── */
+.options-section{background:var(--card);border-radius:var(--radius);padding:18px 20px;margin-top:0;box-shadow:var(--shadow)}
+.option-row{display:flex;align-items:center;gap:10px;padding:10px 0}
+.option-row+.option-row{border-top:1px solid var(--border)}
+.toggle-label{display:flex;align-items:center;gap:8px;font-size:.88rem;cursor:pointer;user-select:none;flex:1}
+.toggle-label input[type=checkbox]{width:18px;height:18px;accent-color:var(--primary)}
+.option-desc{font-size:.75rem;color:var(--text-light);margin-top:2px}
+
+/* ── Generate button ── */
+.generate-btn{display:block;width:100%;max-width:380px;margin:32px auto;padding:16px;background:var(--primary);color:#fff;border:none;border-radius:8px;font-family:var(--serif);font-size:1rem;font-weight:700;letter-spacing:.06em;cursor:pointer;transition:background .2s,transform .1s,box-shadow .2s;box-shadow:0 2px 8px rgba(200,90,53,.2)}
+.generate-btn:hover{background:var(--primary-hover);box-shadow:0 4px 16px rgba(200,90,53,.25)}
+.generate-btn:active{transform:scale(.97)}
+.generate-btn:disabled{opacity:.4;cursor:not-allowed}
+
+/* ── Results ── */
+.results{margin-top:32px;margin-bottom:60px}
+.results.hidden{display:none}
+.results-header{text-align:center;margin-bottom:20px}
+.results-header h2{font-family:var(--serif);font-size:1.15rem;letter-spacing:.04em}
+.results-header p{font-size:.8rem;color:var(--text-light);margin-top:4px}
+
+/* ── Day cards ── */
+.day-cards{display:grid;gap:16px}
+@media(min-width:700px){.day-cards{grid-template-columns:repeat(3,1fr)}}
+.day-card{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden;animation:fadeUp .4s ease both}
+.day-card:nth-child(2){animation-delay:.1s}
+.day-card:nth-child(3){animation-delay:.2s}
+@keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+.day-label{padding:14px 18px;font-family:var(--serif);font-weight:700;font-size:.88rem;color:#fff;letter-spacing:.05em}
+.day1 .day-label{background:#C85A35}
+.day2 .day-label{background:#4A8C6F}
+.day3 .day-label{background:#5B7EC2}
+.day-label small{font-family:var(--sans);font-weight:400;opacity:.8;margin-left:8px;font-size:.74rem}
+.day-body{padding:18px 20px}
+.menu-row{margin-bottom:14px;padding-bottom:14px;border-bottom:1px solid var(--border);position:relative}
+.menu-row:last-child{margin-bottom:0;padding-bottom:0;border-bottom:none}
+.menu-cat{font-size:.72rem;color:var(--text-light);margin-bottom:3px;text-transform:uppercase;letter-spacing:.08em}
+.menu-name{font-size:.9rem;font-weight:600}
+.menu-note{font-size:.76rem;color:var(--text-light);margin-top:2px}
+.nutri-badge{font-size:.8rem;color:#5c5148;background:#f6f2ea;border-radius:8px;padding:7px 10px;margin-top:10px}
+.nutri-note{display:block;font-size:.68rem;color:#a39a8f;margin-top:3px}
+.toriwake{font-size:.76rem;color:var(--green);margin-top:3px}
+.carryover-row{border-left:2px solid var(--green);padding-left:12px;margin-left:0}
+.new-dish-row{border-left:2px solid var(--primary);padding-left:12px;margin-left:0}
+
+/* ── Single mode card ── */
+.single-card{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden;animation:fadeUp .4s ease both;max-width:400px;margin:0 auto}
+.single-label{padding:14px 18px;font-family:var(--serif);font-weight:700;font-size:.88rem;color:#fff;background:#C85A35;letter-spacing:.05em}
+.single-body{padding:18px 20px}
+
+/* ── Regen button ── */
+.regen-btn{display:block;width:100%;max-width:300px;margin:28px auto 0;padding:12px;background:transparent;color:var(--text-mid);border:1.5px solid var(--border);border-radius:8px;font-size:.88rem;cursor:pointer;transition:all .2s}
+.regen-btn:hover{border-color:var(--primary);color:var(--primary)}
+.regen-btn:active{transform:scale(.97)}
+
+/* ── 段階選択フロー ── */
+.btn-stack{max-width:380px;margin:32px auto}
+.btn-stack .generate-btn{margin:0 0 12px;max-width:none}
+.generate-btn.secondary{background:transparent;color:var(--primary);border:1.5px solid var(--primary);box-shadow:none;font-weight:600}
+.generate-btn.secondary:hover{background:var(--primary-light)}
+.generate-btn.secondary .spinner{border-color:rgba(200,90,53,.25);border-top-color:var(--primary)}
+.flow-progress{display:flex;justify-content:center;align-items:center;gap:8px;font-size:.8rem;color:var(--text-light);margin-bottom:14px;flex-wrap:wrap}
+.flow-progress .cur{color:var(--primary);font-weight:700}
+.flow-progress .done{color:var(--green)}
+.flow-arrow{color:var(--text-light);font-size:.7rem}
+.picked-row{display:flex;justify-content:center;gap:8px;flex-wrap:wrap;margin-bottom:16px}
+.picked-chip{font-size:.78rem;color:var(--green);background:var(--green-light);border-radius:999px;padding:4px 12px}
+.cand-grid{display:grid;gap:10px;grid-template-columns:repeat(auto-fill,minmax(160px,1fr))}
+.cand-card{background:var(--card);border:1.5px solid var(--border);border-radius:var(--radius);padding:14px;cursor:pointer;text-align:left;font-family:var(--sans);transition:border-color .2s,box-shadow .2s;animation:fadeUp .3s ease both}
+.cand-card:hover{border-color:var(--primary);box-shadow:var(--shadow)}
+.cand-card:active{transform:scale(.97)}
+.cand-name{font-size:.9rem;font-weight:600;color:var(--text)}
+.cand-meta{font-size:.72rem;color:var(--text-light);margin-top:4px;line-height:1.5}
+
+/* ── Error ── */
+.error-msg{text-align:center;padding:24px;color:var(--primary);font-size:.9rem;background:var(--primary-light);border-radius:var(--radius)}
+
+/* ── Footer ── */
+.footer{text-align:center;padding:40px 20px;font-size:.76rem;color:var(--text-light);letter-spacing:.01em}
+
+/* ── Status bar ── */
+.status-bar{text-align:center;padding:14px 0;font-size:.84rem;color:var(--text-mid)}
+.status-bar strong{color:var(--primary);font-size:1.05rem;font-weight:700}
+
+/* ── Workflow ── */
+.workflow-details{margin:0 0 12px;border-radius:var(--radius);overflow:hidden;background:var(--surface)}
+.workflow-summary{cursor:pointer;padding:14px 16px;background:var(--surface);font-size:.85rem;font-weight:600;color:var(--text);list-style:none;display:flex;align-items:center;gap:6px}
+.workflow-summary::-webkit-details-marker{display:none}
+.workflow-summary::before{content:'▶';font-size:.55rem;transition:transform .2s;display:inline-block;color:var(--text-light)}
+details[open]>.workflow-summary::before{transform:rotate(90deg)}
+.workflow-body{padding:14px 12px 10px;font-size:.8rem;line-height:1.75;background:var(--card)}
+.wf-step{display:flex;gap:8px;margin-bottom:12px;padding-bottom:10px;align-items:flex-start;border-bottom:1px solid var(--border)}
+.wf-step:last-child{border-bottom:none;margin-bottom:0;padding-bottom:0}
+.wf-num{font-family:var(--serif);font-size:.88rem;font-weight:700;color:var(--primary);min-width:1.4em;text-align:center;flex-shrink:0}
+.wf-content{flex:1}
+.wf-title{font-weight:600;margin-bottom:2px;font-size:.84rem}
+.wf-detail{color:var(--text-light);font-size:.78rem;padding-left:4px}
+.wf-parallel{color:var(--green);font-size:.73rem;margin-left:6px}
+
+/* ── Recipe toggle ── */
+.recipe-toggle{margin-top:4px}
+.recipe-toggle summary{cursor:pointer;font-size:.76rem;color:var(--primary);list-style:none;display:inline-flex;align-items:center;gap:3px}
+.recipe-toggle summary::-webkit-details-marker{display:none}
+.recipe-toggle summary::before{content:'▶';font-size:.5rem;transition:transform .2s;display:inline-block}
+.recipe-toggle[open] summary::before{transform:rotate(90deg)}
+.recipe-body{padding:8px 0 2px;font-size:.78rem;line-height:1.75;color:var(--text)}
+.recipe-line{margin-bottom:3px}
+.recipe-label{font-size:.7rem;color:var(--text-light);display:block;letter-spacing:.02em}
+
+/* ── Step indicator ── */
+.step-label{display:flex;align-items:center;gap:10px;margin:28px 0 10px;padding:0 2px}
+.step-num{width:26px;height:26px;border-radius:50%;background:var(--text);color:#fff;font-size:.72rem;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.step-text{font-family:var(--serif);font-size:.82rem;font-weight:700;color:var(--text);letter-spacing:.03em}
+.step-label:first-of-type{margin-top:20px}
+
+/* ── Generate button loading ── */
+.generate-btn.loading{pointer-events:none;opacity:.7}
+.generate-btn.loading .btn-text{display:none}
+.generate-btn.loading .btn-loading{display:inline-flex;align-items:center;gap:8px}
+.generate-btn .btn-loading{display:none}
+@keyframes spin{to{transform:rotate(360deg)}}
+.spinner{width:18px;height:18px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .6s linear infinite}
+
+/* ── Carryover flow arrow (mobile only) ── */
+.carryover-flow{text-align:center;padding:6px 0;font-size:.73rem;color:var(--green);display:flex;align-items:center;justify-content:center;gap:4px}
+.carryover-flow::before{content:'';display:inline-block;width:0;height:0;border-left:5px solid transparent;border-right:5px solid transparent;border-top:6px solid var(--green)}
+@media(min-width:700px){.carryover-flow{display:none}}
+
+/* ── Save hint ── */
+.save-hint{font-size:.8rem;color:var(--text-mid);text-align:center;margin:20px 0 4px;letter-spacing:.02em}
+
+/* ── Photo banner ── */
+.photo-banner{width:100%;height:200px;background-size:cover;background-position:center;position:relative}
+.photo-banner::after{content:'';position:absolute;inset:0;background:linear-gradient(to bottom,var(--bg) 0%,transparent 15%,transparent 85%,var(--bg) 100%)}
+@media(min-width:700px){.photo-banner{height:260px}}
+
+/* ── Favorites ── */
+.fav-btn{display:block;width:100%;max-width:300px;margin:12px auto 0;padding:10px;background:transparent;color:var(--primary);border:1.5px solid var(--primary);border-radius:8px;font-size:.85rem;cursor:pointer;transition:all .2s}
+.fav-btn:hover{background:var(--primary-light)}
+.fav-heart{position:absolute;top:10px;right:10px;background:none;border:none;font-size:1.2rem;cursor:pointer;opacity:.5;transition:opacity .2s}
+.fav-heart.active{opacity:1}
+.fav-heart:hover{opacity:1}
+.fav-section{margin-top:24px}
+.fav-item{display:flex;justify-content:space-between;align-items:center;padding:10px 14px;background:var(--surface);border-radius:6px;margin-bottom:6px;font-size:.85rem}
+.fav-item button{background:none;border:none;color:var(--text-light);cursor:pointer;font-size:.8rem}
+.fav-item button:hover{color:var(--primary)}
+
+/* ── Menu picker（作りたいメニュー指定） ── */
+.menu-picker{position:relative;width:100%;margin-top:8px}
+.menu-picker input{width:100%;padding:10px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:16px;background:var(--surface);outline:none;font-family:var(--sans)}
+.menu-picker input:focus{border-color:var(--primary);background:#fff}
+.menu-suggestions{position:absolute;top:calc(100% + 4px);left:0;right:0;background:var(--card);border:1px solid var(--border);border-radius:8px;box-shadow:0 4px 20px rgba(0,0,0,.1);max-height:240px;overflow-y:auto;z-index:10}
+.menu-suggest-item{display:flex;justify-content:space-between;align-items:center;padding:10px 12px;font-size:.86rem;cursor:pointer;border-bottom:1px solid var(--border)}
+.menu-suggest-item:last-child{border-bottom:none}
+.menu-suggest-item:hover,.menu-suggest-item:active{background:var(--primary-light)}
+.menu-suggest-cat{font-size:.68rem;color:var(--text-light);background:var(--tag);border-radius:4px;padding:2px 6px;margin-left:8px;flex-shrink:0}
+.menu-suggest-empty{padding:10px 12px;font-size:.8rem;color:var(--text-light)}
+.menu-selected{display:flex;align-items:center;gap:8px;background:var(--primary-light);border:1.5px solid var(--primary);border-radius:8px;padding:9px 12px;font-size:.9rem;font-weight:600;margin-top:8px}
+.menu-selected .menu-suggest-cat{margin-left:0}
+.menu-selected button{margin-left:auto;background:none;border:none;color:var(--text-mid);cursor:pointer;font-size:.9rem;padding:2px 6px}
+.menu-selected button:hover{color:var(--primary)}
+</style>
+</head>
+<body>
+<header class="hero">
+  <div class="container">
+    <h1>面倒だけど、<br>3品は諦めたくない。</h1>
+    <p class="tagline">押すだけで3日分。カンタンに、3品が叶う。</p>
+    <div class="features">
+      <span class="feature">🔪 毎日ひと品仕込んで</span>
+      <span class="feature">🍳 昨日の繰り越しで品数UP</span>
+      <span class="feature">✨ 味も自然に変わる</span>
+    </div>
+  </div>
+</header>
+<div class="photo-banner" style="background-image:url('https://images.unsplash.com/photo-1498837167922-ddd27525d352?w=1400&fit=crop&q=80&auto=format')"></div>
+<main class="container">
+  <p class="save-hint">💡 チェック内容はブラウザに自動保存。次に開いてもそのまま使えます。</p>
+  <div class="step-label"><span class="step-num">1</span><span class="step-text">手持ちの調味料をチェック</span></div>
+  <section class="section" id="seasoning-section">
+    <h2>🧂 手持ちの調味料</h2>
+    <p class="section-desc">あるものにチェック。ここで作れる料理が決まります。</p>
+    <div id="seasoning-groups"></div>
+  </section>
+  <div class="step-label"><span class="step-num">2</span><span class="step-text">冷蔵庫の中身をチェック</span></div>
+  <section class="section" id="ingredient-section">
+    <h2>🥬 冷蔵庫の中身</h2>
+    <p class="section-desc">今あるものにチェック。この食材だけで献立を組みます。</p>
+    <div id="ingredient-groups"></div>
+  </section>
+  <div class="status-bar">今の条件で <strong id="recipe-count">0</strong> 品の主菜が作れます</div>
+  <div class="step-label"><span class="step-num">3</span><span class="step-text">オプションを選んで生成</span></div>
+  <section class="options-section">
+    <div class="option-row" style="flex-direction:column;align-items:stretch">
+      <span style="font-size:.88rem;font-weight:600">🎯 今日作りたいメニューがある？</span>
+      <div class="menu-picker" id="menu-picker">
+        <input type="text" id="menu-search" placeholder="メニュー名で検索（例：ポークチャップ）" autocomplete="off" oninput="onMenuSearch(this.value)" onfocus="onMenuSearch(this.value)">
+        <div id="menu-suggestions" class="menu-suggestions" style="display:none"></div>
+      </div>
+      <div id="menu-selected" class="menu-selected" style="display:none"></div>
+      <span style="font-size:.75rem;color:var(--text-light);margin-top:6px">指定したメニューを軸に、残り（副菜・汁物）を自動で組みます。空欄なら従来どおり全自動。</span>
+    </div>
+    <div class="option-row">
+      <label class="toggle-label">
+        <input type="checkbox" id="single-mode" onchange="onOptionChange()">
+        <span>🍚 今日は1品でOK</span>
+      </label>
+    </div>
+    <div class="option-row" style="flex-direction:column;align-items:flex-start">
+      <label class="toggle-label">
+        <input type="checkbox" id="single-mode-info" style="display:none">
+        <span style="font-size:.75rem;color:var(--text-light);padding-left:26px;margin-top:-4px">丼・麺・ワンプレートから提案</span>
+      </label>
+    </div>
+    <div class="option-row">
+      <label class="toggle-label">
+        <input type="checkbox" id="bento-mode" onchange="onOptionChange()">
+        <span>🍱 お弁当向きだけ</span>
+      </label>
+    </div>
+    <div class="option-row" style="flex-direction:column;align-items:flex-start">
+      <label class="toggle-label">
+        <input type="checkbox" style="display:none">
+        <span style="font-size:.75rem;color:var(--text-light);padding-left:26px;margin-top:-4px">作り置き × 冷めてもOK なメニューだけ</span>
+      </label>
+    </div>
+    <div class="option-row">
+      <label class="toggle-label">
+        <input type="checkbox" id="keepok-mode" onchange="onOptionChange()">
+        <span>🥡 置いといても美味しい</span>
+      </label>
+    </div>
+    <div class="option-row" style="flex-direction:column;align-items:flex-start;padding-top:0">
+      <span style="font-size:.75rem;color:var(--text-light);padding-left:26px">作り置き・冷めてもおいしい料理だけで組む</span>
+    </div>
+    <div class="option-row">
+      <label class="toggle-label">
+        <input type="checkbox" id="variety-mode" onchange="onOptionChange()">
+        <span>🎲 ちょい、いつもと違う味</span>
+      </label>
+    </div>
+    <div class="option-row" style="flex-direction:column;align-items:flex-start;padding-top:0">
+      <span style="font-size:.75rem;color:var(--text-light);padding-left:26px">最近出た料理や、いつものジャンルを避けて新鮮に</span>
+    </div>
+    <div class="option-row">
+      <label class="toggle-label">
+        <input type="checkbox" id="fav-priority" onchange="onOptionChange()">
+        <span>❤️ お気に入りを優先</span>
+      </label>
+    </div>
+    <div class="option-row" style="flex-direction:column;align-items:flex-start;padding-top:0">
+      <span style="font-size:.75rem;color:var(--text-light);padding-left:26px">保存したお気に入りがあれば優先的に出す</span>
+    </div>
+  </section>
+  <div class="btn-stack">
+    <button class="generate-btn" id="step-btn" onclick="startStepFlow()">
+      <span class="btn-text">選びながら作る（メイン → 副菜 → 汁物）</span>
+    </button>
+    <button class="generate-btn secondary" id="generate-btn" onclick="generate()">
+      <span class="btn-text">おまかせで3日分出す</span>
+      <span class="btn-loading"><span class="spinner"></span>献立を考え中…</span>
+    </button>
+  </div>
+  <button class="fav-btn" id="fav-btn" onclick="showFavorites()" style="display:none">
+    ❤️ お気に入り (<span id="fav-count">0</span>)
+  </button>
+  <div id="results" class="results hidden"></div>
+</main>
+<footer class="footer">
+  <p>手持ちの食材と調味料から、3日分の献立を自動で組み立てます。</p>
+</footer>
+<script>
+let D = {};
+let R = {};
+
+const SEASONING_GROUPS = [
+  {name:"基本", items:[
+    {id:"醤油",on:true},{id:"みりん",on:true},{id:"酒",on:true},{id:"塩",on:true},
+    {id:"こしょう",on:true},{id:"砂糖",on:true},{id:"酢",on:true},{id:"だし",on:true}
+  ]},
+  {name:"あると広がる", items:[
+    {id:"味噌",on:true},{id:"にんにく",on:true},{id:"片栗粉",on:true},
+    {id:"マヨネーズ",on:true},{id:"ケチャップ",on:true},{id:"ソース",on:true}
+  ]},
+  {name:"洋風", items:[
+    {id:"コンソメ",on:false},{id:"バター",on:true},{id:"オリーブ油",on:false}
+  ]},
+  {name:"中華・アジアン", items:[
+    {id:"ごま油",on:true},{id:"鶏ガラ",on:true},{id:"オイスター",on:false},
+    {id:"コチュジャン",on:false},{id:"ナンプラー",on:false},{id:"カレー粉",on:false},{id:"カレールー",on:false}
+  ]},
+  {name:"和風プラス", items:[
+    {id:"すりごま",on:false},{id:"かつお節",on:false},{id:"塩昆布",on:false},{id:"ポン酢",on:false}
+  ]},
+  {name:"そのほか", items:[
+    {id:"牛乳",on:true},{id:"チーズ",on:true},{id:"粉チーズ",on:true},{id:"めんつゆ",on:true},
+    {id:"ウスターソース",on:true},{id:"レモン",on:true},{id:"塩麹",on:false},
+    {id:"キムチ",on:false},{id:"わさび",on:false},{id:"ごまだれ",on:false}
+  ]}
+];
+
+const ING_GROUPS = [
+  {name:"お肉", items:["鶏もも肉","鶏むね肉","鶏ひき肉","手羽元","豚ロース薄切り","豚ロースブロック","豚バラ","豚ヒレ","豚こま","牛こま","合いびき肉","豚ひき肉"]},
+  {name:"魚介", items:["ブリ切り身","メカジキ","太刀魚","鮭切り身","タラ切り身","サワラ切り身","カレイ切り身(骨なし)","骨取りサバ","鯛切り身","むきえび","ホタテ"]},
+  {name:"たまご・大豆", items:["たまご","豆腐","厚揚げ","油揚げ"]},
+  {name:"野菜", items:["じゃがいも","にんじん","玉ねぎ","大根","キャベツ","白菜","ほうれん草","小松菜","ちんげん菜","ブロッコリー","もやし","にら","きのこ","長ねぎ","ピーマン","トマト","きゅうり","こんにゃく","生姜"]},
+  {name:"ストック", items:["トマト缶","ツナ缶","コーン缶","春雨","そうめん","ウィンナー","パン粉","わかめ","ひじき","大豆","大葉","ヨーグルト","うどん","パスタ","焼きそば麺"]}
+];
+
+const st = {
+  seasonings: new Set(),
+  ingredients: new Set(),
+  lastMainId: null,
+  favorites: new Set(),
+  requestedId: null
+};
+
+// ── 作りたいメニュー指定 ──
+function findMenuById(id){
+  const m=(D.main||[]).find(x=>x.id===id);
+  if(m)return {item:m,kind:'main'};
+  const s=(D.single||[]).find(x=>x.id===id);
+  if(s)return {item:s,kind:'single'};
+  return null;
+}
+function onMenuSearch(q){
+  const box=document.getElementById('menu-suggestions');
+  q=(q||'').trim();
+  if(!q){box.style.display='none';box.innerHTML='';return;}
+  const hits=[];
+  (D.main||[]).forEach(m=>{if(m.name.includes(q))hits.push({id:m.id,name:m.name,cat:'主菜'});});
+  (D.single||[]).forEach(s=>{if(s.name.includes(q))hits.push({id:s.id,name:s.name,cat:'1品'});});
+  if(hits.length===0){
+    box.innerHTML='<div class="menu-suggest-empty">見つかりませんでした（登録済みメニューから検索します）</div>';
+  }else{
+    box.innerHTML=hits.slice(0,8).map(h=>
+      `<div class="menu-suggest-item" onclick="selectMenu('${h.id}')"><span>${h.name}</span><span class="menu-suggest-cat">${h.cat}</span></div>`
+    ).join('');
+  }
+  box.style.display='block';
+}
+function selectMenu(id){
+  const found=findMenuById(id);
+  if(!found)return;
+  st.requestedId=id;
+  document.getElementById('menu-picker').style.display='none';
+  document.getElementById('menu-suggestions').style.display='none';
+  document.getElementById('menu-search').value='';
+  const sel=document.getElementById('menu-selected');
+  sel.innerHTML=`<span class="menu-suggest-cat">${found.kind==='main'?'主菜':'1品'}</span><span>${found.item.name}</span><button onclick="clearMenu()">✕ 外す</button>`;
+  sel.style.display='flex';
+  const btn=document.getElementById('generate-btn');
+  btn.querySelector('.btn-text').textContent=found.kind==='main'?`「${found.item.name}」を軸に献立を出す`:`「${found.item.name}」で今日はOK`;
+}
+function clearMenu(){
+  st.requestedId=null;
+  document.getElementById('menu-selected').style.display='none';
+  document.getElementById('menu-picker').style.display='';
+  onOptionChange();
+}
+document.addEventListener('click',e=>{
+  if(!e.target.closest('.menu-picker')){
+    const box=document.getElementById('menu-suggestions');
+    if(box)box.style.display='none';
+  }
+});
+
+function pick(arr) { return arr[Math.floor(Math.random()*arr.length)]; }
+function shuffle(arr) { const a=[...arr]; for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];} return a; }
+
+// ── 3色食品群のかんたん判定（材料名からの自動判定・目安）──
+const NUTRI_RED=['鶏','豚','牛','ひき','ミンチ','ベーコン','ハム','ソーセージ','ウインナー','たまご','卵','豆腐','厚揚げ','油揚げ','大豆','ビーンズ','鮭','さば','鯖','ぶり','たら','えび','海老','いか','ツナ','しらす','ちくわ','かにかま','はんぺん','納豆','チーズ','牛乳','ヨーグルト','あさり','肉'];
+const NUTRI_GREEN=['ほうれん草','小松菜','キャベツ','レタス','白菜','ブロッコリー','トマト','きゅうり','なす','ピーマン','パプリカ','にんじん','人参','玉ねぎ','ねぎ','大根','かぶ','ごぼう','れんこん','もやし','オクラ','アスパラ','ズッキーニ','セロリ','水菜','チンゲン菜','ニラ','にら','しめじ','えのき','まいたけ','しいたけ','エリンギ','きのこ','わかめ','ひじき','海藻','豆苗','枝豆','いんげん','スナップ','とうもろこし','コーン','春菊','三つ葉','大葉','青梗菜','野菜'];
+const NUTRI_YELLOW=['ごはん','ご飯','米','麺','うどん','そば','パスタ','スパゲ','パン','じゃがいも','さつまいも','里芋','いも','餅','春雨','皮','小麦粉'];
+function nutriCount(dish,color){const list=color==='red'?NUTRI_RED:color==='green'?NUTRI_GREEN:NUTRI_YELLOW;const ings=(dish&&dish.ingredients)||[];const hits=new Set();ings.forEach(i=>{list.forEach(k=>{if(String(i).includes(k))hits.add(i);});});return hits.size;}
+function nutriBadge(dishes,riceIncluded){
+  let red=0,green=0,yellow=0;
+  dishes.forEach(d=>{if(!d)return;red+=nutriCount(d,'red');green+=nutriCount(d,'green');yellow+=nutriCount(d,'yellow');});
+  if(riceIncluded)yellow+=1;
+  const mark=(n,ok,good)=>n>=good?'◎':n>=ok?'○':'△';
+  return `<div class="nutri-badge">きょうのバランス　🔴たんぱく ${mark(red,1,2)}　🟢野菜 ${mark(green,2,3)}　🟡主食 ${mark(yellow,1,1)}<span class="nutri-note">※3色食品群のかんたん判定（材料名から自動・目安です）</span></div>`;
+}
+
+// ── オプション取得・保存 ──
+function getOpts(){
+  return {
+    single: document.getElementById('single-mode').checked,
+    bento: document.getElementById('bento-mode').checked,
+    keepOk: document.getElementById('keepok-mode').checked,
+    variety: document.getElementById('variety-mode').checked,
+    favPriority: document.getElementById('fav-priority').checked
+  };
+}
+function saveOpts(){
+  const o={
+    keepOk:document.getElementById('keepok-mode').checked,
+    variety:document.getElementById('variety-mode').checked,
+    favPriority:document.getElementById('fav-priority').checked
+  };
+  localStorage.setItem('kondate-opts',JSON.stringify(o));
+}
+
+// ── 履歴（いつもと違う味の判定用）──
+function loadHistory(){try{return JSON.parse(localStorage.getItem('kondate-history')||'[]');}catch(e){return [];}}
+function recordHistory(ids){
+  const genreById={};[...(D.main||[]),...(D.single||[])].forEach(m=>{genreById[m.id]=m.genre;});
+  let h=loadHistory();const ts=Date.now();
+  ids.forEach(id=>{if(id)h.push({id,genre:genreById[id]||'',ts});});
+  if(h.length>30)h=h.slice(h.length-30);
+  localStorage.setItem('kondate-history',JSON.stringify(h));
+}
+// 履歴が十分貯まっていれば、最近出たもの＋最頻ジャンルを避けた候補を返す
+function applyVariety(pool){
+  const h=loadHistory();
+  if(h.length<10)return pool; // データが少ないうちは通常通り
+  const recentIds=new Set(h.slice(-8).map(x=>x.id));
+  const gc={};h.forEach(x=>{if(x.genre)gc[x.genre]=(gc[x.genre]||0)+1;});
+  const dominant=Object.keys(gc).sort((a,b)=>gc[b]-gc[a])[0];
+  let p=pool.filter(m=>!recentIds.has(m.id)&&m.genre!==dominant);
+  if(p.length>0)return p;
+  p=pool.filter(m=>!recentIds.has(m.id));
+  return p.length>0?p:pool;
+}
+// 手順(recipes.json)が無い料理向け：データのpointを表示
+function pointNote(item){
+  if(!item||!item.point)return '';
+  return `<details class="recipe-toggle"><summary>ポイントを見る</summary><div class="recipe-body"><div class="recipe-line">${item.point}</div></div></details>`;
+}
+
+// 調味料1つが「使える」か。複合・別名トークンも解決する
+function seasoningOK(s){
+  if(st.seasonings.has(s))return true;
+  if(st.ingredients.has(s))return true; // 生姜など食材と兼用のもの
+  switch(s){
+    case '塩こしょう':return st.seasonings.has('塩')&&st.seasonings.has('こしょう');
+    case '黒こしょう':return st.seasonings.has('こしょう');
+    case 'ごまだれ or マヨ':return st.seasonings.has('マヨネーズ')||st.seasonings.has('ごまだれ');
+  }
+  return false;
+}
+function canMake(item) {
+  if (!item.seasonings) return true;
+  return item.seasonings.every(seasoningOK);
+}
+
+function genreMatch(item, genre) {
+  if (!item.genre) return true;
+  if (item.genre === '万能') return true;
+  return item.genre === genre;
+}
+
+function saveState(){
+  localStorage.setItem('kondate-s',JSON.stringify([...st.seasonings]));
+  localStorage.setItem('kondate-i',JSON.stringify([...st.ingredients]));
+}
+
+function saveFavorites(){
+  localStorage.setItem('kondate-fav',JSON.stringify([...st.favorites]));
+  updateFavBtn();
+}
+
+function updateFavBtn(){
+  const btn=document.getElementById('fav-btn');
+  const count=st.favorites.size;
+  document.getElementById('fav-count').textContent=count;
+  btn.style.display=count>0?'block':'none';
+}
+
+function toggleFav(id){
+  if(st.favorites.has(id))st.favorites.delete(id);else st.favorites.add(id);
+  saveFavorites();
+  const btns=document.querySelectorAll(`.fav-heart[data-id="${id}"]`);
+  btns.forEach(b=>{b.classList.toggle('active',st.favorites.has(id));b.textContent=st.favorites.has(id)?'❤️':'🤍';});
+}
+
+function favBtn(id){
+  const active=st.favorites.has(id);
+  return `<button class="fav-heart${active?' active':''}" data-id="${id}" onclick="event.stopPropagation();toggleFav('${id}')">${active?'❤️':'🤍'}</button>`;
+}
+
+function showFavorites(){
+  const el=document.getElementById('results');
+  el.classList.remove('hidden');
+  if(st.favorites.size===0){
+    el.innerHTML=`<div class="results-header"><h2>❤️ お気に入り</h2><p>まだありません。献立を生成して 🤍 をタップしてね。</p></div>`;
+    el.scrollIntoView({behavior:'smooth',block:'start'});
+    return;
+  }
+  const allItems=[...(D.main||[]),...(D.side||[]),...(D.soup||[]),...(D.single||[])];
+  const lookup={};allItems.forEach(i=>{lookup[i.id]=i;});
+  let html=`<div class="results-header"><h2>❤️ お気に入り（${st.favorites.size}品）</h2></div><div class="fav-section">`;
+  st.favorites.forEach(id=>{
+    const item=lookup[id];
+    const name=item?item.name:id;
+    html+=`<div class="fav-item"><span>${name}</span><button onclick="toggleFav('${id}');showFavorites()">✕ 外す</button></div>`;
+  });
+  html+='</div><button class="regen-btn" onclick="generate()">🔄 献立を出す</button>';
+  el.innerHTML=html;
+  el.scrollIntoView({behavior:'smooth',block:'start'});
+}
+
+// 再描画しても開いているグループはそのまま（開閉状態は保存しない・セッション内のみ）
+function openGroupsIn(container){
+  return new Set([...container.querySelectorAll('details[open]')].map(d=>d.dataset.group));
+}
+
+function renderSeasonings() {
+  const container = document.getElementById('seasoning-groups');
+  const openSet = openGroupsIn(container);
+  container.innerHTML = SEASONING_GROUPS.map(group => {
+    const allChecked = group.items.every(i => st.seasonings.has(i.id));
+    const count = group.items.filter(i => st.seasonings.has(i.id)).length;
+    return `<details class="group-details" data-group="${group.name}"${openSet.has(group.name)?' open':''}>
+      <summary class="group-summary">
+        <span class="group-name">${group.name}</span>
+        <span class="group-badge${count===0?' zero':''}" data-badge="s-${group.name}">選択中 ${count}</span>
+        <button class="group-toggle" onclick="event.preventDefault();event.stopPropagation();toggleGroupAll('${group.name}')">${allChecked ? '全解除' : '全選択'}</button>
+      </summary>
+      <div class="group-body"><div class="checkbox-grid">
+        ${group.items.map(item => {
+          const checked = st.seasonings.has(item.id);
+          return `<label class="cb-label${checked?' checked':''}">
+            <input type="checkbox" ${checked?'checked':''} onchange="toggleSeasoning('${item.id}',this)">
+            ${item.id}
+          </label>`;
+        }).join('')}
+      </div></div>
+    </details>`;
+  }).join('');
+}
+
+function renderIngredients() {
+  const container = document.getElementById('ingredient-groups');
+  const openSet = openGroupsIn(container);
+  container.innerHTML = ING_GROUPS.map(group => {
+    const allChecked = group.items.every(i => st.ingredients.has(i));
+    const count = group.items.filter(i => st.ingredients.has(i)).length;
+    return `<details class="group-details" data-group="${group.name}"${openSet.has(group.name)?' open':''}>
+      <summary class="group-summary">
+        <span class="group-name">${group.name}</span>
+        <span class="group-badge${count===0?' zero':''}" data-badge="i-${group.name}">選択中 ${count}</span>
+        <button class="group-toggle" onclick="event.preventDefault();event.stopPropagation();toggleIngGroup('${group.name}')">${allChecked ? '全解除' : '全選択'}</button>
+      </summary>
+      <div class="group-body"><div class="checkbox-grid">
+        ${group.items.map(item => {
+          const checked = st.ingredients.has(item);
+          return `<label class="cb-label${checked?' checked':''}">
+            <input type="checkbox" ${checked?'checked':''} onchange="toggleIngredient('${item}',this)">
+            ${item}
+          </label>`;
+        }).join('')}
+      </div></div>
+    </details>`;
+  }).join('');
+}
+
+// バッジ（選択中◯個）だけを更新（個別チェック時・再描画なし）
+function updateBadges(){
+  SEASONING_GROUPS.forEach(g=>{
+    const n=g.items.filter(i=>st.seasonings.has(i.id)).length;
+    const el=document.querySelector(`[data-badge="s-${g.name}"]`);
+    if(el){el.textContent=`選択中 ${n}`;el.classList.toggle('zero',n===0);}
+  });
+  ING_GROUPS.forEach(g=>{
+    const n=g.items.filter(i=>st.ingredients.has(i)).length;
+    const el=document.querySelector(`[data-badge="i-${g.name}"]`);
+    if(el){el.textContent=`選択中 ${n}`;el.classList.toggle('zero',n===0);}
+  });
+}
+
+// 食材チェックリスト（ING_GROUPSに載っている＝ユーザーが申告できる食材）
+const KNOWN_ING = new Set(ING_GROUPS.flatMap(g => g.items));
+// データの食材名 → チェックリストの食材名（名前ゆれ吸収）
+const ING_ALIAS = {
+  '豚ロース':['豚ロース薄切り','豚ロースブロック'],
+  '豚バラ薄切り':['豚バラ'],'豚バラブロック':['豚バラ'],
+  'しめじ':['きのこ'],'なめこ':['きのこ'],
+  'チンゲン菜':['ちんげん菜'],
+  '鮭':['鮭切り身'],'ブリ':['ブリ切り身'],
+  'カレイ切り身':['カレイ切り身(骨なし)']
+};
+function ingredientOK(i){
+  if(st.ingredients.has(i))return true;
+  const al=ING_ALIAS[i];
+  if(al)return al.some(x=>st.ingredients.has(x));
+  // チェックリストに無い食材（主食・薬味・特殊食材など）は献立を妨げない＝常備扱い
+  if(!KNOWN_ING.has(i))return true;
+  return false;
+}
+function hasIngredients(item) {
+  if (!item.ingredients) return true;
+  return item.ingredients.every(ingredientOK);
+}
+
+function updateCount(){
+  const mains=D.main.filter(m=>canMake(m)&&hasIngredients(m));
+  document.getElementById('recipe-count').textContent=mains.length;
+}
+
+function toggleSeasoning(id,cb){
+  if(cb.checked)st.seasonings.add(id);else st.seasonings.delete(id);
+  cb.closest('.cb-label').classList.toggle('checked',cb.checked);
+  updateCount();updateBadges();saveState();
+}
+
+function toggleIngredient(id,cb){
+  if(cb.checked)st.ingredients.add(id);else st.ingredients.delete(id);
+  cb.closest('.cb-label').classList.toggle('checked',cb.checked);
+  updateCount();updateBadges();saveState();
+}
+
+function toggleGroupAll(groupName){
+  const group=SEASONING_GROUPS.find(g=>g.name===groupName);
+  const allOn=group.items.every(i=>st.seasonings.has(i.id));
+  group.items.forEach(i=>{if(allOn)st.seasonings.delete(i.id);else st.seasonings.add(i.id);});
+  renderSeasonings();updateCount();saveState();
+}
+
+function toggleIngGroup(groupName){
+  const group=ING_GROUPS.find(g=>g.name===groupName);
+  const allOn=group.items.every(i=>st.ingredients.has(i));
+  group.items.forEach(i=>{if(allOn)st.ingredients.delete(i);else st.ingredients.add(i);});
+  renderIngredients();updateCount();saveState();
+}
+
+function onOptionChange(){
+  const btn=document.getElementById('generate-btn');
+  const singleMode=document.getElementById('single-mode').checked;
+  // 1品モードでは段階選択（メイン→副菜→汁物）は使わない
+  document.getElementById('step-btn').style.display=singleMode?'none':'block';
+  if(st.requestedId){saveOpts();return;} // メニュー指定中はボタン文言を維持
+  const t=singleMode?'今日の1品を出す':'おまかせで3日分出す';
+  btn.querySelector('.btn-text').textContent=t;
+  saveOpts();
+}
+
+function generate(){
+  const btn=document.getElementById('generate-btn');
+  btn.classList.add('loading');
+  setTimeout(()=>{
+    const opts=getOpts();
+    const bentoIds=new Set((D._meta&&D._meta.bento_ids)||[]);
+    const req=st.requestedId?findMenuById(st.requestedId):null;
+    if(req&&req.kind==='single'){generateSingle(opts,bentoIds,req.item);}
+    else if(req){generateThreeDay(opts,bentoIds,req.item);}
+    else if(opts.single){generateSingle(opts,bentoIds);}
+    else{generateThreeDay(opts,bentoIds);}
+    btn.classList.remove('loading');
+  },400);
+}
+
+function generateSingle(opts,bentoIds,forcedDish){
+  let dish;
+  if(forcedDish){
+    dish=forcedDish; // 指定メニューは食材・調味料チェックを通さず必ず出す
+  }else{
+    let candidates=D.single.filter(s=>canMake(s)&&hasIngredients(s));
+    if(opts.bento)candidates=candidates.filter(s=>bentoIds.has(s.id));
+    if(opts.keepOk){const f=candidates.filter(s=>s.keep_ok);if(f.length>0)candidates=f;}
+    if(candidates.length===0){showError('この条件に合う1品メニューが見つかりませんでした。食材や調味料を増やしてみてください。');return;}
+    let pool=candidates;
+    if(opts.favPriority&&st.favorites.size>0){const fp=pool.filter(s=>st.favorites.has(s.id));if(fp.length>0)pool=fp;}
+    if(opts.variety){pool=applyVariety(pool);}
+    dish=pick(pool);
+  }
+  recordHistory([dish.id]);
+  const r=R[dish.id];
+  const el=document.getElementById('results');
+  el.classList.remove('hidden');
+  el.innerHTML=`
+    <div class="results-header"><h2>🍚 今日の1品</h2><p>これだけでOK。お疲れさまの日に。</p></div>
+    <div class="single-card">
+      <div class="single-label">${dish.name}（${dish.type}）</div>
+      <div class="single-body">
+        <div class="menu-row">
+          ${favBtn(dish.id)}
+          <div class="menu-cat">材料</div>
+          <div class="menu-name">${dish.ingredients.join('、')}</div>
+        </div>
+        ${dish.toriwake?`<div class="toriwake">👧 子ども：${dish.toriwake.kodomo}　👨 大人：${dish.toriwake.otona}</div>`:''}
+        ${r?recipeHtml(r):pointNote(dish)}
+        ${nutriBadge([dish],false)}
+      </div>
+    </div>
+    <button class="regen-btn" onclick="generate()">🔄 もう一回出す</button>`;
+  el.scrollIntoView({behavior:'smooth',block:'start'});
+}
+
+function generateThreeDay(opts,bentoIds,forcedMain){
+  let mains=D.main.filter(m=>canMake(m)&&hasIngredients(m));
+  let sides=D.side.filter(s=>canMake(s)&&hasIngredients(s));
+  let soups=D.soup.filter(s=>canMake(s)&&hasIngredients(s));
+  if(opts.bento){mains=mains.filter(m=>bentoIds.has(m.id));sides=sides.filter(s=>bentoIds.has(s.id));}
+  if(opts.keepOk){
+    const fm=mains.filter(m=>m.keep_ok),fs=sides.filter(s=>s.keep_ok),fp=soups.filter(s=>s.keep_ok);
+    if(fm.length>0)mains=fm; if(fs.length>0)sides=fs; if(fp.length>0)soups=fp;
+  }
+  // 副菜・汁物が食材チェックで全滅したら全データから補う（空クラッシュ防止）
+  if(sides.length===0)sides=[...D.side];
+  if(soups.length===0)soups=[...D.soup];
+  let batchMains=mains.filter(m=>m.batch);
+  if(forcedMain&&batchMains.filter(m=>m.id!==forcedMain.id).length===0){
+    // 指定メニュー時、Day2用の候補が食材チェックで空なら全データから補う
+    batchMains=D.main.filter(m=>m.batch&&m.id!==forcedMain.id);
+  }
+  if(batchMains.length===0){showError('今ある食材と調味料で作り置きできる主菜が見つかりませんでした。条件をゆるめてみてください。');return;}
+  let day1Main;
+  if(forcedMain){
+    day1Main=forcedMain; // 指定メニューは食材・調味料チェックを通さず必ず軸にする
+  }else{
+    let day1Pool=batchMains.filter(m=>m.id!==st.lastMainId);
+    if(day1Pool.length===0)day1Pool=batchMains;
+    if(opts.favPriority&&st.favorites.size>0){const favPool=day1Pool.filter(m=>st.favorites.has(m.id));if(favPool.length>0)day1Pool=favPool;}
+    if(opts.variety){day1Pool=applyVariety(day1Pool);}
+    day1Main=pick(day1Pool);
+  }
+  st.lastMainId=day1Main.id;
+  const day2Carryover=pick(day1Main.carryover);
+  let day2Pool=batchMains.filter(m=>m.genre!==day1Main.genre&&m.id!==day1Main.id);
+  if(day2Pool.length===0)day2Pool=batchMains.filter(m=>m.protein!==day1Main.protein&&m.id!==day1Main.id);
+  if(day2Pool.length===0)day2Pool=batchMains.filter(m=>m.id!==day1Main.id);
+  if(day2Pool.length===0)day2Pool=batchMains;
+  const day2NewMain=pick(day2Pool);
+  recordHistory([day1Main.id,day2NewMain.id]);
+  const day3Carryover=pick(day2NewMain.carryover);
+  const makeaheadSides=shuffle(sides.filter(s=>s.makeahead));
+  const freshSides=shuffle(sides.filter(s=>!s.makeahead));
+  const allSidesShuffled=shuffle(sides);
+  const usedSideIds=new Set();
+  function pickSide(pool){const av=pool.filter(s=>!usedSideIds.has(s.id));if(av.length===0)return pick(pool.length>0?pool:sides);const s=av[0];usedSideIds.add(s.id);return s;}
+  let d1SidePool=makeaheadSides.filter(s=>genreMatch(s,day1Main.genre));
+  if(nutriCount(day1Main,'green')===0){const gp=d1SidePool.filter(s=>nutriCount(s,'green')>0);if(gp.length>0)d1SidePool=gp;}
+  const day1Side=pickSide(d1SidePool.length>0?d1SidePool:makeaheadSides.length>0?makeaheadSides:allSidesShuffled);
+  let d2SidePool=freshSides.length>0?freshSides:allSidesShuffled;
+  if(nutriCount(day2NewMain,'green')===0){const gp=d2SidePool.filter(s=>nutriCount(s,'green')>0);if(gp.length>0)d2SidePool=gp;}
+  const day2Side=pickSide(d2SidePool);
+  let d3SidePool=allSidesShuffled.filter(s=>genreMatch(s,day2NewMain.genre)&&!usedSideIds.has(s.id));
+  if(nutriCount(day2NewMain,'green')===0){const gp=d3SidePool.filter(s=>nutriCount(s,'green')>0);if(gp.length>0)d3SidePool=gp;}
+  const day3Side=pickSide(d3SidePool.length>0?d3SidePool:allSidesShuffled);
+  const usedSoupIds=new Set();
+  function pickSoup(pool){const av=pool.filter(s=>!usedSoupIds.has(s.id));if(av.length===0)return pick(pool.length>0?pool:soups);const s=pick(av);usedSoupIds.add(s.id);return s;}
+  let batchSoups=soups.filter(s=>s.batch);
+  let d1SoupPool=batchSoups.filter(s=>genreMatch(s,day1Main.genre));
+  const day1Soup=pickSoup(d1SoupPool.length>0?d1SoupPool:batchSoups.length>0?batchSoups:soups);
+  let day2Soup,day2SoupNote='';
+  if(day1Soup.batch&&Math.random()<0.5){day2Soup=day1Soup;day2SoupNote='（昨日の続き・温めるだけ）';}
+  else{let d2SoupPool=soups.filter(s=>genreMatch(s,day2NewMain.genre));day2Soup=pickSoup(d2SoupPool.length>0?d2SoupPool:soups);if(day2Soup.id===day1Soup.id)day2SoupNote='（昨日の続き）';}
+  let d3SoupPool=soups.filter(s=>genreMatch(s,day2NewMain.genre));
+  const day3Soup=pickSoup(d3SoupPool.length>0?d3SoupPool:soups);
+  const g1=day1Main.genre,g2=day2NewMain.genre;
+  const genreLabel=g1===g2?g1:`${g1} → ${g2}`;
+  renderThreeDayResults({genreLabel,
+    day1:{main:day1Main,side:day1Side,soup:day1Soup},
+    day2:{carryover:day2Carryover,carryoverFrom:day1Main,newMain:day2NewMain,side:day2Side,soup:day2Soup,soupNote:day2SoupNote},
+    day3:{carryover:day3Carryover,carryoverFrom:day2NewMain,side:day3Side,soup:day3Soup}
+  });
+}
+
+function buildWorkflow(items,dayNum){
+  const N=['①','②','③','④','⑤','⑥','⑦','⑧'];
+  let ni=0,html='';
+  const carryovers=items.filter(i=>i.type==='carryover');
+  const cookItems=items.filter(i=>i.type!=='carryover');
+  const cuts=[];
+  cookItems.forEach(item=>{const r=R[item.id];if(r&&r.c&&r.c!=='なし')cuts.push(item.name+'：'+r.c);});
+  if(cuts.length>0){
+    html+=`<div class="wf-step"><span class="wf-num">${N[ni++]}</span><div class="wf-content"><div class="wf-title">まず全部切る</div>${cuts.map(c=>`<div class="wf-detail">🔪 ${c}</div>`).join('')}</div></div>`;
+  }
+  const sauces=[];
+  cookItems.forEach(item=>{const r=R[item.id];if(r&&r.s)sauces.push(item.name+'：'+r.s);});
+  if(sauces.length>0){
+    html+=`<div class="wf-step"><span class="wf-num">${N[ni++]}</span><div class="wf-content"><div class="wf-title">合わせ調味料を準備</div>${sauces.map(s=>`<div class="wf-detail">🫙 ${s}</div>`).join('')}</div></div>`;
+  }
+  if(carryovers.length>0){
+    html+=`<div class="wf-step"><span class="wf-num">${N[ni++]}</span><div class="wf-content"><div class="wf-title">繰り越しは温めるだけ</div><div class="wf-detail">レンジまたは鍋で温め直し</div></div></div>`;
+  }
+  const sorted=[...cookItems].sort((a,b)=>{const ra=R[a.id],rb=R[b.id];return((rb?rb.w:0)||0)-((ra?ra.w:0)||0);});
+  sorted.forEach(item=>{
+    const r=R[item.id];if(!r)return;
+    const wait=r.w||0;
+    const parallel=wait>0?`<span class="wf-parallel">→ ${wait}分煮ている間に次へ</span>`:'';
+    html+=`<div class="wf-step"><span class="wf-num">${N[ni++]||'⑨'}</span><div class="wf-content"><div class="wf-title">${item.name}${parallel}</div><div class="wf-detail">${r.t}</div></div></div>`;
+  });
+  let total=0;
+  items.forEach(item=>{if(item.type==='carryover'){total+=3;return;}const r=R[item.id];total+=(r?r.m:10);});
+  const waitSave=cookItems.reduce((s,item)=>{const r=R[item.id];return s+(r&&r.w?Math.min(r.w,15):0);},0);
+  total=Math.max(10,total-Math.round(waitSave*0.6));
+  return `<details class="workflow-details"${dayNum===1?' open':''}><summary class="workflow-summary">📋 段取りガイド（約${total}分）</summary><div class="workflow-body">${html}</div></details>`;
+}
+
+function recipeHtml(r){
+  if(!r)return '';
+  let body='';
+  if(r.c&&r.c!=='なし')body+=`<div class="recipe-line"><span class="recipe-label">下ごしらえ</span>${r.c}</div>`;
+  if(r.s)body+=`<div class="recipe-line"><span class="recipe-label">調味料</span>${r.s}</div>`;
+  body+=`<div class="recipe-line"><span class="recipe-label">作り方</span>${r.t}</div>`;
+  body+=`<div class="recipe-line"><span class="recipe-label">目安</span>約${r.m}分</div>`;
+  return `<details class="recipe-toggle"><summary>レシピを見る</summary><div class="recipe-body">${body}</div></details>`;
+}
+
+function renderThreeDayResults(plan){
+  const el=document.getElementById('results');
+  el.classList.remove('hidden');
+  const wf1Items=[{id:plan.day1.main.id,name:plan.day1.main.name,type:'main'},{id:plan.day1.side.id,name:plan.day1.side.name,type:'side'},{id:plan.day1.soup.id,name:plan.day1.soup.name,type:'soup'}];
+  const d2SoupType=(plan.day2.soupNote&&plan.day2.soupNote.includes('続き'))?'carryover':'soup';
+  const wf2Items=[{id:null,name:plan.day2.carryover.n,type:'carryover'},{id:plan.day2.newMain.id,name:plan.day2.newMain.name,type:'main'},{id:plan.day2.side.id,name:plan.day2.side.name,type:'side'},{id:plan.day2.soup.id,name:plan.day2.soup.name,type:d2SoupType}];
+  const wf3Items=[{id:null,name:plan.day3.carryover.n,type:'carryover'},{id:plan.day3.side.id,name:plan.day3.side.name,type:'side'},{id:plan.day3.soup.id,name:plan.day3.soup.name,type:'soup'}];
+
+  const d2HintHtml=plan.day2.carryover.h?`<div class="menu-note">💡 ${plan.day2.carryover.h}</div>`:'';
+  const d3HintHtml=plan.day3.carryover.h?`<div class="menu-note">💡 ${plan.day3.carryover.h}</div>`:'';
+
+  el.innerHTML=`
+    <div class="results-header">
+      <h2>🍽️ 3日分の献立｜${plan.genreLabel}</h2>
+      <p>毎日ひと品仕込んで繰り越すから、品数も味も自然に変わる。</p>
+    </div>
+    <div class="day-cards">
+      <div class="day-card day1">
+        <div class="day-label">🔪 Day1<small>仕込み・多めに作る</small></div>
+        <div class="day-body">
+          ${buildWorkflow(wf1Items,1)}
+          <div class="menu-row new-dish-row">
+            ${favBtn(plan.day1.main.id)}
+            <div class="menu-cat">主菜（多めに→明日へ）</div>
+            <div class="menu-name">${plan.day1.main.name}</div>
+            ${plan.day1.main.serve?'<div class="menu-note">🍽️ '+plan.day1.main.serve+'</div>':''}
+            <div class="toriwake">👧 ${plan.day1.main.toriwake.kodomo}　👨 ${plan.day1.main.toriwake.otona}</div>
+            ${R[plan.day1.main.id]?recipeHtml(R[plan.day1.main.id]):pointNote(plan.day1.main)}
+          </div>
+          <div class="menu-row">
+            ${favBtn(plan.day1.side.id)}
+            <div class="menu-cat">副菜</div>
+            <div class="menu-name">${plan.day1.side.name}</div>
+            ${recipeHtml(R[plan.day1.side.id])}
+          </div>
+          <div class="menu-row">
+            ${favBtn(plan.day1.soup.id)}
+            <div class="menu-cat">汁物</div>
+            <div class="menu-name">${plan.day1.soup.name}${plan.day1.soup.batch?'（明日の分も）':''}</div>
+            ${recipeHtml(R[plan.day1.soup.id])}
+          </div>
+          ${nutriBadge([plan.day1.main,plan.day1.side,plan.day1.soup],true)}
+        </div>
+      </div>
+      <div class="carryover-flow">${plan.day1.main.name} → ${plan.day2.carryover.n}</div>
+      <div class="day-card day2">
+        <div class="day-label">🍳 Day2<small>繰り越し＋もうひと品</small></div>
+        <div class="day-body">
+          ${buildWorkflow(wf2Items,2)}
+          <div class="menu-row carryover-row">
+            <div class="menu-cat">繰り越し</div>
+            <div class="menu-name">${plan.day2.carryover.n}</div>
+            ${d2HintHtml}
+            <div class="toriwake">👧 ${plan.day2.carryoverFrom.toriwake.kodomo}　👨 ${plan.day2.carryoverFrom.toriwake.otona}</div>
+          </div>
+          <div class="menu-row new-dish-row">
+            ${favBtn(plan.day2.newMain.id)}
+            <div class="menu-cat">新作（多めに→明日へ）</div>
+            <div class="menu-name">${plan.day2.newMain.name}</div>
+            ${plan.day2.newMain.serve?'<div class="menu-note">🍽️ '+plan.day2.newMain.serve+'</div>':''}
+            <div class="toriwake">👧 ${plan.day2.newMain.toriwake.kodomo}　👨 ${plan.day2.newMain.toriwake.otona}</div>
+            ${R[plan.day2.newMain.id]?recipeHtml(R[plan.day2.newMain.id]):pointNote(plan.day2.newMain)}
+          </div>
+          <div class="menu-row">
+            ${favBtn(plan.day2.side.id)}
+            <div class="menu-cat">副菜</div>
+            <div class="menu-name">${plan.day2.side.name}</div>
+            ${!plan.day2.side.makeahead?'<div class="menu-note">作りたて感プラス</div>':''}
+            ${recipeHtml(R[plan.day2.side.id])}
+          </div>
+          <div class="menu-row">
+            ${favBtn(plan.day2.soup.id)}
+            <div class="menu-cat">汁物</div>
+            <div class="menu-name">${plan.day2.soup.name}${plan.day2.soupNote}</div>
+            ${recipeHtml(R[plan.day2.soup.id])}
+          </div>
+          ${nutriBadge([plan.day2.carryoverFrom,plan.day2.newMain,plan.day2.side,plan.day2.soup],true)}
+        </div>
+      </div>
+      <div class="carryover-flow">${plan.day2.newMain.name} → ${plan.day3.carryover.n}</div>
+      <div class="day-card day3">
+        <div class="day-label">✨ Day3<small>繰り越し・ラクする日</small></div>
+        <div class="day-body">
+          ${buildWorkflow(wf3Items,3)}
+          <div class="menu-row carryover-row">
+            <div class="menu-cat">繰り越し</div>
+            <div class="menu-name">${plan.day3.carryover.n}</div>
+            ${d3HintHtml}
+            <div class="toriwake">👧 ${plan.day3.carryoverFrom.toriwake.kodomo}　👨 ${plan.day3.carryoverFrom.toriwake.otona}</div>
+          </div>
+          <div class="menu-row">
+            ${favBtn(plan.day3.side.id)}
+            <div class="menu-cat">副菜</div>
+            <div class="menu-name">${plan.day3.side.name}</div>
+            ${recipeHtml(R[plan.day3.side.id])}
+          </div>
+          <div class="menu-row">
+            ${favBtn(plan.day3.soup.id)}
+            <div class="menu-cat">汁物</div>
+            <div class="menu-name">${plan.day3.soup.name}</div>
+            ${recipeHtml(R[plan.day3.soup.id])}
+          </div>
+          ${nutriBadge([plan.day3.carryoverFrom,plan.day3.side,plan.day3.soup],true)}
+        </div>
+      </div>
+    </div>
+    <button class="regen-btn" onclick="generate()">🔄 もう一回出す</button>`;
+  el.scrollIntoView({behavior:'smooth',block:'start'});
+}
+
+function showError(msg) {
+  const el = document.getElementById('results');
+  el.classList.remove('hidden');
+  el.innerHTML = `<div class="error-msg">${msg}</div>
+    <button class="regen-btn" onclick="generate()">🔄 もう一回出す</button>`;
+  el.scrollIntoView({behavior:'smooth',block:'start'});
+}
+
+// ── 段階選択フロー（メイン → 副菜 → 汁物）──
+const flow={step:0,main:null,side:null,soup:null,cands:[],candLists:{}};
+
+// おまかせ生成と同じフィルタ（食材・調味料・お弁当・置いといてもOK）を尊重した候補プール
+function flowPools(){
+  const opts=getOpts();
+  const bentoIds=new Set((D._meta&&D._meta.bento_ids)||[]);
+  let mains=D.main.filter(m=>canMake(m)&&hasIngredients(m));
+  let sides=D.side.filter(s=>canMake(s)&&hasIngredients(s));
+  let soups=D.soup.filter(s=>canMake(s)&&hasIngredients(s));
+  if(opts.bento){mains=mains.filter(m=>bentoIds.has(m.id));sides=sides.filter(s=>bentoIds.has(s.id));}
+  if(opts.keepOk){
+    const fm=mains.filter(m=>m.keep_ok),fs=sides.filter(s=>s.keep_ok),fp=soups.filter(s=>s.keep_ok);
+    if(fm.length>0)mains=fm; if(fs.length>0)sides=fs; if(fp.length>0)soups=fp;
+  }
+  return {mains,sides,soups,opts};
+}
+
+function newCandList(step, avoid){
+  const {mains,sides,soups,opts}=flowPools();
+  let pool;
+  if(step===1){
+    pool=mains;
+    if(opts.variety)pool=applyVariety(pool);
+  }else if(step===2){
+    const match=sides.filter(s=>genreMatch(s,flow.main.genre));
+    pool=match.length>0?match:sides;
+  }else{
+    const match=soups.filter(s=>genreMatch(s,flow.main.genre));
+    pool=match.length>0?match:soups;
+  }
+  let a=shuffle(pool);
+  if(opts.favPriority&&st.favorites.size>0){
+    a=[...a.filter(x=>st.favorites.has(x.id)),...a.filter(x=>!st.favorites.has(x.id))];
+  }
+  // 「別の候補を見る」で直前と同じものを避ける（プール不足時は避けた分で埋める）
+  if(avoid&&avoid.size){
+    a=[...a.filter(x=>!avoid.has(x.id)),...a.filter(x=>avoid.has(x.id))];
+  }
+  return a.slice(0,6);
+}
+
+function startStepFlow(){
+  const {mains}=flowPools();
+  if(mains.length===0){showError('今の食材と調味料で作れるメインが見つかりませんでした。チェックを増やしてみてください。');return;}
+  flow.step=1;flow.main=null;flow.side=null;flow.soup=null;flow.candLists={};
+  flow.cands=newCandList(1);flow.candLists[1]=flow.cands;
+  renderFlowStep();
+}
+
+function selectCand(i){
+  const item=flow.cands[i];
+  if(!item)return;
+  if(flow.step===1)flow.main=item;
+  else if(flow.step===2)flow.side=item;
+  else{flow.soup=item;renderFlowResult();return;}
+  flow.step++;
+  advanceFlow();
+}
+
+function advanceFlow(){
+  const list=newCandList(flow.step);
+  if(list.length===0){
+    // 作れる候補が無い工程はスキップ（副菜なし・汁物なしで完成）
+    if(flow.step===2){flow.side=null;flow.step=3;advanceFlow();return;}
+    flow.soup=null;renderFlowResult();return;
+  }
+  flow.cands=list;flow.candLists[flow.step]=list;
+  renderFlowStep();
+}
+
+function reshuffleFlow(){
+  const avoid=new Set((flow.cands||[]).map(c=>c.id));
+  flow.cands=newCandList(flow.step, avoid);flow.candLists[flow.step]=flow.cands;
+  renderFlowStep();
+}
+
+function flowBack(){
+  if(flow.step<=1)return;
+  flow.step--;
+  if(flow.step===1)flow.main=null;
+  if(flow.step<=2)flow.side=null;
+  flow.cands=flow.candLists[flow.step]||newCandList(flow.step);
+  renderFlowStep();
+}
+
+function renderFlowStep(){
+  const el=document.getElementById('results');
+  el.classList.remove('hidden');
+  const names=['メイン','副菜','汁物'];
+  const prog=names.map((n,idx)=>{
+    const s=idx+1;
+    const cls=s<flow.step?'done':s===flow.step?'cur':'';
+    return `<span class="${cls}">${s<flow.step?'✓ ':''}${s}. ${n}</span>`;
+  }).join('<span class="flow-arrow">▶</span>');
+  const picked=[];
+  if(flow.main)picked.push(`<span class="picked-chip">主菜：${flow.main.name}</span>`);
+  if(flow.side)picked.push(`<span class="picked-chip">副菜：${flow.side.name}</span>`);
+  const title=flow.step===1?'メインを選ぶ':flow.step===2?'副菜を選ぶ':'汁物を選ぶ';
+  const desc=flow.step===1?'今の食材で作れるメインから、食べたいものをタップ'
+    :flow.step===2?'メインに合う副菜をタップ':'最後に汁物を選んで完成';
+  el.innerHTML=`
+    <div class="results-header"><h2>🧭 ${title}</h2><p>${desc}</p></div>
+    <div class="flow-progress">${prog}</div>
+    ${picked.length?`<div class="picked-row">${picked.join('')}</div>`:''}
+    <div class="cand-grid">
+      ${flow.cands.map((c,i)=>`
+        <button class="cand-card" onclick="selectCand(${i})">
+          <div class="cand-name">${c.name}</div>
+          <div class="cand-meta">${c.genre||''}${c.ingredients&&c.ingredients.length?'｜'+c.ingredients.slice(0,3).join('・'):''}</div>
+        </button>`).join('')}
+    </div>
+    <button class="regen-btn" onclick="reshuffleFlow()">🔄 別の候補を見る</button>
+    ${flow.step>1?'<button class="regen-btn" onclick="flowBack()">← ひとつ戻る</button>':''}`;
+  el.scrollIntoView({behavior:'smooth',block:'start'});
+}
+
+function renderFlowResult(){
+  const m=flow.main,s=flow.side,p=flow.soup;
+  recordHistory([m.id]);
+  st.lastMainId=m.id;
+  const wfItems=[{id:m.id,name:m.name,type:'main'}];
+  if(s)wfItems.push({id:s.id,name:s.name,type:'side'});
+  if(p)wfItems.push({id:p.id,name:p.name,type:'soup'});
+  const el=document.getElementById('results');
+  el.classList.remove('hidden');
+  el.innerHTML=`
+    <div class="results-header"><h2>🍽️ 今夜の献立</h2><p>自分で選んだ組み合わせ。そのまま段取りへどうぞ。</p></div>
+    <div class="single-card">
+      <div class="single-label">🧭 選んだ献立</div>
+      <div class="single-body">
+        ${buildWorkflow(wfItems,1)}
+        <div class="menu-row new-dish-row">
+          ${favBtn(m.id)}
+          <div class="menu-cat">主菜</div>
+          <div class="menu-name">${m.name}</div>
+          ${m.serve?'<div class="menu-note">🍽️ '+m.serve+'</div>':''}
+          ${m.toriwake?`<div class="toriwake">👧 ${m.toriwake.kodomo}　👨 ${m.toriwake.otona}</div>`:''}
+          ${R[m.id]?recipeHtml(R[m.id]):pointNote(m)}
+        </div>
+        ${s?`<div class="menu-row">
+          ${favBtn(s.id)}
+          <div class="menu-cat">副菜</div>
+          <div class="menu-name">${s.name}</div>
+          ${recipeHtml(R[s.id])||pointNote(s)}
+        </div>`:''}
+        ${p?`<div class="menu-row">
+          ${favBtn(p.id)}
+          <div class="menu-cat">汁物</div>
+          <div class="menu-name">${p.name}</div>
+          ${recipeHtml(R[p.id])||pointNote(p)}
+        </div>`:''}
+      </div>
+    </div>
+    <button class="regen-btn" onclick="startStepFlow()">🧭 もう一度選び直す</button>`;
+  el.scrollIntoView({behavior:'smooth',block:'start'});
+}
+
+function init(){
+  const savedS=localStorage.getItem('kondate-s');
+  const savedI=localStorage.getItem('kondate-i');
+  if(savedS){try{JSON.parse(savedS).forEach(s=>st.seasonings.add(s));}catch(e){}}
+  else{SEASONING_GROUPS.forEach(g=>g.items.forEach(i=>{if(i.on)st.seasonings.add(i.id);}));}
+  if(savedI){try{JSON.parse(savedI).forEach(i=>st.ingredients.add(i));}catch(e){}}
+  const savedF=localStorage.getItem('kondate-fav');
+  if(savedF){try{JSON.parse(savedF).forEach(f=>st.favorites.add(f));}catch(e){}}
+  const savedO=localStorage.getItem('kondate-opts');
+  if(savedO){try{const o=JSON.parse(savedO);
+    if(o.keepOk)document.getElementById('keepok-mode').checked=true;
+    if(o.variety)document.getElementById('variety-mode').checked=true;
+    if(o.favPriority)document.getElementById('fav-priority').checked=true;
+  }catch(e){}}
+  renderSeasonings();
+  renderIngredients();
+  updateCount();
+  updateFavBtn();
+}
+
+async function loadData(){
+  try{
+    const [dataRes,recipeRes]=await Promise.all([
+      fetch('./data.json'),
+      fetch('./recipes.json')
+    ]);
+    D=await dataRes.json();
+    R=await recipeRes.json();
+    // Normalize carryover: flat strings → {n, h} objects
+    if(D.main){
+      D.main.forEach(m=>{
+        if(m.carryover){
+          m.carryover=m.carryover.map(c=>typeof c==='string'?{n:c,h:''}:c);
+        }
+      });
+    }
+    init();
+  }catch(e){
+    console.error('データの読み込みに失敗しました',e);
+    document.getElementById('results').classList.remove('hidden');
+    document.getElementById('results').innerHTML='<div class="error-msg">データの読み込みに失敗しました。ページを再読み込みしてください。</div>';
+  }
+}
+loadData();
+</script>
+<script>
+// ネイティブアプリ（Capacitor）判定。Webでは何もしない
+function isNativeApp(){
+  return !!(window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform());
+}
+
+if('serviceWorker' in navigator && !isNativeApp()){
+  navigator.serviceWorker.register('./service-worker.js');
+}
+
+// ネイティブ版のみ: 毎朝7:30「今日の3品」リマインダー（ローカル通知・サーバー不要）
+async function setupDailyReminder(){
+  if(!isNativeApp()) return;
+  try{
+    const LN = window.Capacitor.Plugins.LocalNotifications;
+    if(!LN) return;
+    const perm = await LN.requestPermissions();
+    if(!perm || perm.display !== 'granted') return;
+    const pending = await LN.getPending();
+    if(pending && pending.notifications && pending.notifications.some(n => Number(n.id) === 1)) return;
+    await LN.schedule({ notifications: [{
+      id: 1,
+      title: '今日の3品、決めちゃおう 🍚',
+      body: '押すだけで3日分。夕飯の献立、いまのうちにまるっと',
+      schedule: { on: { hour: 7, minute: 30 }, allowWhileIdle: true }
+    }] });
+  }catch(e){ console.log('daily reminder skipped:', e); }
+}
+setTimeout(setupDailyReminder, 2500);
+</script>
+</body>
+</html>
