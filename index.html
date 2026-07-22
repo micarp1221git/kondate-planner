@@ -939,7 +939,7 @@ function renderThreeDayResults(plan){
     </div>
     <div class="day-cards">
       <div class="day-card day1">
-        <div class="day-label">🔪 Day1<small>仕込み・多めに作る</small><button class="reroll-btn" onclick="rerollDay(1)">🎲 別メニュー</button></div>
+        <div class="day-label">🔪 Day1<small>仕込み・多めに作る</small><button class="reroll-btn" onclick="rerollDay(1)">🎲 別メニューを提案し直す</button></div>
         <div class="day-body">
           ${menuListHtml(wf1Items)}
           ${buildWorkflow(wf1Items,1)}
@@ -968,7 +968,7 @@ function renderThreeDayResults(plan){
       </div>
       <div class="carryover-flow">${plan.day1.main.name} → ${plan.day2.carryover.n}</div>
       <div class="day-card day2">
-        <div class="day-label">🍳 Day2<small>繰り越し＋もうひと品</small><button class="reroll-btn" onclick="rerollDay(2)">🎲 別メニュー</button></div>
+        <div class="day-label">🍳 Day2<small>繰り越し＋もうひと品</small><button class="reroll-btn" onclick="rerollDay(2)">🎲 別メニューを提案し直す</button></div>
         <div class="day-body">
           ${menuListHtml(wf2Items)}
           ${buildWorkflow(wf2Items,2)}
@@ -1004,7 +1004,7 @@ function renderThreeDayResults(plan){
       </div>
       <div class="carryover-flow">${plan.day2.newMain.name} → ${plan.day3.carryover.n}</div>
       <div class="day-card day3">
-        <div class="day-label">✨ Day3<small>繰り越し・ラクする日</small><button class="reroll-btn" onclick="rerollDay(3)">🎲 別メニュー</button></div>
+        <div class="day-label">✨ Day3<small>繰り越し・ラクする日</small><button class="reroll-btn" onclick="rerollDay(3)">🎲 別メニューを提案し直す</button></div>
         <div class="day-body">
           ${menuListHtml(wf3Items)}
           ${buildWorkflow(wf3Items,3)}
