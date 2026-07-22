@@ -2874,6 +2874,63 @@
       },
       "point": "塩麹をもみ込み半日〜一晩→皮目から焼く。冷めても柔らかい・作り置き向き",
       "keep_ok": true
+    },
+    {
+      "id": "wa-okura-nikumaki",
+      "name": "オクラの豚肉巻き",
+      "genre": "和",
+      "protein": "豚ロース薄切り",
+      "method": "焼く",
+      "ratio": "醤油1:酒1:みりん1",
+      "seasonings": [
+        "醤油",
+        "みりん",
+        "酒"
+      ],
+      "ingredients": [
+        "豚ロース薄切り",
+        "オクラ"
+      ],
+      "batch": true,
+      "carryover": [
+        "肉巻き丼",
+        "お弁当おかず",
+        "サラダのせ"
+      ],
+      "toriwake": {
+        "kodomo": "そのまま",
+        "otona": "七味・柚子こしょう"
+      },
+      "keep_ok": true,
+      "point": "板ずりしたオクラに豚肉をくるくる巻いて焼くだけ。タレは照り焼きの黄金比"
+    },
+    {
+      "id": "yo-zucchini-chicken",
+      "name": "鶏とズッキーニのバター醤油炒め",
+      "genre": "洋",
+      "protein": "鶏もも",
+      "method": "炒める",
+      "ratio": "醤油1+バター",
+      "seasonings": [
+        "醤油",
+        "バター",
+        "こしょう"
+      ],
+      "ingredients": [
+        "鶏もも肉",
+        "ズッキーニ"
+      ],
+      "batch": true,
+      "carryover": [
+        "パスタの具",
+        "オムレツの具"
+      ],
+      "toriwake": {
+        "kodomo": "そのまま",
+        "otona": "黒こしょう追い"
+      },
+      "keep_ok": true,
+      "point": "ズッキーニは厚めの輪切りで食べごたえ。仕上げにバター醤油"
     }
   ],
   "side": [
@@ -3681,6 +3738,97 @@
         "納豆"
       ],
       "point": "レンチンほうれん草に納豆を混ぜるだけ"
+    },
+    {
+      "id": "s-okura-okaka",
+      "name": "オクラのおかか和え",
+      "genre": "和",
+      "makeahead": true,
+      "seasonings": [
+        "醤油",
+        "かつお節"
+      ],
+      "ingredients": [
+        "オクラ"
+      ],
+      "keep_ok": true,
+      "point": "さっと茹でて和えるだけ。板ずりすると色よく仕上がる"
+    },
+    {
+      "id": "s-okura-natto",
+      "name": "オクラ納豆",
+      "genre": "和",
+      "makeahead": false,
+      "seasonings": [
+        "醤油"
+      ],
+      "ingredients": [
+        "オクラ",
+        "納豆"
+      ],
+      "point": "刻んで混ぜるだけの最速ねばねば。ごはんにも豆腐にも"
+    },
+    {
+      "id": "s-natsuyasai-agebitashi",
+      "name": "夏野菜の揚げ浸し",
+      "genre": "和",
+      "makeahead": true,
+      "seasonings": [
+        "めんつゆ"
+      ],
+      "ingredients": [
+        "なす",
+        "ピーマン",
+        "オクラ"
+      ],
+      "keep_ok": true,
+      "point": "多めの油で焼いてめんつゆに浸すだけ。冷やすほどおいしい作り置き"
+    },
+    {
+      "id": "s-paprika-marine",
+      "name": "パプリカの甘酢マリネ",
+      "genre": "洋",
+      "makeahead": true,
+      "seasonings": [
+        "酢",
+        "砂糖",
+        "塩"
+      ],
+      "ingredients": [
+        "パプリカ"
+      ],
+      "keep_ok": true,
+      "point": "酢1:砂糖1に塩少々。彩り担当の作り置き"
+    },
+    {
+      "id": "s-zucchini-cheese",
+      "name": "ズッキーニのチーズ焼き",
+      "genre": "洋",
+      "makeahead": false,
+      "seasonings": [
+        "塩",
+        "こしょう",
+        "粉チーズ"
+      ],
+      "ingredients": [
+        "ズッキーニ"
+      ],
+      "point": "輪切りに粉チーズをのせてトースターで焼くだけ"
+    },
+    {
+      "id": "s-asupara-bacon",
+      "name": "アスパラベーコン炒め",
+      "genre": "洋",
+      "makeahead": false,
+      "seasonings": [
+        "塩",
+        "こしょう"
+      ],
+      "ingredients": [
+        "アスパラ",
+        "ベーコン"
+      ],
+      "point": "ベーコンの塩気で調味はほぼ不要。お弁当にも"
     }
   ],
   "soup": [
@@ -4001,6 +4149,38 @@
         "長ねぎ",
         "チンゲン菜"
       ]
+    },
+    {
+      "id": "sp-okura-miso",
+      "name": "オクラと豆腐の味噌汁",
+      "genre": "和",
+      "batch": false,
+      "seasonings": [
+        "味噌",
+        "だし"
+      ],
+      "ingredients": [
+        "オクラ",
+        "豆腐"
+      ],
+      "keep_ok": true,
+      "point": "とろみが出て、食欲がない日でも飲みやすい"
+    },
+    {
+      "id": "sp-okura-tamago",
+      "name": "オクラとたまごの中華スープ",
+      "genre": "中",
+      "batch": false,
+      "seasonings": [
+        "鶏ガラ",
+        "ごま油"
+      ],
+      "ingredients": [
+        "オクラ",
+        "たまご"
+      ],
+      "keep_ok": true,
+      "point": "溶き卵を回し入れて仕上げにごま油"
     }
   ],
   "single": [
