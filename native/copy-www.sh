@@ -4,7 +4,7 @@
 cd "$(dirname "$0")"
 rm -rf www
 mkdir -p www
-for f in index.html manifest.json service-worker.js privacy.html data.json recipes.json \
+for f in index.html manifest.json service-worker.js privacy.html data.json recipes.json photo-banner.jpg \
          icon-192.png icon-192-maskable.png icon-512.png icon-512-maskable.png icon-192.svg icon-512.svg; do
   cp "../$f" www/
 done
