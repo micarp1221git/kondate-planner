@@ -1276,7 +1276,8 @@ if('serviceWorker' in navigator && !isNativeApp()){
   navigator.serviceWorker.register('./service-worker.js');
 }
 
-// ネイティブ版のみ: 毎朝7:30「今日の3品」リマインダー（ローカル通知・サーバー不要）
+// ネイティブ版のみ: 毎日16:00「今日の3品」リマインダー（ローカル通知・サーバー不要）
+// 16時の根拠: 15時ごろから「夕飯どうしよう」が始まり、献立は帰宅中・買い物中に考える人が半数（調査）。買い物前に届くのが価値
 async function setupDailyReminder(){
   if(!isNativeApp()) return;
   try{
@@ -1285,12 +1286,14 @@ async function setupDailyReminder(){
     const perm = await LN.requestPermissions();
     if(!perm || perm.display !== 'granted') return;
     const pending = await LN.getPending();
-    if(pending && pending.notifications && pending.notifications.some(n => Number(n.id) === 1)) return;
+    const has = id => pending && pending.notifications && pending.notifications.some(n => Number(n.id) === id);
+    if(has(1)) await LN.cancel({ notifications: [{ id: 1 }] }); // 旧7:30通知を置き換え
+    if(has(2)) return;
     await LN.schedule({ notifications: [{
-      id: 1,
-      title: '今日の3品、決めちゃおう 🍚',
-      body: '押すだけで3日分。夕飯の献立、いまのうちにまるっと',
-      schedule: { on: { hour: 7, minute: 30 }, allowWhileIdle: true }
+      id: 2,
+      title: '今日の夕飯、まだ白紙？ 🍚',
+      body: '押すだけで3日分。買い物に行く前に、まるっと決めちゃおう',
+      schedule: { on: { hour: 16, minute: 0 }, allowWhileIdle: true }
     }] });
   }catch(e){ console.log('daily reminder skipped:', e); }
 }
