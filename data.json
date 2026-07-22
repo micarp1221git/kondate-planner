@@ -2931,6 +2931,267 @@
       },
       "keep_ok": true,
       "point": "ズッキーニは厚めの輪切りで食べごたえ。仕上げにバター醤油"
+    },
+    {
+      "id": "chu-gyoza",
+      "name": "焼き餃子",
+      "genre": "中",
+      "protein": "豚ひき肉",
+      "method": "焼く",
+      "ratio": "具は醤油+ごま油+にんにく",
+      "seasonings": [
+        "醤油",
+        "ごま油",
+        "にんにく"
+      ],
+      "ingredients": [
+        "豚ひき肉",
+        "キャベツ",
+        "にら",
+        "餃子の皮"
+      ],
+      "batch": true,
+      "carryover": [
+        "スープ餃子",
+        "焼き直してもう1食"
+      ],
+      "toriwake": {
+        "kodomo": "そのまま",
+        "otona": "ラー油・酢こしょう"
+      },
+      "keep_ok": true,
+      "point": "多めに包んで冷凍OK。焼くのは食べる分だけ"
+    },
+    {
+      "id": "chu-happosai",
+      "name": "八宝菜",
+      "genre": "中",
+      "protein": "豚こま",
+      "method": "炒める",
+      "ratio": "オイスター1:醤油1:砂糖0.5",
+      "seasonings": [
+        "オイスター",
+        "醤油",
+        "酒",
+        "鶏ガラ",
+        "片栗粉"
+      ],
+      "ingredients": [
+        "豚こま",
+        "白菜",
+        "にんじん",
+        "きのこ"
+      ],
+      "batch": true,
+      "carryover": [
+        "中華丼(ごはんにのせるだけ)"
+      ],
+      "toriwake": {
+        "kodomo": "そのまま",
+        "otona": "ラー油・からし"
+      },
+      "keep_ok": true,
+      "point": "あんは翌日ごはんにかけて中華丼に"
+    },
+    {
+      "id": "yo-sasami-cheese",
+      "name": "ささみのチーズパン粉焼き",
+      "genre": "洋",
+      "protein": "ささみ",
+      "method": "焼く",
+      "ratio": "マヨ+粉チーズ+パン粉",
+      "seasonings": [
+        "塩",
+        "こしょう",
+        "マヨネーズ",
+        "粉チーズ"
+      ],
+      "ingredients": [
+        "ささみ",
+        "パン粉"
+      ],
+      "batch": true,
+      "carryover": [
+        "サンドの具",
+        "お弁当おかず"
+      ],
+      "toriwake": {
+        "kodomo": "そのまま",
+        "otona": "黒こしょう・マスタード"
+      },
+      "keep_ok": true,
+      "point": "マヨを塗ってパン粉をつけるとしっとり"
+    },
+    {
+      "id": "chu-banbanji",
+      "name": "蒸しささみのバンバンジー",
+      "genre": "中",
+      "protein": "ささみ",
+      "method": "蒸す",
+      "ratio": "ごまだれ(orマヨ)+醤油",
+      "seasonings": [
+        "ごまだれ or マヨ",
+        "醤油"
+      ],
+      "ingredients": [
+        "ささみ",
+        "きゅうり",
+        "トマト"
+      ],
+      "batch": true,
+      "carryover": [
+        "棒々鶏サラダ",
+        "春雨サラダの具"
+      ],
+      "toriwake": {
+        "kodomo": "たれ少なめ",
+        "otona": "ラー油をひとたらし"
+      },
+      "keep_ok": true,
+      "point": "レンジ蒸しでOK。裂いて和えるだけ"
+    },
+    {
+      "id": "wa-sabakan-daikon",
+      "name": "サバ缶と大根の煮物",
+      "genre": "和",
+      "protein": "サバ缶",
+      "method": "煮る",
+      "ratio": "だし8:醤油1:みりん1",
+      "seasonings": [
+        "だし",
+        "醤油",
+        "みりん"
+      ],
+      "ingredients": [
+        "サバ缶",
+        "大根"
+      ],
+      "batch": true,
+      "carryover": [
+        "ほぐして混ぜごはん",
+        "うどんにかける"
+      ],
+      "toriwake": {
+        "kodomo": "そのまま",
+        "otona": "七味・おろし生姜"
+      },
+      "keep_ok": true,
+      "point": "缶の汁ごと使うとだしいらずでコクが出る"
+    },
+    {
+      "id": "wa-goya-champuru",
+      "name": "ゴーヤチャンプルー",
+      "genre": "和",
+      "protein": "豚バラ",
+      "method": "炒める",
+      "ratio": "塩こしょう+醤油+かつお節",
+      "seasonings": [
+        "塩",
+        "こしょう",
+        "醤油",
+        "かつお節"
+      ],
+      "ingredients": [
+        "ゴーヤ",
+        "豆腐",
+        "豚バラ",
+        "たまご"
+      ],
+      "batch": false,
+      "carryover": [
+        "卵を足して炒め直し"
+      ],
+      "toriwake": {
+        "kodomo": "ゴーヤ少なめ・卵多め",
+        "otona": "そのまま"
+      },
+      "point": "ゴーヤは塩もみで苦みマイルドに"
+    },
+    {
+      "id": "wa-ika-satoimo",
+      "name": "イカと里芋の煮物",
+      "genre": "和",
+      "protein": "イカ",
+      "method": "煮る",
+      "ratio": "だし8:醤油1:みりん1",
+      "seasonings": [
+        "だし",
+        "醤油",
+        "みりん",
+        "砂糖"
+      ],
+      "ingredients": [
+        "イカ",
+        "里芋"
+      ],
+      "batch": true,
+      "carryover": [
+        "煮汁ごと卵とじ",
+        "煮汁で炊き込みごはん"
+      ],
+      "toriwake": {
+        "kodomo": "里芋多め",
+        "otona": "そのまま"
+      },
+      "keep_ok": true,
+      "point": "イカは煮すぎない。冷凍里芋なら皮むき不要"
+    },
+    {
+      "id": "wa-tebasaki",
+      "name": "手羽先の甘辛焼き",
+      "genre": "和",
+      "protein": "手羽先",
+      "method": "焼く",
+      "ratio": "醤油1:みりん1:砂糖0.5",
+      "seasonings": [
+        "醤油",
+        "みりん",
+        "砂糖",
+        "にんにく"
+      ],
+      "ingredients": [
+        "手羽先"
+      ],
+      "batch": true,
+      "carryover": [
+        "骨を外してチャーハンの具",
+        "スープの具"
+      ],
+      "toriwake": {
+        "kodomo": "甘め",
+        "otona": "黒こしょう・七味"
+      },
+      "keep_ok": true,
+      "point": "皮目からじっくり焼くとパリッと"
+    },
+    {
+      "id": "wa-kabu-soboro",
+      "name": "かぶのそぼろあんかけ",
+      "genre": "和",
+      "protein": "鶏ひき肉",
+      "method": "煮る",
+      "ratio": "だし8:醤油1:みりん1+片栗粉",
+      "seasonings": [
+        "だし",
+        "醤油",
+        "みりん",
+        "片栗粉"
+      ],
+      "ingredients": [
+        "鶏ひき肉",
+        "かぶ"
+      ],
+      "batch": true,
+      "carryover": [
+        "ごはんにかけてあんかけ丼",
+        "うどんにかける"
+      ],
+      "toriwake": {
+        "kodomo": "そのまま",
+        "otona": "おろし生姜"
+      },
+      "keep_ok": true,
+      "point": "かぶはすぐ煮えるので時短。葉も刻んで入れる"
     }
   ],
   "side": [
@@ -3829,6 +4090,160 @@
         "ベーコン"
       ],
       "point": "ベーコンの塩気で調味はほぼ不要。お弁当にも"
+    },
+    {
+      "id": "s-kiriboshi",
+      "name": "切り干し大根の煮物",
+      "genre": "和",
+      "makeahead": true,
+      "seasonings": [
+        "だし",
+        "醤油",
+        "みりん"
+      ],
+      "ingredients": [
+        "切り干し大根",
+        "にんじん",
+        "油揚げ"
+      ],
+      "keep_ok": true,
+      "point": "定番の作り置き。汁気を少し残すと翌日しっとり"
+    },
+    {
+      "id": "s-koyadofu",
+      "name": "高野豆腐の含め煮",
+      "genre": "和",
+      "makeahead": true,
+      "seasonings": [
+        "だし",
+        "醤油",
+        "みりん",
+        "砂糖"
+      ],
+      "ingredients": [
+        "高野豆腐"
+      ],
+      "keep_ok": true,
+      "point": "じゅわっと味が染みる。冷蔵3日OK"
+    },
+    {
+      "id": "s-hanpen-cheese",
+      "name": "はんぺんのチーズ焼き",
+      "genre": "和",
+      "makeahead": false,
+      "seasonings": [
+        "バター",
+        "醤油"
+      ],
+      "ingredients": [
+        "はんぺん",
+        "チーズ"
+      ],
+      "point": "切って挟んで焼くだけ。お弁当にも"
+    },
+    {
+      "id": "s-edamame-corn",
+      "name": "枝豆とコーンのバター炒め",
+      "genre": "洋",
+      "makeahead": false,
+      "seasonings": [
+        "バター",
+        "塩"
+      ],
+      "ingredients": [
+        "枝豆",
+        "コーン缶"
+      ],
+      "point": "冷凍枝豆でOK。彩り担当"
+    },
+    {
+      "id": "s-mizuna-tuna",
+      "name": "水菜とツナのサラダ",
+      "genre": "和",
+      "makeahead": false,
+      "seasonings": [
+        "醤油",
+        "ごま油"
+      ],
+      "ingredients": [
+        "水菜",
+        "ツナ缶"
+      ],
+      "point": "切って和えるだけ。シャキシャキ食感"
+    },
+    {
+      "id": "s-kabu-asazuke",
+      "name": "かぶの塩昆布浅漬け",
+      "genre": "和",
+      "makeahead": true,
+      "seasonings": [
+        "塩昆布"
+      ],
+      "ingredients": [
+        "かぶ"
+      ],
+      "keep_ok": true,
+      "point": "袋で揉んで置くだけ。葉も一緒に"
+    },
+    {
+      "id": "s-avocado-tomato",
+      "name": "アボカドとトマトのサラダ",
+      "genre": "洋",
+      "makeahead": false,
+      "seasonings": [
+        "醤油",
+        "レモン"
+      ],
+      "ingredients": [
+        "アボカド",
+        "トマト"
+      ],
+      "point": "わさび醤油にしても合う"
+    },
+    {
+      "id": "s-nagaimo-isobe",
+      "name": "長芋の磯辺バター焼き",
+      "genre": "和",
+      "makeahead": false,
+      "seasonings": [
+        "バター",
+        "醤油"
+      ],
+      "ingredients": [
+        "長芋",
+        "刻み海苔"
+      ],
+      "point": "外はカリッと中はホクホク"
+    },
+    {
+      "id": "s-corn-butter",
+      "name": "とうもろこしのバター醤油焼き",
+      "genre": "和",
+      "makeahead": false,
+      "seasonings": [
+        "バター",
+        "醤油"
+      ],
+      "ingredients": [
+        "とうもろこし"
+      ],
+      "point": "焼き目をつけると香ばしさが段違い"
+    },
+    {
+      "id": "s-celery-marine",
+      "name": "セロリの甘酢マリネ",
+      "genre": "洋",
+      "makeahead": true,
+      "seasonings": [
+        "酢",
+        "砂糖",
+        "塩"
+      ],
+      "ingredients": [
+        "セロリ"
+      ],
+      "keep_ok": true,
+      "point": "筋を取ると子どもも食べやすい"
     }
   ],
   "soup": [
@@ -4181,6 +4596,59 @@
       ],
       "keep_ok": true,
       "point": "溶き卵を回し入れて仕上げにごま油"
+    },
+    {
+      "id": "sp-satoimo",
+      "name": "里芋の味噌汁",
+      "genre": "和",
+      "batch": false,
+      "seasonings": [
+        "味噌",
+        "だし"
+      ],
+      "ingredients": [
+        "里芋",
+        "長ねぎ"
+      ],
+      "keep_ok": true,
+      "point": "ねっとり里芋で食べごたえのある一杯"
+    },
+    {
+      "id": "sp-kabu-miso",
+      "name": "かぶの味噌汁",
+      "genre": "和",
+      "batch": false,
+      "seasonings": [
+        "味噌",
+        "だし"
+      ],
+      "ingredients": [
+        "かぶ",
+        "油揚げ"
+      ],
+      "keep_ok": true,
+      "point": "かぶは葉まで入れて彩りに"
+    },
+    {
+      "id": "sp-clam-chowder",
+      "name": "クラムチャウダー",
+      "genre": "洋",
+      "batch": true,
+      "seasonings": [
+        "牛乳",
+        "バター",
+        "塩",
+        "こしょう"
+      ],
+      "ingredients": [
+        "あさり",
+        "じゃがいも",
+        "にんじん",
+        "玉ねぎ",
+        "牛乳"
+      ],
+      "keep_ok": true,
+      "point": "あさりは冷凍むき身でも水煮缶でもOK"
     }
   ],
   "single": [
@@ -4802,6 +5270,88 @@
         "otona": "タバスコ・粉チーズ"
       },
       "point": "フライパン1つでパスタごと煮る。別茹で不要"
+    },
+    {
+      "id": "tan-yakiudon",
+      "name": "焼きうどん",
+      "genre": "和",
+      "type": "麺",
+      "protein": "豚こま",
+      "seasonings": [
+        "ソース",
+        "かつお節"
+      ],
+      "ingredients": [
+        "うどん",
+        "豚こま",
+        "キャベツ"
+      ],
+      "toriwake": {
+        "kodomo": "そのまま",
+        "otona": "青のり・マヨ"
+      }
+    },
+    {
+      "id": "tan-curry-udon",
+      "name": "カレーうどん",
+      "genre": "和",
+      "type": "麺",
+      "protein": "豚こま",
+      "seasonings": [
+        "カレールー",
+        "めんつゆ"
+      ],
+      "ingredients": [
+        "うどん",
+        "豚こま",
+        "長ねぎ"
+      ],
+      "toriwake": {
+        "kodomo": "マイルド・とろみ多め",
+        "otona": "七味"
+      }
+    },
+    {
+      "id": "tan-shirasu-don",
+      "name": "しらす丼",
+      "genre": "和",
+      "type": "丼",
+      "protein": "しらす",
+      "seasonings": [
+        "醤油",
+        "ごま油"
+      ],
+      "ingredients": [
+        "しらす",
+        "ごはん",
+        "たまご",
+        "刻み海苔"
+      ],
+      "toriwake": {
+        "kodomo": "そのまま",
+        "otona": "大葉・わさび"
+      }
+    },
+    {
+      "id": "tan-tamago-zosui",
+      "name": "卵雑炊",
+      "genre": "和",
+      "type": "飯",
+      "protein": "たまご",
+      "seasonings": [
+        "だし",
+        "醤油",
+        "塩"
+      ],
+      "ingredients": [
+        "ごはん",
+        "たまご",
+        "長ねぎ"
+      ],
+      "toriwake": {
+        "kodomo": "そのまま",
+        "otona": "梅・柚子こしょう"
+      }
     }
   ]
 }
