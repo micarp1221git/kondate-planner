@@ -200,7 +200,8 @@ details[open]>.workflow-summary::before{transform:rotate(90deg)}
 .guide-bar .guide-act{background:#fff;color:var(--primary);border:none;border-radius:8px;padding:8px 14px;font-weight:700;font-size:.8rem;white-space:nowrap;cursor:pointer}
 .guide-bar .guide-act:disabled{opacity:.55;cursor:default}
 #help-fab{position:fixed;right:14px;top:calc(14px + env(safe-area-inset-top,0px));z-index:60;width:36px;height:36px;border-radius:50%;background:var(--primary);color:#fff;border:none;font-size:1rem;font-weight:700;box-shadow:0 2px 8px rgba(0,0,0,.2);cursor:pointer}
-.guide-highlight{box-shadow:0 0 0 4px rgba(200,90,53,.4) !important}
+.guide-highlight{animation:guide-pulse 1.4s ease-in-out infinite;border-radius:12px}
+@keyframes guide-pulse{0%,100%{box-shadow:0 0 0 4px rgba(200,90,53,.45)}50%{box-shadow:0 0 0 8px rgba(200,90,53,.15)}}
 @keyframes spin{to{transform:rotate(360deg)}}
 .spinner{width:18px;height:18px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .6s linear infinite}
 
@@ -1263,19 +1264,35 @@ function showFirstTimeGuide(){
   bar.appendChild(label);bar.appendChild(act);
   document.body.prepend(bar);
 
+  // ガイド表示中は「？」ボタンと右上で重なるので隠す（ガイドが消えたら自動で戻す）
+  const fab=document.getElementById('help-fab');
+  if(fab){
+    fab.style.display='none';
+    const restoreFab=new MutationObserver(()=>{
+      if(!document.getElementById('guide-bar')){fab.style.display='';restoreFab.disconnect();}
+    });
+    restoreFab.observe(document.body,{childList:true});
+  }
+
+  function spotlight(el){
+    if(!el)return;
+    el.classList.add('guide-highlight');
+    document.querySelectorAll('.guide-spotlighted').forEach(x=>{if(x!==el)x.classList.remove('guide-spotlighted','guide-highlight');});
+    el.classList.add('guide-spotlighted');
+  }
   function step1(){
     label.innerHTML='<b>1/3</b> まず、手持ちの調味料が合っているか見てください（基本は入れてあります）';
     act.textContent='OK、次へ';
     act.disabled=false;
     act.onclick=step2;
     const sec=document.getElementById('seasoning-section');
-    if(sec){sec.classList.remove('collapsed');sec.scrollIntoView({behavior:'smooth',block:'start'});}
+    if(sec){sec.classList.remove('collapsed');sec.scrollIntoView({behavior:'smooth',block:'start'});spotlight(sec);}
   }
   function step2(){
     label.innerHTML='<b>2/3</b> 冷蔵庫にあるものを<b>3つ以上</b>タップしてください';
     act.textContent='あと3つ';act.disabled=true;
     const sec=document.getElementById('ingredient-section');
-    if(sec){sec.classList.remove('collapsed');sec.scrollIntoView({behavior:'smooth',block:'start'});}
+    if(sec){sec.classList.remove('collapsed');sec.scrollIntoView({behavior:'smooth',block:'start'});spotlight(sec);}
     const watch=setInterval(()=>{
       if(!document.getElementById('guide-bar')){clearInterval(watch);return;}
       const n=st.ingredients.size;
@@ -1284,6 +1301,7 @@ function showFirstTimeGuide(){
     },400);
   }
   function step3(){
+    document.querySelectorAll('.guide-spotlighted').forEach(x=>x.classList.remove('guide-spotlighted','guide-highlight'));
     label.innerHTML='<b>3/3</b> このボタンを押すと3日分できます';
     act.textContent='とじる';
     act.onclick=()=>bar.remove();
@@ -1299,7 +1317,10 @@ function showFirstTimeGuide(){
   // ガイドを無視して「つくる」を直接押した場合も、ガイドはその場で片付ける
   // （進行の邪魔をしない。押した後の空振り対策はshowError側の分岐が担当）
   const genBtn=document.getElementById('generate-btn');
-  if(genBtn)genBtn.addEventListener('click',()=>{const b=document.getElementById('guide-bar');if(b)b.remove();});
+  if(genBtn)genBtn.addEventListener('click',()=>{
+    const b=document.getElementById('guide-bar');if(b)b.remove();
+    document.querySelectorAll('.guide-spotlighted').forEach(x=>x.classList.remove('guide-spotlighted','guide-highlight'));
+  });
 }
 
 function init(){
