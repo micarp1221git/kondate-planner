@@ -199,6 +199,7 @@ details[open]>.workflow-summary::before{transform:rotate(90deg)}
 .guide-bar .guide-label{flex:1;line-height:1.4}
 .guide-bar .guide-act{background:#fff;color:var(--primary);border:none;border-radius:8px;padding:8px 14px;font-weight:700;font-size:.8rem;white-space:nowrap;cursor:pointer}
 .guide-bar .guide-act:disabled{opacity:.55;cursor:default}
+#help-fab{position:fixed;right:16px;bottom:calc(16px + env(safe-area-inset-bottom,0px));z-index:60;width:44px;height:44px;border-radius:50%;background:var(--primary);color:#fff;border:none;font-size:1.1rem;font-weight:700;box-shadow:0 3px 10px rgba(0,0,0,.25);cursor:pointer}
 .guide-highlight{box-shadow:0 0 0 4px rgba(200,90,53,.4) !important}
 @keyframes spin{to{transform:rotate(360deg)}}
 .spinner{width:18px;height:18px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .6s linear infinite}
@@ -244,6 +245,7 @@ details[open]>.workflow-summary::before{transform:rotate(90deg)}
 </style>
 </head>
 <body>
+<button id="help-fab" onclick="showFirstTimeGuide()" title="使い方を見る" aria-label="使い方を見る">？</button>
 <header class="hero">
   <div class="container">
     <h1>面倒だけど、<br>3品は諦めたくない。</h1>
@@ -1243,6 +1245,13 @@ function setupReturningUser(){
 // 「食材チェック済み」の有無で判定する（kondate_visitedは読み込み時に即セットされるため使えない）
 function setupFirstTimeGuide(){
   if(localStorage.getItem('kondate-i'))return; // 一度でも食材チェックが保存済みなら卒業
+  showFirstTimeGuide();
+}
+
+// ガイドの表示本体（判定なし・いつでも呼べる。初回自動表示と「？」ボタン両方から使う）
+function showFirstTimeGuide(){
+  const old=document.getElementById('guide-bar');
+  if(old)old.remove();
   const bar=document.createElement('div');
   bar.className='guide-bar';
   bar.id='guide-bar';
