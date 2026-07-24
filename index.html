@@ -194,6 +194,12 @@ details[open]>.workflow-summary::before{transform:rotate(90deg)}
 .generate-btn.loading .btn-text{display:none}
 .generate-btn.loading .btn-loading{display:inline-flex;align-items:center;gap:8px}
 .generate-btn .btn-loading{display:none}
+.guide-bar{position:sticky;top:0;z-index:50;background:var(--primary);color:#fff;padding:10px 16px;font-size:.82rem;display:flex;gap:10px;align-items:center;justify-content:space-between;box-shadow:0 2px 10px rgba(0,0,0,.15)}
+.guide-bar b{font-weight:700}
+.guide-bar .guide-label{flex:1;line-height:1.4}
+.guide-bar .guide-act{background:#fff;color:var(--primary);border:none;border-radius:8px;padding:8px 14px;font-weight:700;font-size:.8rem;white-space:nowrap;cursor:pointer}
+.guide-bar .guide-act:disabled{opacity:.55;cursor:default}
+.guide-highlight{box-shadow:0 0 0 4px rgba(200,90,53,.4) !important}
 @keyframes spin{to{transform:rotate(360deg)}}
 .spinner{width:18px;height:18px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .6s linear infinite}
 
@@ -1037,6 +1043,19 @@ function renderThreeDayResults(plan){
 function showError(msg) {
   const el = document.getElementById('results');
   el.classList.remove('hidden');
+  // 冷蔵庫チェックがゼロのまま生成を押した場合は、汎用エラーでなく
+  // 「まず何をすればいいか」を示して食材欄へ連れて行く（初見の空振り対策）
+  if (st.ingredients.size === 0) {
+    el.innerHTML = `<div class="error-msg">今チェックしている食材が0件です。<br>まず冷蔵庫にあるものを3つほどチェックしてみてください。</div>
+      <button class="regen-btn" id="goto-ingredients-btn">🥬 冷蔵庫の中身をチェックする</button>`;
+    el.scrollIntoView({behavior:'smooth',block:'start'});
+    const gbtn = document.getElementById('goto-ingredients-btn');
+    if (gbtn) gbtn.onclick = () => {
+      const sec = document.getElementById('ingredient-section');
+      if (sec) { sec.classList.remove('collapsed'); sec.scrollIntoView({behavior:'smooth',block:'start'}); }
+    };
+    return;
+  }
   el.innerHTML = `<div class="error-msg">${msg}</div>
     <button class="regen-btn" onclick="generate()">🔄 もう一回出す</button>`;
   el.scrollIntoView({behavior:'smooth',block:'start'});
@@ -1220,6 +1239,60 @@ function setupReturningUser(){
   });
 }
 
+// 初見ユーザー向けガイド（①調味料確認→②冷蔵庫3つ以上→③つくる、を連れて行く）
+// 「食材チェック済み」の有無で判定する（kondate_visitedは読み込み時に即セットされるため使えない）
+function setupFirstTimeGuide(){
+  if(localStorage.getItem('kondate-i'))return; // 一度でも食材チェックが保存済みなら卒業
+  const bar=document.createElement('div');
+  bar.className='guide-bar';
+  bar.id='guide-bar';
+  const label=document.createElement('div');
+  label.className='guide-label';
+  const act=document.createElement('button');
+  act.className='guide-act';
+  act.id='guide-act';
+  bar.appendChild(label);bar.appendChild(act);
+  document.body.prepend(bar);
+
+  function step1(){
+    label.innerHTML='<b>1/3</b> まず、手持ちの調味料が合っているか見てください（基本は入れてあります）';
+    act.textContent='OK、次へ';
+    act.disabled=false;
+    act.onclick=step2;
+    const sec=document.getElementById('seasoning-section');
+    if(sec){sec.classList.remove('collapsed');sec.scrollIntoView({behavior:'smooth',block:'start'});}
+  }
+  function step2(){
+    label.innerHTML='<b>2/3</b> 冷蔵庫にあるものを<b>3つ以上</b>タップしてください';
+    act.textContent='あと3つ';act.disabled=true;
+    const sec=document.getElementById('ingredient-section');
+    if(sec){sec.classList.remove('collapsed');sec.scrollIntoView({behavior:'smooth',block:'start'});}
+    const watch=setInterval(()=>{
+      if(!document.getElementById('guide-bar')){clearInterval(watch);return;}
+      const n=st.ingredients.size;
+      if(n>=3){clearInterval(watch);act.textContent='OK！つくるへ';act.disabled=false;act.onclick=step3;}
+      else{act.textContent='あと'+(3-n)+'つ';act.disabled=true;}
+    },400);
+  }
+  function step3(){
+    label.innerHTML='<b>3/3</b> このボタンを押すと3日分できます';
+    act.textContent='とじる';
+    act.onclick=()=>bar.remove();
+    const btn=document.getElementById('generate-btn');
+    if(btn){
+      btn.scrollIntoView({behavior:'smooth',block:'center'});
+      btn.classList.add('guide-highlight');
+      setTimeout(()=>btn.classList.remove('guide-highlight'),2600);
+    }
+  }
+  step1();
+
+  // ガイドを無視して「つくる」を直接押した場合も、ガイドはその場で片付ける
+  // （進行の邪魔をしない。押した後の空振り対策はshowError側の分岐が担当）
+  const genBtn=document.getElementById('generate-btn');
+  if(genBtn)genBtn.addEventListener('click',()=>{const b=document.getElementById('guide-bar');if(b)b.remove();});
+}
+
 function init(){
   const savedS=localStorage.getItem('kondate-s');
   const savedI=localStorage.getItem('kondate-i');
@@ -1265,6 +1338,7 @@ async function loadData(){
 }
 loadData();
 setupReturningUser();
+setupFirstTimeGuide();
 </script>
 <script>
 // ネイティブアプリ（Capacitor）判定。Webでは何もしない
