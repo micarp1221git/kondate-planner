@@ -297,6 +297,15 @@ details[open]>.workflow-summary::before{transform:rotate(90deg)}
         <span style="font-size:.75rem;color:var(--text-light);padding-left:26px;margin-top:-4px">丼・麺・ワンプレートから提案</span>
       </label>
     </div>
+    <div class="option-row" id="dish-count-row" style="flex-direction:column;align-items:stretch">
+      <span style="font-size:.88rem;font-weight:600">🍽️ 何品つくる？</span>
+      <select id="dish-count" onchange="onOptionChange()" style="margin-top:6px;padding:8px;border:1px solid var(--border);border-radius:8px;font-size:.9rem">
+        <option value="3">3品（主菜・副菜・汁物）</option>
+        <option value="2">2品（主菜・副菜）</option>
+        <option value="1">1品（主菜だけ）</option>
+      </select>
+      <span style="font-size:.75rem;color:var(--text-light);margin-top:6px">減らしても、作り方は今までどおり見られます。</span>
+    </div>
     <div class="option-row">
       <label class="toggle-label">
         <input type="checkbox" id="bento-mode" onchange="onOptionChange()">
@@ -722,6 +731,24 @@ function onOptionChange(){
   saveOpts();
 }
 
+// 何品つくるか（3=フル / 2=汁物なし / 1=主菜だけ）
+function dishCount(){
+  const el=document.getElementById('dish-count');
+  const n=el?parseInt(el.value,10):3;
+  return (n===1||n===2)?n:3;
+}
+// 作らない品に hide フラグを立てる。中身は消さないので、描画側の参照は壊れない
+function applyDishCount(plan){
+  const n=dishCount();
+  if(n>=3) return plan;
+  ['day1','day2','day3'].forEach(d=>{
+    const day=plan[d]; if(!day) return;
+    if(day.soup) day.soup=Object.assign({},day.soup,{_hide:true});
+    if(n===1&&day.side) day.side=Object.assign({},day.side,{_hide:true});
+  });
+  return plan;
+}
+
 function generate(){
   const btn=document.getElementById('generate-btn');
   btn.classList.add('loading');
@@ -767,7 +794,7 @@ function generateSingle(opts,bentoIds,forcedDish){
         </div>
         ${dish.toriwake?`<div class="toriwake">👧 子ども：${dish.toriwake.kodomo}　👨 大人：${dish.toriwake.otona}</div>`:''}
         ${r?recipeHtml(r):pointNote(dish)}
-        ${nutriBadge([dish],false)}
+        ${nutriBadge([dish].filter(x=>x&&!x._hide),false)}
       </div>
     </div>
     <button class="regen-btn" onclick="generate()">🔄 もう一回出す</button>`;
@@ -931,12 +958,13 @@ function rerollDay(n){
 }
 
 function renderThreeDayResults(plan){
+  plan=applyDishCount(plan);
   const el=document.getElementById('results');
   el.classList.remove('hidden');
-  const wf1Items=[{id:plan.day1.main.id,name:plan.day1.main.name,type:'main'},{id:plan.day1.side.id,name:plan.day1.side.name,type:'side'},{id:plan.day1.soup.id,name:plan.day1.soup.name,type:'soup'}];
+  const wf1Items=[{id:plan.day1.main.id,name:plan.day1.main.name,type:'main'},(plan.day1.side._hide?null:{id:plan.day1.side.id,name:plan.day1.side.name,type:'side'}),(plan.day1.soup._hide?null:{id:plan.day1.soup.id,name:plan.day1.soup.name,type:'soup'})].filter(Boolean);
   const d2SoupType=(plan.day2.soupNote&&plan.day2.soupNote.includes('続き'))?'carryover':'soup';
-  const wf2Items=[{id:null,name:plan.day2.carryover.n,type:'carryover'},{id:plan.day2.newMain.id,name:plan.day2.newMain.name,type:'main'},{id:plan.day2.side.id,name:plan.day2.side.name,type:'side'},{id:plan.day2.soup.id,name:plan.day2.soup.name,type:d2SoupType}];
-  const wf3Items=[{id:null,name:plan.day3.carryover.n,type:'carryover'},{id:plan.day3.side.id,name:plan.day3.side.name,type:'side'},{id:plan.day3.soup.id,name:plan.day3.soup.name,type:'soup'}];
+  const wf2Items=[{id:null,name:plan.day2.carryover.n,type:'carryover'},{id:plan.day2.newMain.id,name:plan.day2.newMain.name,type:'main'},(plan.day2.side._hide?null:{id:plan.day2.side.id,name:plan.day2.side.name,type:'side'}),(plan.day2.soup._hide?null:{id:plan.day2.soup.id,name:plan.day2.soup.name,type:d2SoupType})].filter(Boolean);
+  const wf3Items=[{id:null,name:plan.day3.carryover.n,type:'carryover'},(plan.day3.side._hide?null:{id:plan.day3.side.id,name:plan.day3.side.name,type:'side'}),(plan.day3.soup._hide?null:{id:plan.day3.soup.id,name:plan.day3.soup.name,type:'soup'})].filter(Boolean);
 
   const d2HintHtml=plan.day2.carryover.h?`<div class="menu-note">💡 ${plan.day2.carryover.h}</div>`:'';
   const d3HintHtml=plan.day3.carryover.h?`<div class="menu-note">💡 ${plan.day3.carryover.h}</div>`:'';
@@ -960,19 +988,19 @@ function renderThreeDayResults(plan){
             <div class="toriwake">👧 ${plan.day1.main.toriwake.kodomo}　👨 ${plan.day1.main.toriwake.otona}</div>
             ${R[plan.day1.main.id]?recipeHtml(R[plan.day1.main.id]):pointNote(plan.day1.main)}
           </div>
-          <div class="menu-row">
+          <div class="menu-row"${plan.day1.side._hide?' style="display:none"':''}>
             ${favBtn(plan.day1.side.id)}
             <div class="menu-cat">副菜</div>
             <div class="menu-name">${plan.day1.side.name}</div>
             ${recipeHtml(R[plan.day1.side.id])}
           </div>
-          <div class="menu-row">
+          <div class="menu-row"${plan.day1.soup._hide?' style="display:none"':''}>
             ${favBtn(plan.day1.soup.id)}
             <div class="menu-cat">汁物</div>
             <div class="menu-name">${plan.day1.soup.name}${plan.day1.soup.batch?'（明日の分も）':''}</div>
             ${recipeHtml(R[plan.day1.soup.id])}
           </div>
-          ${nutriBadge([plan.day1.main,plan.day1.side,plan.day1.soup],true)}
+          ${nutriBadge([plan.day1.main,plan.day1.side,plan.day1.soup].filter(x=>x&&!x._hide),true)}
         </div>
       </div>
       <div class="carryover-flow">${plan.day1.main.name} → ${plan.day2.carryover.n}</div>
@@ -995,20 +1023,20 @@ function renderThreeDayResults(plan){
             <div class="toriwake">👧 ${plan.day2.newMain.toriwake.kodomo}　👨 ${plan.day2.newMain.toriwake.otona}</div>
             ${R[plan.day2.newMain.id]?recipeHtml(R[plan.day2.newMain.id]):pointNote(plan.day2.newMain)}
           </div>
-          <div class="menu-row">
+          <div class="menu-row"${plan.day2.side._hide?' style="display:none"':''}>
             ${favBtn(plan.day2.side.id)}
             <div class="menu-cat">副菜</div>
             <div class="menu-name">${plan.day2.side.name}</div>
             ${!plan.day2.side.makeahead?'<div class="menu-note">作りたて感プラス</div>':''}
             ${recipeHtml(R[plan.day2.side.id])}
           </div>
-          <div class="menu-row">
+          <div class="menu-row"${plan.day2.soup._hide?' style="display:none"':''}>
             ${favBtn(plan.day2.soup.id)}
             <div class="menu-cat">汁物</div>
             <div class="menu-name">${plan.day2.soup.name}${plan.day2.soupNote}</div>
             ${recipeHtml(R[plan.day2.soup.id])}
           </div>
-          ${nutriBadge([plan.day2.carryoverFrom,plan.day2.newMain,plan.day2.side,plan.day2.soup],true)}
+          ${nutriBadge([plan.day2.carryoverFrom,plan.day2.newMain,plan.day2.side,plan.day2.soup].filter(x=>x&&!x._hide),true)}
         </div>
       </div>
       <div class="carryover-flow">${plan.day2.newMain.name} → ${plan.day3.carryover.n}</div>
@@ -1023,19 +1051,19 @@ function renderThreeDayResults(plan){
             ${d3HintHtml}
             <div class="toriwake">👧 ${plan.day3.carryoverFrom.toriwake.kodomo}　👨 ${plan.day3.carryoverFrom.toriwake.otona}</div>
           </div>
-          <div class="menu-row">
+          <div class="menu-row"${plan.day3.side._hide?' style="display:none"':''}>
             ${favBtn(plan.day3.side.id)}
             <div class="menu-cat">副菜</div>
             <div class="menu-name">${plan.day3.side.name}</div>
             ${recipeHtml(R[plan.day3.side.id])}
           </div>
-          <div class="menu-row">
+          <div class="menu-row"${plan.day3.soup._hide?' style="display:none"':''}>
             ${favBtn(plan.day3.soup.id)}
             <div class="menu-cat">汁物</div>
             <div class="menu-name">${plan.day3.soup.name}</div>
             ${recipeHtml(R[plan.day3.soup.id])}
           </div>
-          ${nutriBadge([plan.day3.carryoverFrom,plan.day3.side,plan.day3.soup],true)}
+          ${nutriBadge([plan.day3.carryoverFrom,plan.day3.side,plan.day3.soup].filter(x=>x&&!x._hide),true)}
         </div>
       </div>
     </div>
