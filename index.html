@@ -297,15 +297,6 @@ details[open]>.workflow-summary::before{transform:rotate(90deg)}
         <span style="font-size:.75rem;color:var(--text-light);padding-left:26px;margin-top:-4px">丼・麺・ワンプレートから提案</span>
       </label>
     </div>
-    <div class="option-row" id="dish-count-row" style="flex-direction:column;align-items:stretch">
-      <span style="font-size:.88rem;font-weight:600">🍽️ 何品つくる？</span>
-      <select id="dish-count" onchange="onOptionChange()" style="margin-top:6px;padding:8px;border:1px solid var(--border);border-radius:8px;font-size:.9rem">
-        <option value="3">3品（主菜・副菜・汁物）</option>
-        <option value="2">2品（主菜・副菜）</option>
-        <option value="1">1品（主菜だけ）</option>
-      </select>
-      <span style="font-size:.75rem;color:var(--text-light);margin-top:6px">減らしても、作り方は今までどおり見られます。</span>
-    </div>
     <div class="option-row">
       <label class="toggle-label">
         <input type="checkbox" id="bento-mode" onchange="onOptionChange()">
@@ -731,24 +722,6 @@ function onOptionChange(){
   saveOpts();
 }
 
-// 何品つくるか（3=フル / 2=汁物なし / 1=主菜だけ）
-function dishCount(){
-  const el=document.getElementById('dish-count');
-  const n=el?parseInt(el.value,10):3;
-  return (n===1||n===2)?n:3;
-}
-// 作らない品に hide フラグを立てる。中身は消さないので、描画側の参照は壊れない
-function applyDishCount(plan){
-  const n=dishCount();
-  if(n>=3) return plan;
-  ['day1','day2','day3'].forEach(d=>{
-    const day=plan[d]; if(!day) return;
-    if(day.soup) day.soup=Object.assign({},day.soup,{_hide:true});
-    if(n===1&&day.side) day.side=Object.assign({},day.side,{_hide:true});
-  });
-  return plan;
-}
-
 function generate(){
   const btn=document.getElementById('generate-btn');
   btn.classList.add('loading');
@@ -958,7 +931,6 @@ function rerollDay(n){
 }
 
 function renderThreeDayResults(plan){
-  plan=applyDishCount(plan);
   const el=document.getElementById('results');
   el.classList.remove('hidden');
   const wf1Items=[{id:plan.day1.main.id,name:plan.day1.main.name,type:'main'},(plan.day1.side._hide?null:{id:plan.day1.side.id,name:plan.day1.side.name,type:'side'}),(plan.day1.soup._hide?null:{id:plan.day1.soup.id,name:plan.day1.soup.name,type:'soup'})].filter(Boolean);
@@ -1205,8 +1177,17 @@ function renderFlowStep(){
         </button>`).join('')}
     </div>
     <button class="regen-btn" onclick="reshuffleFlow()">🔄 別の候補を見る</button>
+    ${flow.step===2?'<button class="regen-btn" style="border-color:#7a9a5b;color:#5f7a45" onclick="finishFlowHere()">✅ 主菜だけで作る（1品）</button>':''}
+    ${flow.step===3?'<button class="regen-btn" style="border-color:#7a9a5b;color:#5f7a45" onclick="finishFlowHere()">✅ 汁物なし、この2品で作る</button>':''}
     ${flow.step>1?'<button class="regen-btn" onclick="flowBack()">← ひとつ戻る</button>':''}`;
   el.scrollIntoView({behavior:'smooth',block:'start'});
+}
+
+// 選んでいる途中で「ここまでで作る」。選んでいない品は作らない
+function finishFlowHere(){
+  if(flow.step<=2)flow.side=null;
+  flow.soup=null;
+  renderFlowResult();
 }
 
 function renderFlowResult(){
