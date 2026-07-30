@@ -99,10 +99,6 @@ details[open]>.group-summary::before{transform:rotate(90deg)}
 .day-label{padding:14px 18px;font-family:var(--serif);font-weight:700;font-size:.88rem;color:#fff;letter-spacing:.05em;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
 .reroll-btn{margin-left:auto;background:rgba(255,255,255,.22);border:1px solid rgba(255,255,255,.5);color:#fff;font-size:.72rem;font-weight:600;padding:5px 10px;border-radius:999px;cursor:pointer;font-family:var(--sans)}
 .reroll-btn:active{background:rgba(255,255,255,.35)}
-.day-menu-list{background:var(--surface);border-radius:10px;padding:10px 14px;margin-bottom:14px}
-.dml-row{display:flex;gap:10px;align-items:baseline;padding:3px 0;font-size:.9rem}
-.dml-cat{flex-shrink:0;font-size:.75rem;color:var(--text-mid);width:5.4em}
-.dml-name{font-weight:600}
 .day1 .day-label{background:#C85A35}
 .day2 .day-label{background:#4A8C6F}
 .day3 .day-label{background:#5B7EC2}
@@ -172,6 +168,37 @@ details[open]>.workflow-summary::before{transform:rotate(90deg)}
 .wf-title{font-weight:600;margin-bottom:2px;font-size:.84rem}
 .wf-detail{color:var(--text-light);font-size:.78rem;padding-left:4px}
 .wf-parallel{color:var(--green);font-size:.73rem;margin-left:6px}
+
+/* ── まとめて作る（統合手順書・常時展開） ── */
+.combine-box{margin:0 0 14px;border-radius:var(--radius);overflow:hidden;border:1.5px solid var(--primary);background:var(--card)}
+.combine-head{padding:12px 14px;background:var(--primary-light);font-size:.85rem;font-weight:700;color:var(--primary);display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.combine-meta{font-weight:400;font-size:.72rem;color:var(--text-mid)}
+.combine-body{padding:12px;font-size:.8rem;background:var(--card)}
+.cmb-dishes{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px}
+.cmb-dishes .cmb-dish{max-width:none;font-size:.76rem;padding:3px 10px;border-radius:999px;margin:0}
+.cmb-dish-co{background:var(--text-light)}
+.cmb-prep{background:var(--surface);border-radius:8px;padding:10px 12px;margin-bottom:10px}
+.cmb-prep-title{font-weight:700;font-size:.8rem;margin-bottom:6px}
+.cmb-prep-line{font-size:.76rem;color:var(--text-mid);padding:3px 0;display:flex;gap:6px;align-items:baseline}
+.cmb-step{display:flex;gap:7px;align-items:flex-start;padding:8px 0;border-bottom:1px dashed var(--border)}
+.cmb-step:last-of-type{border-bottom:none}
+.cmb-time{flex-shrink:0;font-size:.68rem;font-weight:700;color:var(--text-mid);background:var(--surface);border-radius:999px;padding:2px 8px;min-width:3.8em;text-align:center;margin-top:2px}
+.cmb-dish{flex-shrink:0;font-size:.68rem;font-weight:600;color:#fff;border-radius:4px;padding:2px 7px;margin-top:2px;max-width:6.5em;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.cmb-text{flex:1;line-height:1.6;min-width:0}
+.cmb-wait{margin-top:3px;font-size:.74rem;color:var(--primary);font-weight:600}
+.cmb-goal{margin-top:10px;background:var(--green-light);color:var(--green);border-radius:8px;padding:9px 12px;font-weight:700;font-size:.8rem;text-align:center}
+.cmb-note{font-size:.7rem;color:var(--text-light);margin-top:6px}
+
+/* ── 個別レシピ（オマケ・閉じたトグル） ── */
+.dish-extras{margin-bottom:12px}
+.dish-extra{border:1px solid var(--border);border-radius:8px;margin-bottom:8px;background:var(--card);overflow:hidden}
+.dish-extra>summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:8px;padding:10px 12px;font-size:.84rem;font-weight:600;user-select:none;flex-wrap:wrap}
+.dish-extra>summary::-webkit-details-marker{display:none}
+.dish-extra>summary::before{content:'▶';font-size:.55rem;color:var(--text-light);transition:transform .2s;flex-shrink:0}
+.dish-extra[open]>summary::before{transform:rotate(90deg)}
+.de-cat{font-size:.68rem;font-weight:400;color:var(--text-mid);background:var(--tag);border-radius:4px;padding:2px 7px;flex-shrink:0}
+.de-hint{margin-left:auto;font-size:.68rem;color:var(--primary);font-weight:400;white-space:nowrap}
+.dish-extra-body{padding:4px 12px 12px;position:relative;font-size:.8rem;line-height:1.75}
 
 /* ── Recipe toggle ── */
 .recipe-toggle{margin-top:4px}
@@ -717,7 +744,7 @@ function onOptionChange(){
   // 1品モードでは段階選択（メイン→副菜→汁物）は使わない
   document.getElementById('step-btn').style.display=singleMode?'none':'block';
   if(st.requestedId){saveOpts();return;} // メニュー指定中はボタン文言を維持
-  const t=singleMode?'今日の1品を出す':'おまかせで3日分出す';
+  const t=singleMode?'今日の1品を出す':'おまかせで3日分つくる';
   btn.querySelector('.btn-text').textContent=t;
   saveOpts();
 }
@@ -760,6 +787,7 @@ function generateSingle(opts,bentoIds,forcedDish){
     <div class="single-card">
       <div class="single-label">${dish.name}（${dish.type}）</div>
       <div class="single-body">
+        ${combinedHtml([{id:dish.id,name:dish.name,type:'main'}])}
         <div class="menu-row">
           ${favBtn(dish.id)}
           <div class="menu-cat">材料</div>
@@ -875,26 +903,125 @@ function buildWorkflow(items,dayNum){
   items.forEach(item=>{if(item.type==='carryover'){total+=3;return;}const r=R[item.id];total+=(r?r.m:10);});
   const waitSave=cookItems.reduce((s,item)=>{const r=R[item.id];return s+(r&&r.w?Math.min(r.w,15):0);},0);
   total=Math.max(10,total-Math.round(waitSave*0.6));
-  return `<details class="workflow-details"${dayNum===1?' open':''}><summary class="workflow-summary">📋 段取りガイド（約${total}分）</summary><div class="workflow-body">${html}</div></details>`;
+  // 統合手順書（まとめて作る）が主役になったため、従来の段取りガイドは常に閉じたオマケ扱い
+  return `<details class="workflow-details"><summary class="workflow-summary">📋 段取りガイド（約${total}分・従来表示）</summary><div class="workflow-body">${html}</div></details>`;
 }
 
-function recipeHtml(r){
-  if(!r)return '';
+function recipeBody(r){
   let body='';
   if(r.c&&r.c!=='なし')body+=`<div class="recipe-line"><span class="recipe-label">下ごしらえ</span>${r.c}</div>`;
   if(r.s)body+=`<div class="recipe-line"><span class="recipe-label">調味料</span>${r.s}</div>`;
   body+=`<div class="recipe-line"><span class="recipe-label">作り方</span>${r.t}</div>`;
   body+=`<div class="recipe-line"><span class="recipe-label">目安</span>約${r.m}分</div>`;
-  return `<details class="recipe-toggle"><summary>レシピを見る</summary><div class="recipe-body">${body}</div></details>`;
+  return body;
+}
+function recipeHtml(r){
+  if(!r)return '';
+  return `<details class="recipe-toggle"><summary>レシピを見る</summary><div class="recipe-body">${recipeBody(r)}</div></details>`;
+}
+
+// ── 🕐 まとめて作る（統合手順書）──
+// 表示中の1〜3品を、下準備（切る・合わせる）→火にかける、の一本の流れに統合する。
+// w（放置できる待ち分）の大きい品から着手し、放置が始まったら次の品の工程を差し込む貪欲方式。
+const CMB_COLORS=['#C85A35','#4A8C6F','#5B7EC2'];
+function cmbParseMin(text){const m=String(text).match(/(\d+)\s*分/);return m?parseInt(m[1],10):0;}
+function buildCombinedSchedule(cookItems){
+  const dishes=cookItems.map((it,i)=>{
+    const r=R[it.id];
+    const steps=r.t.split('→').map(s=>s.trim()).filter(Boolean);
+    // 放置工程＝「N分」を含む末尾寄りの工程（なければ最終工程）。w=0の品は放置なし
+    let wi=-1;
+    if((r.w||0)>0){
+      wi=steps.length-1;
+      for(let j=steps.length-1;j>=0;j--){if(cmbParseMin(steps[j])>0){wi=j;break;}}
+    }
+    return {name:it.name,color:CMB_COLORS[i%3],r,steps,wi,w:r.w||0,m:r.m||10,finish:0};
+  });
+  // 下準備はまとめて先頭に（既存の段取りガイドと同じ体験を統合版の入口に）
+  const cuts=dishes.filter(d=>d.r.c&&d.r.c!=='なし');
+  const sauces=dishes.filter(d=>d.r.s);
+  const prepMin=cuts.length*3+(sauces.length?2:0);
+  // 火にかける工程：w降順に着手。放置工程を開始したらその品からは手が離れるので、
+  // 続く品の工程が自然に「待ち時間への差し込み」になる。放置明けの仕上げは後回しにする
+  const order=[...dishes].sort((a,b)=>b.w-a.w);
+  const steps=[];const finishing=[];let t=prepMin;
+  order.forEach(d=>{
+    for(let i=0;i<d.steps.length;i++){
+      const text=d.steps[i];
+      if(i===d.wi){
+        const waitMin=Math.max(d.w,cmbParseMin(text));
+        steps.push({time:t,dish:d,text,isWait:true,waitMin});
+        t+=1; // 火にかけるのに1分→あとは放置
+        const rest=d.steps.slice(i+1);
+        if(rest.length)finishing.push({dish:d,texts:rest,ready:t+waitMin});
+        else d.finish=t+waitMin;
+        break;
+      }
+      steps.push({time:t,dish:d,text,isWait:false,waitMin:0});
+      t+=(cmbParseMin(text)||2); // 「中火3分」等は明記の分数、なければ2分目安
+    }
+    if(d.wi<0)d.finish=t;
+  });
+  // 放置明けの仕上げ工程（味噌を溶く・とろみ付け等）は待ち終わりのタイミングで
+  finishing.sort((a,b)=>a.ready-b.ready);
+  finishing.forEach(f=>{
+    t=Math.max(t,f.ready);
+    f.texts.forEach(text=>{
+      steps.push({time:t,dish:f.dish,text,isWait:false,waitMin:0});
+      t+=(cmbParseMin(text)||2);
+    });
+    f.dish.finish=t;
+  });
+  const total=Math.max(t,...dishes.map(d=>d.finish));
+  const saved=Math.max(0,dishes.reduce((s,d)=>s+d.m,0)-total); // 1品ずつ順に作った場合との差
+  return {dishes,cuts,sauces,prepMin,steps,total,saved};
+}
+function combinedHtml(items){
+  const cookItems=items.filter(i=>i.type!=='carryover'&&R[i.id]);
+  const carryovers=items.filter(i=>i.type==='carryover');
+  if(items.length===0)return '';
+  if(cookItems.length===0){
+    // 全品「温めるだけ」の日（現データでは起きないが念のため）
+    return `<div class="combine-box"><div class="combine-head">🕐 きょうは温めるだけ</div><div class="combine-body">${items.map(c=>`<div class="cmb-step"><span class="cmb-dish cmb-dish-co">${c.name}</span><div class="cmb-text">レンジまたは鍋で温め直す</div></div>`).join('')}</div></div>`;
+  }
+  const sc=buildCombinedSchedule(cookItems);
+  const badge=d=>`<span class="cmb-dish" style="background:${d.color}">${d.name}</span>`;
+  let body='';
+  body+=`<div class="cmb-dishes">${sc.dishes.map(badge).join('')}${carryovers.map(c=>`<span class="cmb-dish cmb-dish-co">🍳 ${c.name}（温めるだけ）</span>`).join('')}</div>`;
+  if(sc.cuts.length||sc.sauces.length){
+    body+=`<div class="cmb-prep"><div class="cmb-prep-title">🔪 まず全部、切る・合わせる（〜${sc.prepMin}分）</div>`
+      +sc.cuts.map(d=>`<div class="cmb-prep-line">${badge(d)}<span>${d.r.c}</span></div>`).join('')
+      +sc.sauces.map(d=>`<div class="cmb-prep-line">${badge(d)}<span>🫙 ${d.r.s}</span></div>`).join('')
+      +`</div>`;
+  }
+  sc.steps.forEach((s,i)=>{
+    let wait='';
+    if(s.isWait){
+      const next=sc.steps[i+1];
+      const tail=!next?'— できあがりを待つだけ':(next.time<s.time+s.waitMin?'— この間に👇':'— 時間がきたら👇');
+      wait=`<div class="cmb-wait">🔥 火にまかせる（${s.waitMin}分）${tail}</div>`;
+    }
+    body+=`<div class="cmb-step"><span class="cmb-time">${s.time}分〜</span>${badge(s.dish)}<div class="cmb-text">${s.text}${wait}</div></div>`;
+  });
+  if(carryovers.length){
+    body+=`<div class="cmb-step"><span class="cmb-time">仕上げ</span><span class="cmb-dish cmb-dish-co">繰り越し</span><div class="cmb-text">${carryovers.map(c=>c.name).join('・')} をレンジまたは鍋で温め直す</div></div>`;
+  }
+  body+=`<div class="cmb-goal">🍽️ ${items.length>1?`約${sc.total}分で${items.length}品そろって完成`:`約${sc.total}分で完成`}${sc.saved>=3?`（同時進行で約${sc.saved}分短縮）`:''}</div>`;
+  body+=`<div class="cmb-note">※時間は目安。「◯分〜」は作りはじめからの経過分です。</div>`;
+  const meta=cookItems.length>1?`${cookItems.length}品同時進行・約${sc.total}分`:`約${sc.total}分`;
+  return `<div class="combine-box"><div class="combine-head">🕐 まとめて作る<span class="combine-meta">${meta}</span></div><div class="combine-body">${body}</div></div>`;
+}
+// 個別レシピ（オマケ）：普段は閉じておき、1品だけ見たいときに開く
+function dishExtraHtml(catLabel,item,extra){
+  const r=R[item.id];
+  const inner=r?`<div class="recipe-body">${recipeBody(r)}</div>`:pointNote(item);
+  return `<details class="dish-extra"><summary><span class="de-cat">${catLabel}</span><span>${item.name}</span><span class="de-hint">この品だけの作り方</span></summary><div class="dish-extra-body">${favBtn(item.id)}${extra||''}${inner}</div></details>`;
+}
+function carryoverExtraHtml(co,from){
+  return `<details class="dish-extra"><summary><span class="de-cat">繰り越し</span><span>${co.n}</span><span class="de-hint">温め方・メモ</span></summary><div class="dish-extra-body">${co.h?`<div class="menu-note">💡 ${co.h}</div>`:'<div class="menu-note">レンジまたは鍋で温め直し</div>'}<div class="toriwake">👧 ${from.toriwake.kodomo}　👨 ${from.toriwake.otona}</div></div></details>`;
 }
 
 let curPlan=null,planCtx=null;
-
-function menuListHtml(items){
-  const icon={main:'🍖',side:'🥗',soup:'🍲',carryover:'🍳'};
-  const cat={main:'主菜',side:'副菜',soup:'汁物',carryover:'繰り越し'};
-  return `<div class="day-menu-list">${items.map(i=>`<div class="dml-row"><span class="dml-cat">${icon[i.type]||''} ${cat[i.type]||''}</span><span class="dml-name">${i.name}</span></div>`).join('')}</div>`;
-}
 
 function rerollDay(n){
   if(!curPlan||!planCtx)return;
@@ -938,9 +1065,6 @@ function renderThreeDayResults(plan){
   const wf2Items=[{id:null,name:plan.day2.carryover.n,type:'carryover'},{id:plan.day2.newMain.id,name:plan.day2.newMain.name,type:'main'},(plan.day2.side._hide?null:{id:plan.day2.side.id,name:plan.day2.side.name,type:'side'}),(plan.day2.soup._hide?null:{id:plan.day2.soup.id,name:plan.day2.soup.name,type:d2SoupType})].filter(Boolean);
   const wf3Items=[{id:null,name:plan.day3.carryover.n,type:'carryover'},(plan.day3.side._hide?null:{id:plan.day3.side.id,name:plan.day3.side.name,type:'side'}),(plan.day3.soup._hide?null:{id:plan.day3.soup.id,name:plan.day3.soup.name,type:'soup'})].filter(Boolean);
 
-  const d2HintHtml=plan.day2.carryover.h?`<div class="menu-note">💡 ${plan.day2.carryover.h}</div>`:'';
-  const d3HintHtml=plan.day3.carryover.h?`<div class="menu-note">💡 ${plan.day3.carryover.h}</div>`:'';
-
   el.innerHTML=`
     <div class="results-header">
       <h2>🍽️ 3日分の献立｜${plan.genreLabel}</h2>
@@ -950,27 +1074,12 @@ function renderThreeDayResults(plan){
       <div class="day-card day1">
         <div class="day-label">🔪 Day1<small>仕込み・多めに作る</small><button class="reroll-btn" onclick="rerollDay(1)">🎲 別メニューを提案し直す</button></div>
         <div class="day-body">
-          ${menuListHtml(wf1Items)}
-          ${buildWorkflow(wf1Items,1)}
-          <div class="menu-row new-dish-row">
-            ${favBtn(plan.day1.main.id)}
-            <div class="menu-cat">主菜（多めに→明日へ）</div>
-            <div class="menu-name">${plan.day1.main.name}</div>
-            ${plan.day1.main.serve?'<div class="menu-note">🍽️ '+plan.day1.main.serve+'</div>':''}
-            <div class="toriwake">👧 ${plan.day1.main.toriwake.kodomo}　👨 ${plan.day1.main.toriwake.otona}</div>
-            ${R[plan.day1.main.id]?recipeHtml(R[plan.day1.main.id]):pointNote(plan.day1.main)}
-          </div>
-          <div class="menu-row"${plan.day1.side._hide?' style="display:none"':''}>
-            ${favBtn(plan.day1.side.id)}
-            <div class="menu-cat">副菜</div>
-            <div class="menu-name">${plan.day1.side.name}</div>
-            ${recipeHtml(R[plan.day1.side.id])}
-          </div>
-          <div class="menu-row"${plan.day1.soup._hide?' style="display:none"':''}>
-            ${favBtn(plan.day1.soup.id)}
-            <div class="menu-cat">汁物</div>
-            <div class="menu-name">${plan.day1.soup.name}${plan.day1.soup.batch?'（明日の分も）':''}</div>
-            ${recipeHtml(R[plan.day1.soup.id])}
+          ${combinedHtml(wf1Items)}
+          <div class="dish-extras">
+            ${dishExtraHtml('主菜',plan.day1.main,(plan.day1.main.serve?'<div class="menu-note">🍽️ '+plan.day1.main.serve+'</div>':'')+'<div class="menu-note">多めに作って明日へ繰り越し</div>'+`<div class="toriwake">👧 ${plan.day1.main.toriwake.kodomo}　👨 ${plan.day1.main.toriwake.otona}</div>`)}
+            ${plan.day1.side._hide?'':dishExtraHtml('副菜',plan.day1.side)}
+            ${plan.day1.soup._hide?'':dishExtraHtml('汁物',plan.day1.soup,plan.day1.soup.batch?'<div class="menu-note">（明日の分も多めに）</div>':'')}
+            ${buildWorkflow(wf1Items,1)}
           </div>
           ${nutriBadge([plan.day1.main,plan.day1.side,plan.day1.soup].filter(x=>x&&!x._hide),true)}
         </div>
@@ -979,34 +1088,13 @@ function renderThreeDayResults(plan){
       <div class="day-card day2">
         <div class="day-label">🍳 Day2<small>繰り越し＋もうひと品</small><button class="reroll-btn" onclick="rerollDay(2)">🎲 別メニューを提案し直す</button></div>
         <div class="day-body">
-          ${menuListHtml(wf2Items)}
-          ${buildWorkflow(wf2Items,2)}
-          <div class="menu-row carryover-row">
-            <div class="menu-cat">繰り越し</div>
-            <div class="menu-name">${plan.day2.carryover.n}</div>
-            ${d2HintHtml}
-            <div class="toriwake">👧 ${plan.day2.carryoverFrom.toriwake.kodomo}　👨 ${plan.day2.carryoverFrom.toriwake.otona}</div>
-          </div>
-          <div class="menu-row new-dish-row">
-            ${favBtn(plan.day2.newMain.id)}
-            <div class="menu-cat">新作（多めに→明日へ）</div>
-            <div class="menu-name">${plan.day2.newMain.name}</div>
-            ${plan.day2.newMain.serve?'<div class="menu-note">🍽️ '+plan.day2.newMain.serve+'</div>':''}
-            <div class="toriwake">👧 ${plan.day2.newMain.toriwake.kodomo}　👨 ${plan.day2.newMain.toriwake.otona}</div>
-            ${R[plan.day2.newMain.id]?recipeHtml(R[plan.day2.newMain.id]):pointNote(plan.day2.newMain)}
-          </div>
-          <div class="menu-row"${plan.day2.side._hide?' style="display:none"':''}>
-            ${favBtn(plan.day2.side.id)}
-            <div class="menu-cat">副菜</div>
-            <div class="menu-name">${plan.day2.side.name}</div>
-            ${!plan.day2.side.makeahead?'<div class="menu-note">作りたて感プラス</div>':''}
-            ${recipeHtml(R[plan.day2.side.id])}
-          </div>
-          <div class="menu-row"${plan.day2.soup._hide?' style="display:none"':''}>
-            ${favBtn(plan.day2.soup.id)}
-            <div class="menu-cat">汁物</div>
-            <div class="menu-name">${plan.day2.soup.name}${plan.day2.soupNote}</div>
-            ${recipeHtml(R[plan.day2.soup.id])}
+          ${combinedHtml(wf2Items)}
+          <div class="dish-extras">
+            ${carryoverExtraHtml(plan.day2.carryover,plan.day2.carryoverFrom)}
+            ${dishExtraHtml('新作',plan.day2.newMain,(plan.day2.newMain.serve?'<div class="menu-note">🍽️ '+plan.day2.newMain.serve+'</div>':'')+'<div class="menu-note">多めに作って明日へ繰り越し</div>'+`<div class="toriwake">👧 ${plan.day2.newMain.toriwake.kodomo}　👨 ${plan.day2.newMain.toriwake.otona}</div>`)}
+            ${plan.day2.side._hide?'':dishExtraHtml('副菜',plan.day2.side,!plan.day2.side.makeahead?'<div class="menu-note">作りたて感プラス</div>':'')}
+            ${plan.day2.soup._hide?'':dishExtraHtml('汁物',plan.day2.soup,plan.day2.soupNote?`<div class="menu-note">${plan.day2.soupNote}</div>`:'')}
+            ${buildWorkflow(wf2Items,2)}
           </div>
           ${nutriBadge([plan.day2.carryoverFrom,plan.day2.newMain,plan.day2.side,plan.day2.soup].filter(x=>x&&!x._hide),true)}
         </div>
@@ -1015,25 +1103,12 @@ function renderThreeDayResults(plan){
       <div class="day-card day3">
         <div class="day-label">✨ Day3<small>繰り越し・ラクする日</small><button class="reroll-btn" onclick="rerollDay(3)">🎲 別メニューを提案し直す</button></div>
         <div class="day-body">
-          ${menuListHtml(wf3Items)}
-          ${buildWorkflow(wf3Items,3)}
-          <div class="menu-row carryover-row">
-            <div class="menu-cat">繰り越し</div>
-            <div class="menu-name">${plan.day3.carryover.n}</div>
-            ${d3HintHtml}
-            <div class="toriwake">👧 ${plan.day3.carryoverFrom.toriwake.kodomo}　👨 ${plan.day3.carryoverFrom.toriwake.otona}</div>
-          </div>
-          <div class="menu-row"${plan.day3.side._hide?' style="display:none"':''}>
-            ${favBtn(plan.day3.side.id)}
-            <div class="menu-cat">副菜</div>
-            <div class="menu-name">${plan.day3.side.name}</div>
-            ${recipeHtml(R[plan.day3.side.id])}
-          </div>
-          <div class="menu-row"${plan.day3.soup._hide?' style="display:none"':''}>
-            ${favBtn(plan.day3.soup.id)}
-            <div class="menu-cat">汁物</div>
-            <div class="menu-name">${plan.day3.soup.name}</div>
-            ${recipeHtml(R[plan.day3.soup.id])}
+          ${combinedHtml(wf3Items)}
+          <div class="dish-extras">
+            ${carryoverExtraHtml(plan.day3.carryover,plan.day3.carryoverFrom)}
+            ${plan.day3.side._hide?'':dishExtraHtml('副菜',plan.day3.side)}
+            ${plan.day3.soup._hide?'':dishExtraHtml('汁物',plan.day3.soup)}
+            ${buildWorkflow(wf3Items,3)}
           </div>
           ${nutriBadge([plan.day3.carryoverFrom,plan.day3.side,plan.day3.soup].filter(x=>x&&!x._hide),true)}
         </div>
@@ -1204,27 +1279,13 @@ function renderFlowResult(){
     <div class="single-card">
       <div class="single-label">🧭 選んだ献立</div>
       <div class="single-body">
-        ${buildWorkflow(wfItems,1)}
-        <div class="menu-row new-dish-row">
-          ${favBtn(m.id)}
-          <div class="menu-cat">主菜</div>
-          <div class="menu-name">${m.name}</div>
-          ${m.serve?'<div class="menu-note">🍽️ '+m.serve+'</div>':''}
-          ${m.toriwake?`<div class="toriwake">👧 ${m.toriwake.kodomo}　👨 ${m.toriwake.otona}</div>`:''}
-          ${R[m.id]?recipeHtml(R[m.id]):pointNote(m)}
+        ${combinedHtml(wfItems)}
+        <div class="dish-extras">
+          ${dishExtraHtml('主菜',m,(m.serve?'<div class="menu-note">🍽️ '+m.serve+'</div>':'')+(m.toriwake?`<div class="toriwake">👧 ${m.toriwake.kodomo}　👨 ${m.toriwake.otona}</div>`:''))}
+          ${s?dishExtraHtml('副菜',s):''}
+          ${p?dishExtraHtml('汁物',p):''}
+          ${buildWorkflow(wfItems,1)}
         </div>
-        ${s?`<div class="menu-row">
-          ${favBtn(s.id)}
-          <div class="menu-cat">副菜</div>
-          <div class="menu-name">${s.name}</div>
-          ${recipeHtml(R[s.id])||pointNote(s)}
-        </div>`:''}
-        ${p?`<div class="menu-row">
-          ${favBtn(p.id)}
-          <div class="menu-cat">汁物</div>
-          <div class="menu-name">${p.name}</div>
-          ${recipeHtml(R[p.id])||pointNote(p)}
-        </div>`:''}
       </div>
     </div>
     <button class="regen-btn" onclick="startStepFlow()">🧭 もう一度選び直す</button>`;
