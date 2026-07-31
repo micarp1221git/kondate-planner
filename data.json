@@ -164,7 +164,7 @@
     "玉ねぎ",
     "たまご"
    ],
-   "batch": true,
+   "batch": false,
    "carryover": [
     "親子丼",
     "うどんの具"
@@ -330,7 +330,7 @@
     "鶏むね肉",
     "たまご"
    ],
-   "batch": true,
+   "batch": false,
    "carryover": [
     "南蛮丼",
     "サンド"
@@ -695,7 +695,7 @@
     "たまご",
     "パン粉"
    ],
-   "batch": true,
+   "batch": false,
    "carryover": [
     "カツ丼",
     "カツサンド"
@@ -1489,7 +1489,7 @@
    "ingredients": [
     "カレイ切り身(骨なし)"
    ],
-   "batch": true,
+   "batch": false,
    "carryover": [
     "甘酢あんかけ",
     "南蛮漬け"
@@ -1658,7 +1658,7 @@
     "にんにく",
     "生姜"
    ],
-   "batch": true,
+   "batch": false,
    "carryover": [
     "甘酢あんかけ",
     "南蛮漬け",
@@ -1775,7 +1775,7 @@
     "たまご",
     "パン粉"
    ],
-   "batch": true,
+   "batch": false,
    "carryover": [
     "カツ丼",
     "カツサンド"
@@ -1913,7 +1913,7 @@
     "たまご",
     "パン粉"
    ],
-   "batch": true,
+   "batch": false,
    "carryover": [
     "カツ丼",
     "カツとじ",
@@ -2225,7 +2225,7 @@
     "玉ねぎ",
     "パン粉"
    ],
-   "batch": true,
+   "batch": false,
    "carryover": [
     "サンド",
     "丼"
@@ -2451,7 +2451,7 @@
     "たまご",
     "パン粉"
    ],
-   "batch": true,
+   "batch": false,
    "carryover": [
     "フィッシュサンド",
     "南蛮漬け"
@@ -3010,7 +3010,7 @@
     "ささみ",
     "パン粉"
    ],
-   "batch": true,
+   "batch": false,
    "carryover": [
     "サンドの具",
     "お弁当おかず"
