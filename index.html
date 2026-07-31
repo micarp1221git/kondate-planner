@@ -43,6 +43,9 @@ body{font-family:var(--sans);line-height:1.75;color:var(--text);background:var(-
 .hero .tagline{font-size:.92rem;color:var(--text-mid);margin-bottom:28px;letter-spacing:.02em}
 .features{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
 .feature{background:var(--surface);border-radius:6px;padding:7px 16px;font-size:.8rem;color:var(--text-mid);white-space:nowrap;letter-spacing:.01em}
+.servings-row{display:flex;align-items:center;justify-content:center;gap:8px;margin-top:18px;font-size:.85rem;color:var(--text-mid)}
+.servings-row select{font-family:var(--sans);font-size:.92rem;font-weight:600;color:var(--text);background:var(--surface);border:1.5px solid var(--border);border-radius:8px;padding:6px 12px;cursor:pointer}
+.qty{font-weight:700}
 
 /* ── Sections (調味料・食材) ── */
 .section{background:var(--card);border-radius:var(--radius);padding:24px 20px;margin-top:0;box-shadow:var(--shadow);scroll-margin-top:calc(64px + env(safe-area-inset-top,0px))}
@@ -179,6 +182,8 @@ details[open]>.workflow-summary::before{transform:rotate(90deg)}
 .cmb-dish-co{background:var(--text-light)}
 .cmb-prep{background:var(--surface);border-radius:8px;padding:10px 12px;margin-bottom:10px}
 .cmb-prep-title{font-weight:700;font-size:.8rem;margin-bottom:6px}
+.cmb-advance{background:var(--green-light);border:1px dashed var(--green);border-radius:8px;padding:10px 12px;margin-bottom:10px}
+.cmb-advance-title{font-weight:700;font-size:.8rem;margin-bottom:6px;color:var(--green)}
 .cmb-prep-line{font-size:.76rem;color:var(--text-mid);padding:3px 0;display:flex;gap:6px;align-items:baseline}
 .cmb-step{display:flex;gap:7px;align-items:flex-start;padding:8px 0;border-bottom:1px dashed var(--border)}
 .cmb-step:last-of-type{border-bottom:none}
@@ -211,6 +216,9 @@ details[open]>.workflow-summary::before{transform:rotate(90deg)}
 .recipe-body{padding:8px 0 2px;font-size:.78rem;line-height:1.75;color:var(--text)}
 .recipe-line{margin-bottom:3px}
 .recipe-label{font-size:.7rem;color:var(--text-light);display:block;letter-spacing:.02em}
+.recipe-steps{padding-left:1.5em;margin:2px 0 8px}
+.recipe-steps li{margin-bottom:4px}
+.rs-wait{color:var(--primary);font-weight:600;font-size:.72rem;white-space:nowrap}
 
 /* ── Step indicator ── */
 .step-label{display:flex;align-items:center;gap:10px;margin:28px 0 10px;padding:0 2px}
@@ -285,6 +293,13 @@ details[open]>.workflow-summary::before{transform:rotate(90deg)}
       <span class="feature">🍳 3品あるのにラクできる</span>
       <span class="feature">🧭 段取りも組んでくれる</span>
     </div>
+    <div class="servings-row"><label for="servings-sel">🍽️ つくる量</label><select id="servings-sel" onchange="onServingsChange(this.value)">
+      <option value="2">2人分</option>
+      <option value="3">3人分</option>
+      <option value="4" selected>4人分</option>
+      <option value="5">5人分</option>
+      <option value="6">6人分</option>
+    </select></div>
   </div>
 </header>
 <div class="photo-banner" style="background-image:url('photo-banner.jpg')"></div>
@@ -424,8 +439,49 @@ const st = {
   ingredients: new Set(),
   lastMainId: null,
   favorites: new Set(),
-  requestedId: null
+  requestedId: null,
+  servings: 4
 };
+
+// ── 人数スケール（stepsの文中 {600ml} 等を n/4 倍で描画。データは4人分基準）──
+function getServings(){return st.servings||4;}
+function parseQtyNum(s){
+  let m=s.match(/^(\d+)と(\d+)\/(\d+)$/);if(m)return +m[1]+ +m[2]/ +m[3];
+  m=s.match(/^(\d+)\/(\d+)$/);if(m)return +m[1]/ +m[2];
+  return parseFloat(s);
+}
+const QTY_FRACS=[[.25,'1/4'],[1/3,'1/3'],[.5,'1/2'],[2/3,'2/3'],[.75,'3/4']];
+function fmtFrac(v){let best=QTY_FRACS[0];QTY_FRACS.forEach(p=>{if(Math.abs(v-p[0])<Math.abs(v-best[0]))best=p;});return best[1];}
+// {}内の1つの分量をスケール。数値なし（少々・適量等）はそのまま返す＝スケール対象外
+function scaleQty(inner,f){
+  const m=inner.match(/\d+と\d+\/\d+|\d+\/\d+|\d+(?:\.\d+)?/);
+  if(!m)return inner;
+  const v0=parseQtyNum(m[0]);
+  if(!isFinite(v0)||v0<=0||f===1)return inner;
+  const v=v0*f;
+  let out;
+  if(/ml/i.test(inner)){out=String(Math.max(10,Math.round(v/10)*10));} // mlは10ml刻み
+  else if(/\d\s*(g|ｇ)/.test(inner)){out=String(Math.max(5,Math.round(v/5)*5));} // gは5g刻み
+  else if(/大さじ|小さじ|カップ/.test(inner)){ // 0.5刻み・1未満は読みやすい分数
+    const r=Math.round(v*2)/2;
+    out=r>=1?String(r):fmtFrac(Math.max(v,.2));
+  }else{ // 個数系：0.5刻み・1未満は読みやすい分数
+    const r=Math.round(v*2)/2;
+    out=r>=1?(r%1===0?String(r):Math.floor(r)+'と1/2'):fmtFrac(Math.max(v,.2));
+  }
+  return inner.replace(m[0],out);
+}
+function scaleText(text){
+  const f=getServings()/4;
+  return String(text).replace(/\{([^{}]+)\}/g,(_,q)=>`<span class="qty">${scaleQty(q,f)}</span>`);
+}
+let lastRender=null; // 人数変更時に直近の結果画面を再描画するためのフック
+function onServingsChange(v){
+  const n=parseInt(v,10);
+  st.servings=(n>=2&&n<=6)?n:4;
+  localStorage.setItem('kondate-servings',String(st.servings));
+  if(lastRender)lastRender();
+}
 
 // ── 作りたいメニュー指定 ──
 function findMenuById(id){
@@ -781,6 +837,11 @@ function generateSingle(opts,bentoIds,forcedDish){
     dish=pick(pool);
   }
   recordHistory([dish.id]);
+  renderSingleResult(dish);
+}
+
+function renderSingleResult(dish){
+  lastRender=()=>renderSingleResult(dish);
   const r=R[dish.id];
   const el=document.getElementById('results');
   el.classList.remove('hidden');
@@ -910,6 +971,16 @@ function buildWorkflow(items,dayNum){
 }
 
 function recipeBody(r){
+  // steps（構造化手順・分量入り）がある品は番号付きリストが主役。c/sは補助表示
+  if(r.steps&&r.steps.length){
+    let body=`<ol class="recipe-steps">${r.steps.map(s=>{
+      const w=s.wait?` <span class="rs-wait">（${waitLabelFor({heat:s.heat,text:s.t})}）</span>`:'';
+      return `<li>${scaleText(s.t)}${w}</li>`;
+    }).join('')}</ol>`;
+    body+=`<div class="recipe-line"><span class="recipe-label">目安</span>約${r.m}分（分量は${getServings()}人分）</div>`;
+    if(r.s)body+=`<div class="recipe-line"><span class="recipe-label">調味料メモ</span>${r.s}</div>`;
+    return body;
+  }
   let body='';
   if(r.c&&r.c!=='なし')body+=`<div class="recipe-line"><span class="recipe-label">下ごしらえ</span>${r.c}</div>`;
   if(r.s)body+=`<div class="recipe-line"><span class="recipe-label">調味料</span>${r.s}</div>`;
@@ -924,65 +995,111 @@ function recipeHtml(r){
 
 // ── 🕐 まとめて作る（統合手順書）──
 // 表示中の1〜3品を、下準備（切る・合わせる）→火にかける、の一本の流れに統合する。
-// w（放置できる待ち分）の大きい品から着手し、放置が始まったら次の品の工程を差し込む貪欲方式。
+// steps（構造化手順・分量入り）がある品はそれを使い、無い品は旧c/s/t文字列から組み立てるフォールバック。
+// 待ち時間の大きい品から着手し、放置が始まったら次の品の工程を差し込む貪欲方式（従来の思想を維持）。
 const CMB_COLORS=['#C85A35','#4A8C6F','#5B7EC2'];
 function cmbParseMin(text){const m=String(text).match(/(\d+)\s*分/);return m?parseInt(m[1],10):0;}
-// 放置工程の文言：火を使わない品（塩置き・レンジ等）に「火にまかせる」と出さない
+// 旧データ用：放置工程の文言を本文から推定（火を使わない品に「火にまかせる」と出さない）
 function cmbWaitLabel(text){
   if(/レンジ|チン|\d+\s*[WwＷｗ]/.test(text))return 'レンジにまかせる';
   if(/[煮焼蒸揚炒茹蓋火沸]|ゆで|グリル|オーブン|トースター|返し|アク|ルー/.test(text))return '🔥 火にまかせる';
   return '⏳ おいておく';
 }
-function buildCombinedSchedule(cookItems){
-  const dishes=cookItems.map((it,i)=>{
-    const r=R[it.id];
-    const steps=r.t.split('→').map(s=>s.trim()).filter(Boolean);
+// stepsがある品はheatフィールドで確定。無い品（heat:null）は旧来の本文推定
+function waitLabelFor(s){
+  if(s.heat==='stove')return '🔥 火にまかせる';
+  if(s.heat==='microwave')return 'レンジにまかせる';
+  if(s.heat==='toaster')return 'トースターにまかせる';
+  if(s.heat==null)return cmbWaitLabel(s.text);
+  return '⏳ おいておく';
+}
+// 品ごとに手順を共通形式へ正規化：prep（切る・合わせる系）とcook（タイムライン工程）。
+// 半日漬ける等の長時間wait（>60分）を含む品は、その工程までを advance（事前仕込み）へ分離する
+const CMB_LONG_WAIT=60;
+function cmbNormalize(it,i){
+  const r=R[it.id];
+  const prep=[],cook=[],advance=[];
+  let maxWait=0,advanceWait=0;
+  if(r.steps&&r.steps.length){
+    let li=-1; // 最後の長時間wait工程。ここまで（漬け込み等の準備を含む）は前日・数時間前の仕事
+    r.steps.forEach((s,j)=>{if(s.wait&&(s.min||0)>CMB_LONG_WAIT)li=j;});
+    r.steps.forEach((s,j)=>{
+      const e={text:scaleText(s.t),min:s.min||1,wait:!!s.wait,heat:s.heat||'none'};
+      if(j<=li){advance.push(e);if(e.wait)advanceWait=Math.max(advanceWait,e.min);}
+      else if(s.prep)prep.push(e);
+      else{cook.push(e);if(e.wait)maxWait=Math.max(maxWait,e.min);}
+    });
+  }else{
+    // フォールバック：旧c/s/t文字列から合成
+    if(r.c&&r.c!=='なし')prep.push({text:r.c,min:3,wait:false,heat:'none'});
+    if(r.s)prep.push({text:'🫙 '+r.s,min:1,wait:false,heat:'none'});
+    const texts=String(r.t||'').split('→').map(s=>s.trim()).filter(Boolean);
     // 放置工程＝「N分」を含む末尾寄りの工程（なければ最終工程）。w=0の品は放置なし
     let wi=-1;
     if((r.w||0)>0){
-      wi=steps.length-1;
-      for(let j=steps.length-1;j>=0;j--){if(cmbParseMin(steps[j])>0){wi=j;break;}}
+      wi=texts.length-1;
+      for(let j=texts.length-1;j>=0;j--){if(cmbParseMin(texts[j])>0){wi=j;break;}}
     }
-    return {name:it.name,color:CMB_COLORS[i%3],co:!!it.co,r,steps,wi,w:r.w||0,m:r.m||10,finish:0};
-  });
-  // 下準備はまとめて先頭に（既存の段取りガイドと同じ体験を統合版の入口に）
-  const cuts=dishes.filter(d=>d.r.c&&d.r.c!=='なし');
-  const sauces=dishes.filter(d=>d.r.s);
-  const prepMin=cuts.length*3+(sauces.length?2:0);
-  // 火にかける工程：w降順に着手。放置工程を開始したらその品からは手が離れるので、
-  // 続く品の工程が自然に「待ち時間への差し込み」になる。放置明けの仕上げは後回しにする
-  const order=[...dishes].sort((a,b)=>b.w-a.w);
-  const steps=[];const finishing=[];let t=prepMin;
+    texts.forEach((tx,j)=>{
+      const isW=(j===wi);
+      cook.push({text:tx,min:isW?Math.max(r.w||0,cmbParseMin(tx)):(cmbParseMin(tx)||2),wait:isW,heat:null});
+    });
+    maxWait=r.w||0;
+  }
+  // 事前仕込みがある品は、当日ぶんの工程時間だけを短縮計算に使う（漬け時間で水増ししない）
+  const mEff=advance.length?cook.reduce((s,e)=>s+e.min,0)+prep.reduce((s,e)=>s+e.min,0):(r.m||10);
+  return {name:it.name,color:CMB_COLORS[i%3],co:!!it.co,r,prep,cook,advance,advanceWait,m:mEff,maxWait,finish:0,cursor:0,startAfter:0};
+}
+function buildCombinedSchedule(cookItems){
+  const dishes=cookItems.map(cmbNormalize);
+  const prepMin=dishes.reduce((s,d)=>s+d.prep.reduce((a,p)=>a+p.min,0),0);
+  const order=[...dishes].sort((a,b)=>b.maxWait-a.maxWait);
+  const steps=[];const finishing=[];
+  // 湯を沸かす等、最初の工程が「手が空く火仕事」の品は、切りものを始める前にまず火にかけておく
   order.forEach(d=>{
-    for(let i=0;i<d.steps.length;i++){
-      const text=d.steps[i];
-      if(i===d.wi){
-        const waitMin=Math.max(d.w,cmbParseMin(text));
-        steps.push({time:t,dish:d,text,isWait:true,waitMin});
-        t+=1; // 火にかけるのに1分→あとは放置
-        const rest=d.steps.slice(i+1);
-        if(rest.length)finishing.push({dish:d,texts:rest,ready:t+waitMin});
-        else d.finish=t+waitMin;
-        break;
-      }
-      steps.push({time:t,dish:d,text,isWait:false,waitMin:0});
-      t+=(cmbParseMin(text)||2); // 「中火3分」等は明記の分数、なければ2分目安
+    const s0=d.cook[0];
+    if(s0&&s0.wait&&(s0.heat==='stove'||s0.heat==='microwave'||s0.heat==='toaster')){
+      steps.push({time:0,dish:d,text:s0.text,isWait:true,waitMin:s0.min,heat:s0.heat});
+      d.cursor=1;d.startAfter=1+s0.min;
     }
-    if(d.wi<0)d.finish=t;
   });
-  // 放置明けの仕上げ工程（味噌を溶く・とろみ付け等）は待ち終わりのタイミングで
+  let t=prepMin;
+  order.forEach(d=>{
+    t=Math.max(t,d.startAfter); // 湯沸かし等が終わる前に続きの工程を置かない
+    let paused=false;
+    for(let i=d.cursor;i<d.cook.length;i++){
+      const s=d.cook[i];
+      if(s.wait){
+        steps.push({time:t,dish:d,text:s.text,isWait:true,waitMin:s.min,heat:s.heat});
+        t+=1; // 火にかけるのに1分→あとは放置
+        const rest=d.cook.slice(i+1);
+        if(rest.length)finishing.push({dish:d,rest,ready:t+s.min});
+        else d.finish=t+s.min;
+        paused=true;break;
+      }
+      steps.push({time:t,dish:d,text:s.text,isWait:false,waitMin:0});
+      t+=s.min||2;
+    }
+    if(!paused)d.finish=t;
+  });
+  // 放置明けの仕上げ工程（味噌を溶く・卵でとじる等）は待ち終わりのタイミングで
   finishing.sort((a,b)=>a.ready-b.ready);
   finishing.forEach(f=>{
     t=Math.max(t,f.ready);
-    f.texts.forEach(text=>{
-      steps.push({time:t,dish:f.dish,text,isWait:false,waitMin:0});
-      t+=(cmbParseMin(text)||2);
+    f.rest.forEach(s=>{
+      if(s.wait){
+        steps.push({time:t,dish:f.dish,text:s.text,isWait:true,waitMin:s.min,heat:s.heat});
+        t+=1+s.min;
+      }else{
+        steps.push({time:t,dish:f.dish,text:s.text,isWait:false,waitMin:0});
+        t+=s.min||2;
+      }
     });
     f.dish.finish=t;
   });
   const total=Math.max(t,...dishes.map(d=>d.finish));
   const saved=Math.max(0,dishes.reduce((s,d)=>s+d.m,0)-total); // 1品ずつ順に作った場合との差
-  return {dishes,cuts,sauces,prepMin,steps,total,saved};
+  return {dishes,prepMin,steps,total,saved};
 }
 function combinedHtml(items){
   const cookItems=items.filter(i=>i.type!=='carryover'&&R[i.id]);
@@ -996,11 +1113,18 @@ function combinedHtml(items){
   const badge=d=>`<span class="cmb-dish" style="background:${d.color}">${d.name}</span>`;
   let body='';
   body+=`<div class="cmb-dishes">${sc.dishes.map(d=>badge(d)+(d.co?'<span class="cmb-co-mark">🍱 翌日の分も、多めに</span>':'')).join('')}${carryovers.map(c=>`<span class="cmb-dish cmb-dish-co">🍳 ${c.name}（温めるだけ）</span>`).join('')}</div>`;
-  if(sc.cuts.length||sc.sauces.length){
-    body+=`<div class="cmb-prep"><div class="cmb-prep-title">🔪 まず全部、切る・合わせる（〜${sc.prepMin}分）</div>`
-      +sc.cuts.map(d=>`<div class="cmb-prep-line">${badge(d)}<span>${d.r.c}</span></div>`).join('')
-      +sc.sauces.map(d=>`<div class="cmb-prep-line">${badge(d)}<span>🫙 ${d.r.s}</span></div>`).join('')
+  // 半日漬ける等がある品は、当日のタイムラインより前に「事前に仕込んでおく」枠を出す
+  const advDishes=sc.dishes.filter(d=>d.advance.length);
+  if(advDishes.length){
+    const hours=Math.ceil(Math.max(...advDishes.map(d=>d.advanceWait))/60);
+    body+=`<div class="cmb-advance"><div class="cmb-advance-title">🕐 事前に仕込んでおく（${hours}時間前〜前日）</div>`
+      +advDishes.map(d=>d.advance.map(p=>`<div class="cmb-prep-line">${badge(d)}<span>${p.text}</span></div>`).join('')).join('')
       +`</div>`;
+  }
+  const prepLines=[];
+  sc.dishes.forEach(d=>d.prep.forEach(p=>prepLines.push(`<div class="cmb-prep-line">${badge(d)}<span>${p.text}</span></div>`)));
+  if(prepLines.length){
+    body+=`<div class="cmb-prep"><div class="cmb-prep-title">🔪 まず全部、切る・合わせる（〜${sc.prepMin}分）</div>${prepLines.join('')}</div>`;
   }
   const coSeen=new Set();
   sc.steps.forEach((s,i)=>{
@@ -1008,7 +1132,7 @@ function combinedHtml(items){
     if(s.isWait){
       const next=sc.steps[i+1];
       const tail=!next?'— できあがりを待つだけ':(next.time<s.time+s.waitMin?'— この間に👇':'— 時間がきたら👇');
-      wait=`<div class="cmb-wait">${cmbWaitLabel(s.text)}（${s.waitMin}分）${tail}</div>`;
+      wait=`<div class="cmb-wait">${waitLabelFor(s)}（${s.waitMin}分）${tail}</div>`;
     }
     // 翌日に繰り越す品は、着手の工程に「多めに」の注記
     let co='';
@@ -1020,7 +1144,8 @@ function combinedHtml(items){
   }
   body+=`<div class="cmb-goal">🍽️ ${items.length>1?`約${sc.total}分で${items.length}品そろって完成`:`約${sc.total}分で完成`}${sc.saved>=3?`（同時進行で約${sc.saved}分短縮）`:''}</div>`;
   body+=`<div class="cmb-note">※時間は目安。「◯分〜」は作りはじめからの経過分です。</div>`;
-  const meta=cookItems.length>1?`${cookItems.length}品同時進行・約${sc.total}分`:`約${sc.total}分`;
+  const hasSteps=cookItems.some(i=>R[i.id]&&R[i.id].steps&&R[i.id].steps.length);
+  const meta=(cookItems.length>1?`${cookItems.length}品同時進行・`:'')+`約${sc.total}分`+(hasSteps?`・${getServings()}人分`:'');
   return `<div class="combine-box"><div class="combine-head">🕐 まとめて作る<span class="combine-meta">${meta}</span></div><div class="combine-body">${body}</div></div>`;
 }
 // 個別レシピ（オマケ）：普段は閉じておき、1品だけ見たいときに開く
@@ -1070,6 +1195,7 @@ function rerollDay(n){
 }
 
 function renderThreeDayResults(plan){
+  lastRender=()=>renderThreeDayResults(plan);
   const el=document.getElementById('results');
   el.classList.remove('hidden');
   // co: 今日多めに作って翌日カードで再利用される品（主菜の繰り越し・続きの汁物）
@@ -1276,10 +1402,10 @@ function finishFlowHere(){
   renderFlowResult();
 }
 
-function renderFlowResult(){
+function renderFlowResult(rerender){
   const m=flow.main,s=flow.side,p=flow.soup;
-  recordHistory([m.id]);
-  st.lastMainId=m.id;
+  lastRender=()=>renderFlowResult(true);
+  if(!rerender){recordHistory([m.id]);st.lastMainId=m.id;}
   const wfItems=[{id:m.id,name:m.name,type:'main'}];
   if(s)wfItems.push({id:s.id,name:s.name,type:'side'});
   if(p)wfItems.push({id:p.id,name:p.name,type:'soup'});
@@ -1417,6 +1543,10 @@ function init(){
     if(o.variety)document.getElementById('variety-mode').checked=true;
     if(o.favPriority)document.getElementById('fav-priority').checked=true;
   }catch(e){}}
+  const savedN=parseInt(localStorage.getItem('kondate-servings')||'4',10);
+  st.servings=(savedN>=2&&savedN<=6)?savedN:4;
+  const sel=document.getElementById('servings-sel');
+  if(sel)sel.value=String(st.servings);
   renderSeasonings();
   renderIngredients();
   updateCount();
