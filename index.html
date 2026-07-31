@@ -1059,7 +1059,7 @@ function buildCombinedSchedule(cookItems){
   order.forEach(d=>{
     const s0=d.cook[0];
     if(s0&&s0.wait&&(s0.heat==='stove'||s0.heat==='microwave'||s0.heat==='toaster')){
-      steps.push({time:0,dish:d,text:s0.text,isWait:true,waitMin:s0.min,heat:s0.heat});
+      steps.push({time:0,dish:d,text:s0.text,isWait:true,waitMin:s0.min,heat:s0.heat,isKickoff:true});
       d.cursor=1;d.startAfter=1+s0.min;
     }
   });
@@ -1131,7 +1131,14 @@ function combinedHtml(items){
     let wait='';
     if(s.isWait){
       const next=sc.steps[i+1];
-      const tail=!next?'— できあがりを待つだけ':(next.time<s.time+s.waitMin?'— この間に👇':'— 時間がきたら👇');
+      let tail;
+      if(s.isKickoff&&prepLines.length){
+        // 湯沸かし等の最初の火仕事は「まず全部切る・合わせる」ブロック（このすぐ上に表示済み）と並行で進む。
+        // 次の配列要素の時刻とは無関係に、上の下準備を続けてもらうのが正しい案内。
+        tail='— このまま上の「切る・合わせる」を続けてOK👆';
+      }else{
+        tail=!next?'— できあがりを待つだけ':(next.time<s.time+s.waitMin?'— この間に👇':'— 時間がきたら👇');
+      }
       wait=`<div class="cmb-wait">${waitLabelFor(s)}（${s.waitMin}分）${tail}</div>`;
     }
     // 翌日に繰り越す品は、着手の工程に「多めに」の注記
