@@ -1619,6 +1619,37 @@ async function setupDailyReminder(){
   }catch(e){ console.log('daily reminder skipped:', e); }
 }
 setTimeout(setupDailyReminder, 2500);
+
+// ネイティブ版のみ: 画面下の小さいバナー広告（AdMob）
+// ⚠️ いまはGoogle公式のテスト広告ID。本番リリース前に AdMob_設定手順書.md の手順で
+//    みかさんのAdMob発行IDへ差し替え、isTesting を false にすること。
+//    npa:true（非パーソナライズ広告）にしてあるのは、追跡許可ダイアログ(ATT)なしで
+//    審査を通せる構成にするため。パーソナライズに変えるならATT実装が必要。
+const ADMOB_CONFIG = {
+  bannerIdIos: 'ca-app-pub-3940256099942544/2934735716',      // テスト用(iOSバナー)
+  bannerIdAndroid: 'ca-app-pub-3940256099942544/6300978111',  // テスト用(Androidバナー)
+  isTesting: true
+};
+async function setupBannerAd(){
+  if(!isNativeApp()) return;
+  try{
+    const AdMob = window.Capacitor.Plugins.AdMob;
+    if(!AdMob) return;
+    await AdMob.initialize();
+    const isIos = window.Capacitor.getPlatform && window.Capacitor.getPlatform() === 'ios';
+    await AdMob.showBanner({
+      adId: isIos ? ADMOB_CONFIG.bannerIdIos : ADMOB_CONFIG.bannerIdAndroid,
+      adSize: 'ADAPTIVE_BANNER',
+      position: 'BOTTOM_CENTER',
+      margin: 0,
+      isTesting: ADMOB_CONFIG.isTesting,
+      npa: true
+    });
+    // バナーに最下部のボタンが隠れないよう、余白を足す
+    document.body.style.paddingBottom = '70px';
+  }catch(e){ console.log('banner ad skipped:', e); }
+}
+setTimeout(setupBannerAd, 1500);
 </script>
 </body>
 </html>

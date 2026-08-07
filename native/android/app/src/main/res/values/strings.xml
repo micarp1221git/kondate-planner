@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">献立まるっとプランナー</string>
+    <string name="title_activity_main">献立まるっとプランナー</string>
+    <string name="package_name">com.experisent.kondate</string>
+    <string name="custom_url_scheme">com.experisent.kondate</string>
+</resources>

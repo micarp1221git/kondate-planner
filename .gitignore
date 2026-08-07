@@ -1,0 +1,6 @@
+
+# Android release signing (never commit)
+native/keystore/
+*.jks
+*.keystore
+native/android/keystore.properties

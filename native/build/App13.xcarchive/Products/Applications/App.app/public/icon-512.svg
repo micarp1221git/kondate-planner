@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <rect width="512" height="512" rx="108" fill="#FAF7F4"/>
+  <g transform="translate(256,260)">
+    <!-- 鍋本体 -->
+    <ellipse cx="0" cy="22" rx="140" ry="42" fill="#E8E2DB"/>
+    <rect x="-140" y="-64" width="280" height="86" rx="16" fill="#C85A35"/>
+    <ellipse cx="0" cy="-64" rx="140" ry="38" fill="#D4694A"/>
+    <!-- 取っ手 -->
+    <rect x="-166" y="-44" width="34" height="20" rx="7" fill="#8E847B"/>
+    <rect x="132" y="-44" width="34" height="20" rx="7" fill="#8E847B"/>
+    <!-- 蓋のつまみ -->
+    <ellipse cx="0" cy="-98" rx="22" ry="13" fill="#8E847B"/>
+    <!-- 湯気 -->
+    <path d="M-38,-120 Q-38,-150 -22,-162 Q-6,-174 -6,-144" stroke="#C85A35" stroke-width="6" fill="none" opacity="0.5" stroke-linecap="round"/>
+    <path d="M6,-126 Q6,-156 22,-168 Q38,-180 38,-150" stroke="#C85A35" stroke-width="6" fill="none" opacity="0.4" stroke-linecap="round"/>
+    <path d="M-16,-116 Q-16,-138 0,-148 Q16,-158 16,-134" stroke="#C85A35" stroke-width="6" fill="none" opacity="0.3" stroke-linecap="round"/>
+  </g>
+  <!-- 「3日分」テキスト -->
+  <text x="256" y="436" text-anchor="middle" font-family="sans-serif" font-weight="700" font-size="54" fill="#C85A35">3日分</text>
+</svg>
