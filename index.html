@@ -1626,11 +1626,13 @@ setTimeout(setupDailyReminder, 2500);
 //    npa:true（非パーソナライズ広告）にしてあるのは、追跡許可ダイアログ(ATT)なしで
 //    審査を通せる構成にするため。パーソナライズに変えるならATT実装が必要。
 const ADMOB_CONFIG = {
+  enabled: false,   // 🚨 v1.3では広告を出さない（テストIDのまま本番に出せない）。本番IDが取れたら true に＋ID差し替え
   bannerIdIos: 'ca-app-pub-3940256099942544/2934735716',      // テスト用(iOSバナー)
   bannerIdAndroid: 'ca-app-pub-3940256099942544/6300978111',  // テスト用(Androidバナー)
   isTesting: true
 };
 async function setupBannerAd(){
+  if(!ADMOB_CONFIG.enabled) return;
   if(!isNativeApp()) return;
   try{
     const AdMob = window.Capacitor.Plugins.AdMob;
