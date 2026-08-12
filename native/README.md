@@ -46,6 +46,7 @@ xcodebuild -exportArchive -archivePath build/App.xcarchive -exportPath build/exp
 
 ## 🚨 2026-08-12 v1.3(build17)で学んだこと（審査提出の追記）
 
-- **AdMobプラグイン入りだと、この手順のクラウド署名が通らない**: `GoogleMobileAds.framework`/`UserMessagingPlatform.framework` が「not properly signed (90035)」でexport失敗。広告版を出すときは署名方法の解決が先（ローカル署名 or フレームワークの手動署名）。今回は `npm remove @capacitor-community/admob` → cap sync で除去して通した
+- **AdMobプラグイン入りだと、従来手順（`CODE_SIGNING_ALLOWED=NO`でアーカイブ）は通らない**: 埋め込みの `GoogleMobileAds.framework`/`UserMessagingPlatform.framework` が無署名のまま残り、export時のクラウド署名が「not properly signed (90035)」で失敗する。v1.3では `npm remove @capacitor-community/admob` で除去して通した
+- ✅ **解決済み（2026-08-13深夜・ローカル実証）**: **アーカイブを署名ありで行う**と通る。`CODE_SIGNING_ALLOWED=NO` を外し、アーカイブにも認証キー3点（-allowProvisioningUpdates -authenticationKeyPath/KeyID/IssuerID）を付けるだけ。検証= destination=export のローカルexportで ipa を作り、App本体「Apple Distribution: EXPERISENT」・フレームワークにTeamIdentifier入りを codesign で確認（アップロードはしていない）。**広告版はこの手順でそのまま提出できる**。プラグイン再追加済みブランチ= `admob-signing-test`（ローカル）
 - **審査提出の後半（バージョン作成→ビルド添付→提出）はASC APIで全自動化できた**: 手順スクリプト＝Vault `06_Projects/20260721_献立アプリUIUX監査/tools/asc.py`（app/builds/versions/create_version/set_build/set_notes/rs_create/rs_add/rs_submit）。⚠️旧 `appStoreVersionSubmissions` はCREATE禁止になっている＝**reviewSubmissions（rs_*）を使う**
 - 💎 **アプリ側ファイルを直したら「いつ申請するか」をその場で決める**: v1.2提出後の変更が未申請のまま4日置かれ、みかさんの「アップデートしても変わらない」で発覚した
