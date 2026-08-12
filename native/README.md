@@ -43,3 +43,9 @@ xcodebuild -exportArchive -archivePath build/App.xcarchive -exportPath build/exp
 
 - 鍵: `~/.appstoreconnect/private_keys/AuthKey_V2DJLMWAM3.p8`（600権限・Adminロール・失効はASC「ユーザとアクセス」→「統合」から）
 - 早口言葉アプリ（hayakuchi-challenge/native）も同じ方式でOK
+
+## 🚨 2026-08-12 v1.3(build17)で学んだこと（審査提出の追記）
+
+- **AdMobプラグイン入りだと、この手順のクラウド署名が通らない**: `GoogleMobileAds.framework`/`UserMessagingPlatform.framework` が「not properly signed (90035)」でexport失敗。広告版を出すときは署名方法の解決が先（ローカル署名 or フレームワークの手動署名）。今回は `npm remove @capacitor-community/admob` → cap sync で除去して通した
+- **審査提出の後半（バージョン作成→ビルド添付→提出）はASC APIで全自動化できた**: 手順スクリプト＝Vault `06_Projects/20260721_献立アプリUIUX監査/tools/asc.py`（app/builds/versions/create_version/set_build/set_notes/rs_create/rs_add/rs_submit）。⚠️旧 `appStoreVersionSubmissions` はCREATE禁止になっている＝**reviewSubmissions（rs_*）を使う**
+- 💎 **アプリ側ファイルを直したら「いつ申請するか」をその場で決める**: v1.2提出後の変更が未申請のまま4日置かれ、みかさんの「アップデートしても変わらない」で発覚した
