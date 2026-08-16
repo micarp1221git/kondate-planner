@@ -139,6 +139,7 @@ details[open]>.group-summary::before{transform:rotate(90deg)}
    おまかせを弱めるのではなく、選ぶ側を実体のあるボタンに上げた。説明を1行ずつ付けて
    「何ができるのか（3日分 / 今日の1食）」がボタンだけで分かるようにしている。 */
 .btn-choice{margin:0 0 12px}
+.regen-btn.omakase{background:var(--primary-light);color:var(--primary);border-color:var(--primary);font-weight:700}
 .btn-note{margin:6px 2px 0;font-size:.78rem;line-height:1.5;color:var(--text-light);text-align:center}
 .generate-btn.secondary{background:var(--primary-light);color:var(--primary);border:1.5px solid var(--primary);box-shadow:0 2px 8px rgba(200,90,53,.10);font-weight:700}
 .generate-btn.secondary:hover{background:var(--primary-light)}
@@ -390,16 +391,14 @@ details[open]>.workflow-summary::before{transform:rotate(90deg)}
       <span style="font-size:.75rem;color:var(--text-light);padding-left:26px">保存したお気に入りがあれば優先的に出す</span>
     </div>
   </section>
+  <!-- 2026-08-16 みかさん「こんだてAIみたいなUI UXの方がわかりやすい気がする」
+       → 入口の二択（おまかせ / 選ぶ）をやめて、ボタンは1つ。押すと候補が出て、そこで
+         「選ぶ」か「おまかせ」かを決める。分かれ道を、押す前ではなく押したあとに置く。 -->
   <div class="btn-stack">
     <div class="btn-choice">
-      <button class="generate-btn" id="generate-btn" onclick="generate()">
-        <span class="btn-text">おまかせで3日分つくる</span>
+      <button class="generate-btn" id="generate-btn" onclick="startHere()">
+        <span class="btn-text">3日分の献立をつくる</span>
         <span class="btn-loading"><span class="spinner"></span>献立を考え中…</span>
-      </button>
-    </div>
-    <div class="btn-choice" id="step-choice">
-      <button class="generate-btn secondary" id="step-btn" onclick="startStepFlow()">
-        <span class="btn-text">初日のメインから選ぶ</span>
       </button>
     </div>
   </div>
@@ -838,14 +837,18 @@ function toggleIngGroup(groupName){
   renderIngredients();updateCount();saveState();
 }
 
+// 入口はこの1つだけ。分かれ道（選ぶ / おまかせ）は候補画面に置く
+function startHere(){
+  const singleMode=document.getElementById('single-mode').checked;
+  if(singleMode||st.requestedId){generate();return;} // 1品モードとメニュー指定は、そのまま出す
+  startStepFlow();
+}
+
 function onOptionChange(){
   const btn=document.getElementById('generate-btn');
   const singleMode=document.getElementById('single-mode').checked;
-  // 1品モードでは段階選択（メイン→副菜→汁物）は使わない
-  // 説明行ごと出し分ける（ボタンだけ消して説明が残る事故を防ぐ）
-  document.getElementById('step-choice').style.display=singleMode?'none':'block';
   if(st.requestedId){saveOpts();return;} // メニュー指定中はボタン文言を維持
-  const t=singleMode?'今日の1品を出す':'おまかせで3日分つくる';
+  const t=singleMode?'今日の1品を出す':'3日分の献立をつくる';
   btn.querySelector('.btn-text').textContent=t;
 
   saveOpts();
@@ -1451,7 +1454,7 @@ function renderFlowStep(){
     :flow.step===2?'メインに合う副菜をタップ':'最後に汁物を選んで完成';
   el.innerHTML=`
     <div class="results-header"><h2>🧭 ${title}</h2><p>${desc}</p></div>
-    <div class="flow-progress">${prog}</div>
+    ${flow.step===1?'':`<div class="flow-progress">${prog}</div>`}
     ${picked.length?`<div class="picked-row">${picked.join('')}</div>`:''}
     <div class="cand-grid">
       ${flow.cands.map((c,i)=>{
@@ -1463,6 +1466,7 @@ function renderFlowStep(){
           ${miss.length?`<div class="cand-miss">🛒 ${miss.join('・')} があれば作れます</div>`:''}
         </button>`;}).join('')}
     </div>
+    ${flow.step===1?'<button class="regen-btn omakase" onclick="generate()">🎲 決められない。おまかせで3日分つくる</button>':''}
     <button class="regen-btn" onclick="reshuffleFlow()">🔄 別の候補を見る</button>
     ${flow.step===2?'<button class="regen-btn" style="border-color:#7a9a5b;color:#5f7a45" onclick="finishFlowHere()">✅ 主菜だけで作る（1品）</button>':''}
     ${flow.step===3?'<button class="regen-btn" style="border-color:#7a9a5b;color:#5f7a45" onclick="finishFlowHere()">✅ 汁物なし、この2品で作る</button>':''}
