@@ -134,7 +134,7 @@ details[open]>.group-summary::before{transform:rotate(90deg)}
 /* 2026-08-16 みかさん「おまかせが目立ちすぎて、選んで作るがわかりにくい」→ 2つを同格に見せる。
    おまかせを弱めるのではなく、選ぶ側を実体のあるボタンに上げた。説明を1行ずつ付けて
    「何ができるのか（3日分 / 今日の1食）」がボタンだけで分かるようにしている。 */
-.btn-choice{margin:0 0 20px}
+.btn-choice{margin:0 0 12px}
 .btn-note{margin:6px 2px 0;font-size:.78rem;line-height:1.5;color:var(--text-light);text-align:center}
 .generate-btn.secondary{background:var(--primary-light);color:var(--primary);border:1.5px solid var(--primary);box-shadow:0 2px 8px rgba(200,90,53,.10);font-weight:700}
 .generate-btn.secondary:hover{background:var(--primary-light)}
@@ -392,13 +392,11 @@ details[open]>.workflow-summary::before{transform:rotate(90deg)}
         <span class="btn-text">おまかせで3日分つくる</span>
         <span class="btn-loading"><span class="spinner"></span>献立を考え中…</span>
       </button>
-      <p class="btn-note" id="generate-note">押すだけ。買い物に行く前に、まるっと決まります</p>
     </div>
     <div class="btn-choice" id="step-choice">
       <button class="generate-btn secondary" id="step-btn" onclick="startStepFlow()">
-        <span class="btn-text">自分で選んで、今日の1食</span>
+        <span class="btn-text">初日のメインから選ぶ</span>
       </button>
-      <p class="btn-note">メイン → 副菜 → 汁物 の順に、食べたいものをタップ</p>
     </div>
   </div>
   <button class="fav-btn" id="fav-btn" onclick="showFavorites()" style="display:none">
@@ -816,8 +814,7 @@ function onOptionChange(){
   if(st.requestedId){saveOpts();return;} // メニュー指定中はボタン文言を維持
   const t=singleMode?'今日の1品を出す':'おまかせで3日分つくる';
   btn.querySelector('.btn-text').textContent=t;
-  const note=document.getElementById('generate-note');
-  if(note)note.textContent=singleMode?'今の食材で作れる1品を、ひとつ出します':'押すだけ。買い物に行く前に、まるっと決まります';
+
   saveOpts();
 }
 
@@ -1350,8 +1347,16 @@ function startStepFlow(){
 function selectCand(i){
   const item=flow.cands[i];
   if(!item)return;
-  if(flow.step===1)flow.main=item;
-  else if(flow.step===2)flow.side=item;
+  // 2026-08-16 みかさん「初日のメインから選ぶ にして、ここも3日分作ろう」
+  //   → メインを1つ選んだ時点で、それを1日目にして3日分を組み立てる。
+  //   副菜・汁物を1品ずつ選ぶ流れ（＝1食分）は、3日分とかみ合わないのでここで終える。
+  if(flow.step===1){
+    const opts=getOpts();
+    const bentoIds=new Set((D._meta&&D._meta.bento_ids)||[]);
+    generateThreeDay(opts,bentoIds,item);
+    return;
+  }
+  if(flow.step===2)flow.side=item;
   else{flow.soup=item;renderFlowResult();return;}
   flow.step++;
   advanceFlow();
@@ -1395,8 +1400,8 @@ function renderFlowStep(){
   const picked=[];
   if(flow.main)picked.push(`<span class="picked-chip">主菜：${flow.main.name}</span>`);
   if(flow.side)picked.push(`<span class="picked-chip">副菜：${flow.side.name}</span>`);
-  const title=flow.step===1?'メインを選ぶ':flow.step===2?'副菜を選ぶ':'汁物を選ぶ';
-  const desc=flow.step===1?'今の食材で作れるメインから、食べたいものをタップ'
+  const title=flow.step===1?'初日のメインを選ぶ':flow.step===2?'副菜を選ぶ':'汁物を選ぶ';
+  const desc=flow.step===1?'これを1日目にして、3日分を組み立てます'
     :flow.step===2?'メインに合う副菜をタップ':'最後に汁物を選んで完成';
   el.innerHTML=`
     <div class="results-header"><h2>🧭 ${title}</h2><p>${desc}</p></div>
