@@ -130,8 +130,13 @@ details[open]>.group-summary::before{transform:rotate(90deg)}
 
 /* ── 段階選択フロー ── */
 .btn-stack{max-width:380px;margin:32px auto}
-.btn-stack .generate-btn{margin:0 0 12px;max-width:none}
-.generate-btn.secondary{background:transparent;color:var(--primary);border:1.5px solid var(--primary);box-shadow:none;font-weight:600}
+.btn-stack .generate-btn{margin:0;max-width:none}
+/* 2026-08-16 みかさん「おまかせが目立ちすぎて、選んで作るがわかりにくい」→ 2つを同格に見せる。
+   おまかせを弱めるのではなく、選ぶ側を実体のあるボタンに上げた。説明を1行ずつ付けて
+   「何ができるのか（3日分 / 今日の1食）」がボタンだけで分かるようにしている。 */
+.btn-choice{margin:0 0 20px}
+.btn-note{margin:6px 2px 0;font-size:.78rem;line-height:1.5;color:var(--text-light);text-align:center}
+.generate-btn.secondary{background:var(--primary-light);color:var(--primary);border:1.5px solid var(--primary);box-shadow:0 2px 8px rgba(200,90,53,.10);font-weight:700}
 .generate-btn.secondary:hover{background:var(--primary-light)}
 .generate-btn.secondary .spinner{border-color:rgba(200,90,53,.25);border-top-color:var(--primary)}
 .flow-progress{display:flex;justify-content:center;align-items:center;gap:8px;font-size:.8rem;color:var(--text-light);margin-bottom:14px;flex-wrap:wrap}
@@ -382,13 +387,19 @@ details[open]>.workflow-summary::before{transform:rotate(90deg)}
     </div>
   </section>
   <div class="btn-stack">
-    <button class="generate-btn" id="generate-btn" onclick="generate()">
-      <span class="btn-text">おまかせで3日分つくる</span>
-      <span class="btn-loading"><span class="spinner"></span>献立を考え中…</span>
-    </button>
-    <button class="generate-btn secondary" id="step-btn" onclick="startStepFlow()">
-      <span class="btn-text">自分で選んでつくる</span>
-    </button>
+    <div class="btn-choice">
+      <button class="generate-btn" id="generate-btn" onclick="generate()">
+        <span class="btn-text">おまかせで3日分つくる</span>
+        <span class="btn-loading"><span class="spinner"></span>献立を考え中…</span>
+      </button>
+      <p class="btn-note" id="generate-note">押すだけ。買い物に行く前に、まるっと決まります</p>
+    </div>
+    <div class="btn-choice" id="step-choice">
+      <button class="generate-btn secondary" id="step-btn" onclick="startStepFlow()">
+        <span class="btn-text">自分で選んで、今日の1食</span>
+      </button>
+      <p class="btn-note">メイン → 副菜 → 汁物 の順に、食べたいものをタップ</p>
+    </div>
   </div>
   <button class="fav-btn" id="fav-btn" onclick="showFavorites()" style="display:none">
     ❤️ お気に入り (<span id="fav-count">0</span>)
@@ -396,7 +407,7 @@ details[open]>.workflow-summary::before{transform:rotate(90deg)}
   <div id="results" class="results hidden"></div>
 </main>
 <footer class="footer">
-  <p>手持ちの食材と調味料から、3日分の献立を自動で組み立てます。</p>
+  <p>手持ちの食材と調味料から、献立を組み立てます。まるっと3日分でも、今日の1食だけでも。</p>
 </footer>
 <script>
 let D = {};
@@ -800,10 +811,13 @@ function onOptionChange(){
   const btn=document.getElementById('generate-btn');
   const singleMode=document.getElementById('single-mode').checked;
   // 1品モードでは段階選択（メイン→副菜→汁物）は使わない
-  document.getElementById('step-btn').style.display=singleMode?'none':'block';
+  // 説明行ごと出し分ける（ボタンだけ消して説明が残る事故を防ぐ）
+  document.getElementById('step-choice').style.display=singleMode?'none':'block';
   if(st.requestedId){saveOpts();return;} // メニュー指定中はボタン文言を維持
   const t=singleMode?'今日の1品を出す':'おまかせで3日分つくる';
   btn.querySelector('.btn-text').textContent=t;
+  const note=document.getElementById('generate-note');
+  if(note)note.textContent=singleMode?'今の食材で作れる1品を、ひとつ出します':'押すだけ。買い物に行く前に、まるっと決まります';
   saveOpts();
 }
 
