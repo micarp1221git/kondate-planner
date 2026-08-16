@@ -361,7 +361,7 @@ details[open]>.workflow-summary::before{transform:rotate(90deg)}
 
   <!-- みかさん「私個人としては初日に使いたいメインの食材を最初に決めたいんだよね」 -->
   <section class="mainpick" id="mainpick">
-    <h2>🥩 初日に使いたい食材</h2>
+    <h2>🥩 初日にメインで使いたい食材</h2>
     <div class="mainpick-chips" id="mainpick-chips"></div>
   </section>
 
@@ -719,15 +719,17 @@ function usesIng(item,ing){
   return item.ingredients.some(i=>i===ing||(ING_ALIAS[i]||[]).includes(ing));
 }
 
-// 「初日に使いたい食材」。チェック済みの食材のうち、主菜に実際に使われるものだけ出す
+// 「初日にメインで使いたい食材」。みかさん2026-08-16「メインっぽい食材だけにしたら？チップ多いと思う」
+//   → 主役になる食材（肉・魚介・たまご/大豆）だけに絞る。野菜とストックは出さない。
+const MAIN_ING_GROUPS=['お肉','魚介','たまご・大豆'];
 function renderMainPick(){
   const box=document.getElementById('mainpick-chips');
   if(!box||!D.main)return;
-  const order=ING_GROUPS.flatMap(g=>g.items);
+  const order=ING_GROUPS.filter(g=>MAIN_ING_GROUPS.includes(g.name)).flatMap(g=>g.items);
   const usable=order.filter(i=>st.ingredients.has(i)&&D.main.some(m=>usesIng(m,i)));
   if(st.mainIng&&!usable.includes(st.mainIng))st.mainIng=null; // チェックを外したら選択も解除
   if(usable.length===0){
-    box.innerHTML='<p class="mainpick-empty">🧊 冷蔵庫 を開いて、いまあるものにチェックを入れてください。<br>チェックした食材が、ここに並びます。</p>';
+    box.innerHTML='<p class="mainpick-empty">🧊 冷蔵庫 で、お肉・魚・たまご・豆腐にチェックを入れると<br>ここに並びます。（決めなくても、おまかせで作れます）</p>';
     return;
   }
   box.innerHTML=`<button class="ing-chip omakase${st.mainIng?'':' on'}" onclick="setMainIng(null)">おまかせ</button>`
