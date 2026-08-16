@@ -91,6 +91,10 @@ details[open]>.group-summary::before{transform:rotate(90deg)}
 .results-header{text-align:center;margin-bottom:20px}
 .results-header h2{font-family:var(--serif);font-size:1.15rem;letter-spacing:.04em}
 .results-header p{font-size:.8rem;color:var(--text-light);margin-top:4px}
+.buy-note{display:inline-block;margin-top:8px;padding:5px 12px;border-radius:14px;background:#fff3e6;color:#a8590f;font-weight:700;font-size:.78rem}
+.cand-near{border-style:dashed}
+.cand-miss{margin-top:6px;font-size:.72rem;color:#a8590f;background:#fff3e6;border-radius:10px;padding:3px 8px;line-height:1.4}
+.status-bar small{display:block;font-size:.72rem;color:var(--text-light);margin-top:2px;font-weight:400}
 
 /* ── Day cards ── */
 .day-cards{display:grid;gap:16px}
@@ -764,18 +768,47 @@ function ingredientOK(i){
   if(!KNOWN_ING.has(i))return true;
   return false;
 }
+// 足りない食材を返す（空＝全部そろっている）
+// 2026-08-16 みかさん「キャベツだけしかなくても3品選びたい」
+//   メイン120品のうち材料1つで作れるのは13品だけ。「全部そろっていないと出さない」作りでは
+//   1つチェックしても候補が0になる。数えられるようにして「あと1つ足りない」も出せるようにする。
+function missingIngredients(item){
+  if(!item.ingredients)return [];
+  return item.ingredients.filter(i=>!ingredientOK(i));
+}
 function hasIngredients(item) {
-  if (!item.ingredients) return true;
-  return item.ingredients.every(ingredientOK);
+  return missingIngredients(item).length===0;
+}
+// 「いまチェックした食材」を実際に何個使うか。
+// ⚠️ ingredientOK はリストに無い食材（薬味など）を常備扱いでtrueにするので、ここでは使えない。
+//    使うと「キャベツをチェックしたのに、キャベツを1つも使わない料理」が候補に出てしまう。
+function usesChecked(item){
+  if(!item.ingredients)return 0;
+  return item.ingredients.filter(i=>{
+    if(st.ingredients.has(i))return true;
+    const al=ING_ALIAS[i];
+    return !!(al&&al.some(x=>st.ingredients.has(x)));
+  }).length;
+}
+
+// 手持ちを使うけれど、あと1〜3つ足りないメイン。近い順（足りない数が少ない→手持ちを多く使う）
+function nearMainList(){
+  return D.main.filter(m=>canMake(m)&&!hasIngredients(m))
+    .map(m=>({m,n:missingIngredients(m).length,u:usesChecked(m)}))
+    .filter(x=>x.n<=3&&x.u>=1).sort((a,b)=>a.n-b.n||b.u-a.u).map(x=>x.m);
 }
 
 function updateCount(){
   const mains=D.main.filter(m=>canMake(m)&&hasIngredients(m));
+  const near=nearMainList();
   const bar=document.querySelector('.status-bar');
   if(mains.length===0){
-    bar.innerHTML='チェックを入れると、作れる料理がここに増えていきます';
+    bar.innerHTML=near.length>0
+      ? 'そろっている主菜はまだありません。<strong id="recipe-count">'+near.length+'</strong> 品は買い足せばつくれます'
+      : 'チェックを入れると、作れる料理がここに増えていきます';
   }else{
-    bar.innerHTML='今の条件で <strong id="recipe-count">'+mains.length+'</strong> 品の主菜が作れます';
+    bar.innerHTML='今の条件で <strong id="recipe-count">'+mains.length+'</strong> 品の主菜が作れます'
+      +(near.length>0?'<small>（買い足しありなら ＋'+near.length+'品）</small>':'');
   }
 }
 
@@ -1223,10 +1256,13 @@ function renderThreeDayResults(plan){
   const wf2Items=[{id:null,name:plan.day2.carryover.n,type:'carryover'},{id:plan.day2.newMain.id,name:plan.day2.newMain.name,type:'main',co:true},(plan.day2.side._hide?null:{id:plan.day2.side.id,name:plan.day2.side.name,type:'side'}),(plan.day2.soup._hide?null:{id:plan.day2.soup.id,name:plan.day2.soup.name,type:d2SoupType})].filter(Boolean);
   const wf3Items=[{id:null,name:plan.day3.carryover.n,type:'carryover'},(plan.day3.side._hide?null:{id:plan.day3.side.id,name:plan.day3.side.name,type:'side'}),(plan.day3.soup._hide?null:{id:plan.day3.soup.id,name:plan.day3.soup.name,type:'soup'})].filter(Boolean);
 
+  // 「あと1つ足りない」メインを選んで3日分にした場合、買い足すものを最初に出す
+  const buyMiss=missingIngredients(plan.day1.main);
   el.innerHTML=`
     <div class="results-header">
       <h2>🍽️ 3日分の献立｜${plan.genreLabel}</h2>
       <p>メインを繰り越して明日の1品へ。3品あるのにラクできる。</p>
+      ${buyMiss.length?`<p class="buy-note">🛒 買い足し：${buyMiss.join('・')}</p>`:''}
     </div>
     <div class="day-cards">
       <div class="day-card day1">
@@ -1304,20 +1340,25 @@ function flowPools(){
   let mains=D.main.filter(m=>canMake(m)&&hasIngredients(m));
   let sides=D.side.filter(s=>canMake(s)&&hasIngredients(s));
   let soups=D.soup.filter(s=>canMake(s)&&hasIngredients(s));
-  if(opts.bento){mains=mains.filter(m=>bentoIds.has(m.id));sides=sides.filter(s=>bentoIds.has(s.id));}
+  // あと1〜2つで作れるメイン。候補が足りないときだけ埋め合わせに使う（足りない食材は画面に出す）
+  // 🚨 nearMainList は「いまチェックした食材を1つ以上使う」ものだけを近い順に返す。
+  //    この条件が無いと、キャベツをチェックしたのに「鶏もも肉があれば作れます」が並ぶ。
+  let nearMains=nearMainList();
+  if(opts.bento){mains=mains.filter(m=>bentoIds.has(m.id));sides=sides.filter(s=>bentoIds.has(s.id));nearMains=nearMains.filter(m=>bentoIds.has(m.id));}
   if(opts.keepOk){
-    const fm=mains.filter(m=>m.keep_ok),fs=sides.filter(s=>s.keep_ok),fp=soups.filter(s=>s.keep_ok);
-    if(fm.length>0)mains=fm; if(fs.length>0)sides=fs; if(fp.length>0)soups=fp;
+    const fm=mains.filter(m=>m.keep_ok),fs=sides.filter(s=>s.keep_ok),fp=soups.filter(s=>s.keep_ok),fn=nearMains.filter(m=>m.keep_ok);
+    if(fm.length>0)mains=fm; if(fs.length>0)sides=fs; if(fp.length>0)soups=fp; if(fn.length>0)nearMains=fn;
   }
-  return {mains,sides,soups,opts};
+  return {mains,sides,soups,nearMains,opts};
 }
 
 function newCandList(step, avoid){
-  const {mains,sides,soups,opts}=flowPools();
-  let pool;
+  const {mains,sides,soups,nearMains,opts}=flowPools();
+  let pool,fill=[];
   if(step===1){
     pool=mains;
     if(opts.variety)pool=applyVariety(pool);
+    fill=nearMains;
   }else if(step===2){
     const match=sides.filter(s=>genreMatch(s,flow.main.genre));
     pool=match.length>0?match:sides;
@@ -1333,12 +1374,17 @@ function newCandList(step, avoid){
   if(avoid&&avoid.size){
     a=[...a.filter(x=>!avoid.has(x.id)),...a.filter(x=>avoid.has(x.id))];
   }
+  // そろっているものだけで6品に足りなければ、「あと少しで作れるもの」を後ろに足す
+  if(fill.length&&a.length<6){
+    const have=new Set(a.map(x=>x.id));
+    a=[...a,...fill.filter(x=>!have.has(x.id))];
+  }
   return a.slice(0,6);
 }
 
 function startStepFlow(){
-  const {mains}=flowPools();
-  if(mains.length===0){showError('今の食材と調味料で作れるメインが見つかりませんでした。チェックを増やしてみてください。');return;}
+  const {mains,nearMains}=flowPools();
+  if(mains.length===0&&nearMains.length===0){showError('今の食材と調味料で作れるメインが見つかりませんでした。チェックを増やしてみてください。');return;}
   flow.step=1;flow.main=null;flow.side=null;flow.soup=null;flow.candLists={};
   flow.cands=newCandList(1);flow.candLists[1]=flow.cands;
   renderFlowStep();
@@ -1408,11 +1454,14 @@ function renderFlowStep(){
     <div class="flow-progress">${prog}</div>
     ${picked.length?`<div class="picked-row">${picked.join('')}</div>`:''}
     <div class="cand-grid">
-      ${flow.cands.map((c,i)=>`
-        <button class="cand-card" onclick="selectCand(${i})">
+      ${flow.cands.map((c,i)=>{
+        const miss=missingIngredients(c);
+        return `
+        <button class="cand-card${miss.length?' cand-near':''}" onclick="selectCand(${i})">
           <div class="cand-name">${c.name}</div>
           <div class="cand-meta">${c.genre||''}${c.ingredients&&c.ingredients.length?'｜'+c.ingredients.slice(0,3).join('・'):''}</div>
-        </button>`).join('')}
+          ${miss.length?`<div class="cand-miss">🛒 ${miss.join('・')} があれば作れます</div>`:''}
+        </button>`;}).join('')}
     </div>
     <button class="regen-btn" onclick="reshuffleFlow()">🔄 別の候補を見る</button>
     ${flow.step===2?'<button class="regen-btn" style="border-color:#7a9a5b;color:#5f7a45" onclick="finishFlowHere()">✅ 主菜だけで作る（1品）</button>':''}
