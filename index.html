@@ -139,6 +139,41 @@ details[open]>.group-summary::before{transform:rotate(90deg)}
    おまかせを弱めるのではなく、選ぶ側を実体のあるボタンに上げた。説明を1行ずつ付けて
    「何ができるのか（3日分 / 今日の1食）」がボタンだけで分かるようにしている。 */
 .btn-choice{margin:0 0 12px}
+/* トップを毎日使える形にするための道具立て（2026-08-16） */
+.toolbar{display:flex;gap:8px;margin:16px 0 4px;flex-wrap:wrap}
+.tool-btn{flex:1 1 0;min-width:0;white-space:nowrap;display:inline-flex;align-items:center;justify-content:center;gap:5px;padding:11px 6px;background:var(--card);border:1.5px solid var(--border);border-radius:10px;font-size:.82rem;font-weight:600;color:var(--text-mid);cursor:pointer;box-shadow:var(--shadow);transition:all .2s}
+#tool-fav{flex:0 0 74px}
+.tool-btn:hover{border-color:var(--primary);color:var(--primary)}
+.tool-btn.open{border-color:var(--primary);color:var(--primary);background:var(--primary-light)}
+.tool-count{display:inline-block;min-width:20px;padding:1px 6px;border-radius:10px;background:var(--primary);color:#fff;font-size:.72rem;font-weight:700}
+.tool-btn.zero .tool-count{background:var(--border);color:var(--text-light)}
+.mainpick{margin:14px 0 4px}
+.mainpick h2{font-family:var(--serif);font-size:.95rem;margin-bottom:8px}
+.mainpick-chips{display:flex;gap:7px;flex-wrap:wrap}
+.ing-chip{padding:8px 13px;border-radius:18px;border:1.5px solid var(--border);background:var(--card);font-size:.85rem;color:var(--text-mid);cursor:pointer;transition:all .15s}
+.ing-chip:hover{border-color:var(--primary)}
+.ing-chip.on{background:var(--primary);border-color:var(--primary);color:#fff;font-weight:700}
+.ing-chip.omakase{border-style:dashed}
+.mainpick-empty{font-size:.8rem;color:var(--text-light);line-height:1.6}
+.panel{margin-top:14px}
+.panel.hidden{display:none}
+.panel-close{display:block;width:100%;max-width:240px;margin:16px auto 0;padding:11px;background:var(--primary-light);color:var(--primary);border:1.5px solid var(--primary);border-radius:8px;font-size:.88rem;font-weight:700;cursor:pointer}
+.opt-details{margin:20px 0 0;border:1.5px solid var(--border);border-radius:10px;background:var(--card);overflow:hidden}
+.opt-details>summary{padding:13px 16px;font-size:.88rem;font-weight:600;color:var(--text-mid);cursor:pointer;list-style:none}
+.opt-details>summary::-webkit-details-marker{display:none}
+.opt-details>summary::after{content:'▾';float:right;color:var(--text-light)}
+.opt-details[open]>summary::after{content:'▴'}
+.opt-details .options-section{margin:0;border:none;box-shadow:none;border-radius:0}
+/* 2回目以降（＝すでに冷蔵庫を登録している人）は、紹介文を畳んでボタンを最初の画面に入れる。
+   はじめての人にはフルで見せる。みかさん「毎日使うページを快適にしたい」 */
+body.returning .hero{padding:20px 20px 16px}
+body.returning .hero h1{font-size:1.15rem;letter-spacing:.04em;margin-bottom:2px}
+body.returning .hero .tagline{font-size:.78rem;margin-bottom:12px}
+body.returning .hero .features{display:none}
+body.returning .hero .servings-row{margin-top:0}
+body.returning .photo-banner{height:72px}
+body.returning .mainpick{margin-top:10px}
+body.returning .status-bar{padding:8px 0}
 .regen-btn.omakase{background:var(--primary-light);color:var(--primary);border-color:var(--primary);font-weight:700}
 .btn-note{margin:6px 2px 0;font-size:.78rem;line-height:1.5;color:var(--text-light);text-align:center}
 .generate-btn.secondary{background:var(--primary-light);color:var(--primary);border:1.5px solid var(--primary);box-shadow:0 2px 8px rgba(200,90,53,.10);font-weight:700}
@@ -314,21 +349,51 @@ details[open]>.workflow-summary::before{transform:rotate(90deg)}
 </header>
 <div class="photo-banner" style="background-image:url('photo-banner.jpg')"></div>
 <main class="container">
-  <p class="save-hint">💡 チェック内容はブラウザに自動保存。次に開いてもそのまま使えます。</p>
-  <div class="step-label"><span class="step-num">1</span><span class="step-text">手持ちの調味料をチェック</span></div>
-  <section class="section" id="seasoning-section">
+  <!-- 2026-08-16 みかさん「基本のトップページはいきなりレシピ検索できるようにしたい。
+       今は下にスクロールしていってやっとボタンがあるでしょ？毎日使うページを快適にしたい」
+       → 調味料・冷蔵庫は毎日いじるものではないので、アイコンから開く引き出しに片付けた。
+         トップに残すのは「今日のメイン食材」と「つくる」ボタンだけ。 -->
+  <div class="toolbar">
+    <button class="tool-btn" id="tool-fridge" onclick="togglePanel('ingredient')">🧊 冷蔵庫<span class="tool-count" id="count-fridge">0</span></button>
+    <button class="tool-btn" id="tool-seasoning" onclick="togglePanel('seasoning')">🧂 調味料<span class="tool-count" id="count-seasoning">0</span></button>
+    <button class="tool-btn" id="tool-fav" onclick="showFavorites()">❤️<span class="tool-count" id="count-fav">0</span></button>
+  </div>
+
+  <!-- みかさん「私個人としては初日に使いたいメインの食材を最初に決めたいんだよね」 -->
+  <section class="mainpick" id="mainpick">
+    <h2>🥩 初日に使いたい食材</h2>
+    <div class="mainpick-chips" id="mainpick-chips"></div>
+  </section>
+
+  <div class="status-bar">今の条件で <strong id="recipe-count">0</strong> 品の主菜が作れます</div>
+
+  <div class="btn-stack">
+    <div class="btn-choice">
+      <button class="generate-btn" id="generate-btn" onclick="startHere()">
+        <span class="btn-text">3日分の献立をつくる</span>
+        <span class="btn-loading"><span class="spinner"></span>献立を考え中…</span>
+      </button>
+    </div>
+  </div>
+  <div id="results" class="results hidden"></div>
+
+  <!-- 引き出し: ふだんは閉じている -->
+  <section class="section panel hidden" id="ingredient-section">
+    <h2>🧊 冷蔵庫の中身</h2>
+    <p class="section-desc">今あるものにチェック。この食材だけで献立を組みます。</p>
+    <div id="ingredient-groups"></div>
+    <button class="panel-close" onclick="togglePanel('ingredient')">✅ 閉じる</button>
+  </section>
+  <section class="section panel hidden" id="seasoning-section">
     <h2>🧂 手持ちの調味料</h2>
     <p class="section-desc">あるものにチェック。ここで作れる料理が決まります。</p>
     <div id="seasoning-groups"></div>
+    <button class="panel-close" onclick="togglePanel('seasoning')">✅ 閉じる</button>
   </section>
-  <div class="step-label"><span class="step-num">2</span><span class="step-text">冷蔵庫の中身をチェック</span></div>
-  <section class="section" id="ingredient-section">
-    <h2>🥬 冷蔵庫の中身</h2>
-    <p class="section-desc">今あるものにチェック。この食材だけで献立を組みます。</p>
-    <div id="ingredient-groups"></div>
-  </section>
-  <div class="status-bar">今の条件で <strong id="recipe-count">0</strong> 品の主菜が作れます</div>
-  <div class="step-label"><span class="step-num">3</span><span class="step-text">献立をつくる</span></div>
+  <p class="save-hint">💡 チェック内容はブラウザに自動保存。次に開いてもそのまま使えます。</p>
+
+  <details class="opt-details" id="opt-details">
+    <summary>⚙️ こまかい設定</summary>
   <section class="options-section">
     <div class="option-row" style="flex-direction:column;align-items:stretch">
       <span style="font-size:.88rem;font-weight:600">🎯 今日作りたいメニューがある？</span>
@@ -391,21 +456,10 @@ details[open]>.workflow-summary::before{transform:rotate(90deg)}
       <span style="font-size:.75rem;color:var(--text-light);padding-left:26px">保存したお気に入りがあれば優先的に出す</span>
     </div>
   </section>
-  <!-- 2026-08-16 みかさん「こんだてAIみたいなUI UXの方がわかりやすい気がする」
-       → 入口の二択（おまかせ / 選ぶ）をやめて、ボタンは1つ。押すと候補が出て、そこで
-         「選ぶ」か「おまかせ」かを決める。分かれ道を、押す前ではなく押したあとに置く。 -->
-  <div class="btn-stack">
-    <div class="btn-choice">
-      <button class="generate-btn" id="generate-btn" onclick="startHere()">
-        <span class="btn-text">3日分の献立をつくる</span>
-        <span class="btn-loading"><span class="spinner"></span>献立を考え中…</span>
-      </button>
-    </div>
-  </div>
+  </details>
   <button class="fav-btn" id="fav-btn" onclick="showFavorites()" style="display:none">
     ❤️ お気に入り (<span id="fav-count">0</span>)
   </button>
-  <div id="results" class="results hidden"></div>
 </main>
 <footer class="footer">
   <p>手持ちの食材と調味料から、献立を組み立てます。まるっと3日分でも、今日の1食だけでも。</p>
@@ -452,7 +506,8 @@ const st = {
   lastMainId: null,
   favorites: new Set(),
   requestedId: null,
-  servings: 4
+  servings: 4,
+  mainIng: null   // 初日に使いたい食材（みかさん2026-08-16）
 };
 
 // ── 人数スケール（stepsの文中 {600ml} 等を n/4 倍で描画。データは4人分基準）──
@@ -634,6 +689,56 @@ function saveState(){
   localStorage.setItem('kondate-i',JSON.stringify([...st.ingredients]));
 }
 
+// ── トップページの道具立て（2026-08-16 みかさん「毎日使うページを快適にしたい」）──
+
+// 調味料・冷蔵庫は毎日いじるものではないので引き出しに片付け、アイコンから開く
+function togglePanel(which){
+  const sec=document.getElementById(which+'-section');
+  const btn=document.getElementById(which==='ingredient'?'tool-fridge':'tool-seasoning');
+  const other=document.getElementById((which==='ingredient'?'seasoning':'ingredient')+'-section');
+  const otherBtn=document.getElementById(which==='ingredient'?'tool-seasoning':'tool-fridge');
+  const opening=sec.classList.contains('hidden');
+  other.classList.add('hidden'); otherBtn.classList.remove('open'); // 引き出しは一度に1つ
+  sec.classList.toggle('hidden',!opening);
+  btn.classList.toggle('open',opening);
+  if(opening)sec.scrollIntoView({behavior:'smooth',block:'start'});
+}
+
+function updateToolbar(){
+  const f=document.getElementById('count-fridge'),s=document.getElementById('count-seasoning'),v=document.getElementById('count-fav');
+  if(!f)return;
+  f.textContent=st.ingredients.size; s.textContent=st.seasonings.size; v.textContent=st.favorites.size;
+  document.getElementById('tool-fridge').classList.toggle('zero',st.ingredients.size===0);
+  document.getElementById('tool-seasoning').classList.toggle('zero',st.seasonings.size===0);
+  document.getElementById('tool-fav').classList.toggle('zero',st.favorites.size===0);
+}
+
+// データ側の食材名（豚バラ薄切り等）が、チェックした名前（豚バラ）と同じものを指すか
+function usesIng(item,ing){
+  if(!item.ingredients)return false;
+  return item.ingredients.some(i=>i===ing||(ING_ALIAS[i]||[]).includes(ing));
+}
+
+// 「初日に使いたい食材」。チェック済みの食材のうち、主菜に実際に使われるものだけ出す
+function renderMainPick(){
+  const box=document.getElementById('mainpick-chips');
+  if(!box||!D.main)return;
+  const order=ING_GROUPS.flatMap(g=>g.items);
+  const usable=order.filter(i=>st.ingredients.has(i)&&D.main.some(m=>usesIng(m,i)));
+  if(st.mainIng&&!usable.includes(st.mainIng))st.mainIng=null; // チェックを外したら選択も解除
+  if(usable.length===0){
+    box.innerHTML='<p class="mainpick-empty">🧊 冷蔵庫 を開いて、いまあるものにチェックを入れてください。<br>チェックした食材が、ここに並びます。</p>';
+    return;
+  }
+  box.innerHTML=`<button class="ing-chip omakase${st.mainIng?'':' on'}" onclick="setMainIng(null)">おまかせ</button>`
+    +usable.map(i=>`<button class="ing-chip${st.mainIng===i?' on':''}" onclick="setMainIng('${i}')">${i}</button>`).join('');
+}
+
+function setMainIng(ing){
+  st.mainIng=(st.mainIng===ing)?null:ing;
+  renderMainPick(); updateCount();
+}
+
 function saveFavorites(){
   localStorage.setItem('kondate-fav',JSON.stringify([...st.favorites]));
   updateFavBtn();
@@ -798,17 +903,21 @@ function nearMainList(){
 }
 
 function updateCount(){
-  const mains=D.main.filter(m=>canMake(m)&&hasIngredients(m));
-  const near=nearMainList();
+  const pick=st.mainIng;
+  const mains=D.main.filter(m=>canMake(m)&&hasIngredients(m)&&(!pick||usesIng(m,pick)));
+  const near=nearMainList().filter(m=>!pick||usesIng(m,pick));
   const bar=document.querySelector('.status-bar');
+  const head=pick?`「${pick}」で `:'今の条件で ';
   if(mains.length===0){
     bar.innerHTML=near.length>0
-      ? 'そろっている主菜はまだありません。<strong id="recipe-count">'+near.length+'</strong> 品は買い足せばつくれます'
-      : 'チェックを入れると、作れる料理がここに増えていきます';
+      ? head+'つくれる主菜は、<strong id="recipe-count">'+near.length+'</strong> 品（買い足しあり）'
+      : (pick?`「${pick}」で作れる主菜が見つかりません。ほかの食材を選んでみてください`
+             :'🧊 冷蔵庫 を開いてチェックを入れると、作れる料理が増えていきます');
   }else{
-    bar.innerHTML='今の条件で <strong id="recipe-count">'+mains.length+'</strong> 品の主菜が作れます'
+    bar.innerHTML=head+'<strong id="recipe-count">'+mains.length+'</strong> 品の主菜が作れます'
       +(near.length>0?'<small>（買い足しありなら ＋'+near.length+'品）</small>':'');
   }
+  updateToolbar();
 }
 
 function toggleSeasoning(id,cb){
@@ -820,7 +929,7 @@ function toggleSeasoning(id,cb){
 function toggleIngredient(id,cb){
   if(cb.checked)st.ingredients.add(id);else st.ingredients.delete(id);
   cb.closest('.cb-label').classList.toggle('checked',cb.checked);
-  updateCount();updateBadges();saveState();
+  renderMainPick();updateCount();updateBadges();saveState();
 }
 
 function toggleGroupAll(groupName){
@@ -834,7 +943,7 @@ function toggleIngGroup(groupName){
   const group=ING_GROUPS.find(g=>g.name===groupName);
   const allOn=group.items.every(i=>st.ingredients.has(i));
   group.items.forEach(i=>{if(allOn)st.ingredients.delete(i);else st.ingredients.add(i);});
-  renderIngredients();updateCount();saveState();
+  renderIngredients();renderMainPick();updateCount();saveState();
 }
 
 // 入口はこの1つだけ。分かれ道（選ぶ / おまかせ）は候補画面に置く
@@ -936,6 +1045,8 @@ function generateThreeDay(opts,bentoIds,forcedMain){
   }else{
     let day1Pool=batchMains.filter(m=>m.id!==st.lastMainId);
     if(day1Pool.length===0)day1Pool=batchMains;
+    // 初日に使いたい食材があれば、1日目のメインはそれを使うものから選ぶ（2日目以降は自由）
+    if(st.mainIng){const ip=day1Pool.filter(m=>usesIng(m,st.mainIng));if(ip.length>0)day1Pool=ip;}
     if(opts.favPriority&&st.favorites.size>0){const favPool=day1Pool.filter(m=>st.favorites.has(m.id));if(favPool.length>0)day1Pool=favPool;}
     if(opts.variety){day1Pool=applyVariety(day1Pool);}
     day1Main=pick(day1Pool);
@@ -1347,6 +1458,8 @@ function flowPools(){
   // 🚨 nearMainList は「いまチェックした食材を1つ以上使う」ものだけを近い順に返す。
   //    この条件が無いと、キャベツをチェックしたのに「鶏もも肉があれば作れます」が並ぶ。
   let nearMains=nearMainList();
+  // 「初日に使いたい食材」を選んでいたら、メインはその食材を使うものだけにする
+  if(st.mainIng){mains=mains.filter(m=>usesIng(m,st.mainIng));nearMains=nearMains.filter(m=>usesIng(m,st.mainIng));}
   if(opts.bento){mains=mains.filter(m=>bentoIds.has(m.id));sides=sides.filter(s=>bentoIds.has(s.id));nearMains=nearMains.filter(m=>bentoIds.has(m.id));}
   if(opts.keepOk){
     const fm=mains.filter(m=>m.keep_ok),fs=sides.filter(s=>s.keep_ok),fp=soups.filter(s=>s.keep_ok),fn=nearMains.filter(m=>m.keep_ok);
@@ -1640,8 +1753,13 @@ function init(){
   if(sel)sel.value=String(st.servings);
   renderSeasonings();
   renderIngredients();
+  renderMainPick();
   updateCount();
   updateFavBtn();
+  // はじめて開いた人は、まず冷蔵庫にチェックを入れないと何も始まらないので開けておく。
+  // すでに登録済みの人（＝毎日使う人）は、紹介文を畳んでボタンをすぐ押せる位置に上げる。
+  if(st.ingredients.size===0)togglePanel('ingredient');
+  else document.body.classList.add('returning');
 }
 
 async function loadData(){
