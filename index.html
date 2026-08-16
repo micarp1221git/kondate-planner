@@ -1382,7 +1382,18 @@ function newCandList(step, avoid){
     const have=new Set(a.map(x=>x.id));
     a=[...a,...fill.filter(x=>!have.has(x.id))];
   }
-  return a.slice(0,6);
+  // 候補の数。こんだてAI（みかさん作）はメイン候補を20〜25個出している。
+  // 6個だと「選んだ気」がしないので、メイン選びだけ多めに出す。
+  return a.slice(0,step===1?12:6);
+}
+
+// こんだてAI（みかさん作）は、どの画面からも「← 食材を入力しなおす」で最初に戻れる。
+// こちらは1ページなので、結果を閉じて食材のところまで戻す。
+function backToIngredients(){
+  const el=document.getElementById('results');
+  el.classList.add('hidden'); el.innerHTML='';
+  flow.step=0;
+  document.getElementById('ingredient-section').scrollIntoView({behavior:'smooth',block:'start'});
 }
 
 function startStepFlow(){
@@ -1470,7 +1481,8 @@ function renderFlowStep(){
     <button class="regen-btn" onclick="reshuffleFlow()">🔄 別の候補を見る</button>
     ${flow.step===2?'<button class="regen-btn" style="border-color:#7a9a5b;color:#5f7a45" onclick="finishFlowHere()">✅ 主菜だけで作る（1品）</button>':''}
     ${flow.step===3?'<button class="regen-btn" style="border-color:#7a9a5b;color:#5f7a45" onclick="finishFlowHere()">✅ 汁物なし、この2品で作る</button>':''}
-    ${flow.step>1?'<button class="regen-btn" onclick="flowBack()">← ひとつ戻る</button>':''}`;
+    ${flow.step>1?'<button class="regen-btn" onclick="flowBack()">← ひとつ戻る</button>':''}
+    <button class="regen-btn" onclick="backToIngredients()">← 食材を選びなおす</button>`;
   el.scrollIntoView({behavior:'smooth',block:'start'});
 }
 
