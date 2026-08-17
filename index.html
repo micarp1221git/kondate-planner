@@ -363,6 +363,13 @@ details[open]>.workflow-summary::before{transform:rotate(90deg)}
   <section class="mainpick" id="mainpick">
     <h2>🥩 初日にメインで使いたい食材</h2>
     <div class="mainpick-chips" id="mainpick-chips"></div>
+    <!-- みかさん2026-08-17「チップに自分の希望かける欄つくれる？」
+         チップに出ない食材（なす・れんこん等）と、料理名の指定をここで受ける -->
+    <div class="menu-picker" id="menu-picker">
+      <input type="text" id="menu-search" placeholder="ほかの食材や料理名で探す（例：なす／回鍋肉）" autocomplete="off" oninput="onMenuSearch(this.value)" onfocus="onMenuSearch(this.value)">
+      <div id="menu-suggestions" class="menu-suggestions" style="display:none"></div>
+    </div>
+    <div id="menu-selected" class="menu-selected" style="display:none"></div>
   </section>
 
   <div class="status-bar">今の条件で <strong id="recipe-count">0</strong> 品の主菜が作れます</div>
@@ -395,15 +402,6 @@ details[open]>.workflow-summary::before{transform:rotate(90deg)}
   <details class="opt-details" id="opt-details">
     <summary>⚙️ こまかい設定</summary>
   <section class="options-section">
-    <div class="option-row" style="flex-direction:column;align-items:stretch">
-      <span style="font-size:.88rem;font-weight:600">🎯 今日作りたいメニューがある？</span>
-      <div class="menu-picker" id="menu-picker">
-        <input type="text" id="menu-search" placeholder="メニュー名で検索（例：ポークチャップ）" autocomplete="off" oninput="onMenuSearch(this.value)" onfocus="onMenuSearch(this.value)">
-        <div id="menu-suggestions" class="menu-suggestions" style="display:none"></div>
-      </div>
-      <div id="menu-selected" class="menu-selected" style="display:none"></div>
-      <span style="font-size:.75rem;color:var(--text-light);margin-top:6px">指定したメニューを軸に、残り（副菜・汁物）を自動で組みます。空欄なら従来どおり全自動。</span>
-    </div>
     <div class="option-row">
       <label class="toggle-label">
         <input type="checkbox" id="single-mode" onchange="onOptionChange()">
@@ -558,21 +556,37 @@ function findMenuById(id){
   if(s)return {item:s,kind:'single'};
   return null;
 }
+// 料理名でも食材名でも受ける。チップに出ない食材（なす・れんこん等）はここから指定できる
 function onMenuSearch(q){
   const box=document.getElementById('menu-suggestions');
   q=(q||'').trim();
   if(!q){box.style.display='none';box.innerHTML='';return;}
   const hits=[];
-  (D.main||[]).forEach(m=>{if(m.name.includes(q))hits.push({id:m.id,name:m.name,cat:'主菜'});});
-  (D.single||[]).forEach(s=>{if(s.name.includes(q))hits.push({id:s.id,name:s.name,cat:'1品'});});
+  // 食材を先に出す（「なす」と打った人が欲しいのは、なすの料理ぜんぶ）
+  const ings=new Set();
+  (D.main||[]).forEach(m=>(m.ingredients||[]).forEach(i=>{if(i.includes(q))ings.add(i);}));
+  [...ings].slice(0,4).forEach(i=>{
+    const n=(D.main||[]).filter(m=>usesIng(m,i)).length;
+    hits.push({kind:'ing',key:i,name:i,cat:`食材 ${n}品`});
+  });
+  (D.main||[]).forEach(m=>{if(m.name.includes(q))hits.push({kind:'menu',key:m.id,name:m.name,cat:'主菜'});});
+  (D.single||[]).forEach(s=>{if(s.name.includes(q))hits.push({kind:'menu',key:s.id,name:s.name,cat:'1品'});});
   if(hits.length===0){
-    box.innerHTML='<div class="menu-suggest-empty">見つかりませんでした（登録済みメニューから検索します）</div>';
+    box.innerHTML='<div class="menu-suggest-empty">見つかりませんでした（登録されている料理と食材から探します）</div>';
   }else{
     box.innerHTML=hits.slice(0,8).map(h=>
-      `<div class="menu-suggest-item" onclick="selectMenu('${h.id}')"><span>${h.name}</span><span class="menu-suggest-cat">${h.cat}</span></div>`
+      `<div class="menu-suggest-item" onclick="${h.kind==='ing'?`selectWishIng('${h.key}')`:`selectMenu('${h.key}')`}"><span>${h.name}</span><span class="menu-suggest-cat">${h.cat}</span></div>`
     ).join('');
   }
   box.style.display='block';
+}
+
+// 検索欄から食材を指定したとき。チップに無い食材でも「初日のメイン食材」にできる
+function selectWishIng(name){
+  st.mainIng=name;
+  document.getElementById('menu-search').value='';
+  document.getElementById('menu-suggestions').style.display='none';
+  renderMainPick(); updateCount();
 }
 function selectMenu(id){
   const found=findMenuById(id);
@@ -726,8 +740,9 @@ function renderMainPick(){
   const box=document.getElementById('mainpick-chips');
   if(!box||!D.main)return;
   const order=ING_GROUPS.filter(g=>MAIN_ING_GROUPS.includes(g.name)).flatMap(g=>g.items);
-  const usable=order.filter(i=>st.ingredients.has(i)&&D.main.some(m=>usesIng(m,i)));
-  if(st.mainIng&&!usable.includes(st.mainIng))st.mainIng=null; // チェックを外したら選択も解除
+  let usable=order.filter(i=>st.ingredients.has(i)&&D.main.some(m=>usesIng(m,i)));
+  // 検索欄から指定した食材（なす等）は一覧に無いので、チップとして足す
+  if(st.mainIng&&!usable.includes(st.mainIng))usable=[...usable,st.mainIng];
   if(usable.length===0){
     box.innerHTML='<p class="mainpick-empty">🧊 冷蔵庫 で、お肉・魚・たまご・豆腐にチェックを入れると<br>ここに並びます。（決めなくても、おまかせで作れます）</p>';
     return;
@@ -866,8 +881,13 @@ const ING_ALIAS = {
   '鮭':['鮭切り身'],'ブリ':['ブリ切り身'],
   'カレイ切り身':['カレイ切り身(骨なし)']
 };
+// データ側の食材名 i が、いま指定中の「初日のメイン食材」と同じものを指すか
+function isMainIng(i){
+  return !!st.mainIng&&(i===st.mainIng||(ING_ALIAS[i]||[]).includes(st.mainIng));
+}
 function ingredientOK(i){
   if(st.ingredients.has(i))return true;
+  if(isMainIng(i))return true; // 検索欄で指定した食材は「持っている」扱い（自分で打った＝あるから打った）
   const al=ING_ALIAS[i];
   if(al)return al.some(x=>st.ingredients.has(x));
   // チェックリストに無い食材（主食・薬味・特殊食材など）は献立を妨げない＝常備扱い
@@ -891,7 +911,7 @@ function hasIngredients(item) {
 function usesChecked(item){
   if(!item.ingredients)return 0;
   return item.ingredients.filter(i=>{
-    if(st.ingredients.has(i))return true;
+    if(st.ingredients.has(i)||isMainIng(i))return true;
     const al=ING_ALIAS[i];
     return !!(al&&al.some(x=>st.ingredients.has(x)));
   }).length;
