@@ -491,7 +491,7 @@ const SEASONING_GROUPS = [
 ];
 
 const ING_GROUPS = [
-  {name:"お肉", items:["鶏もも肉","鶏むね肉","ささみ","鶏ひき肉","手羽元","手羽先","豚ロース薄切り","豚ロースブロック","豚バラ","豚ヒレ","豚こま","牛こま","合いびき肉","豚ひき肉"]},
+  {name:"お肉", items:["鶏もも肉","鶏むね肉","ささみ","鶏ひき肉","手羽元","手羽先","豚ロース(とんかつ用)","豚ロース(薄切り)","豚バラ","豚ヒレ","豚こま","牛こま","合いびき肉","豚ひき肉"]},
   {name:"魚介", items:["ブリ切り身","メカジキ","太刀魚","鮭切り身","タラ切り身","サワラ切り身","カレイ切り身(骨なし)","骨取りサバ","鯛切り身","むきえび","ホタテ","イカ","しらす"]},
   {name:"たまご・大豆", items:["たまご","豆腐","厚揚げ","油揚げ"]},
   {name:"野菜", items:["じゃがいも","にんじん","玉ねぎ","大根","かぶ","キャベツ","白菜","レタス","水菜","ほうれん草","小松菜","ちんげん菜","ブロッコリー","もやし","にら","きのこ","長ねぎ","ピーマン","トマト","きゅうり","オクラ","ズッキーニ","パプリカ","アスパラ","ゴーヤ","セロリ","アボカド","枝豆","とうもろこし","里芋","長芋","こんにゃく","生姜"]},
@@ -874,7 +874,12 @@ function updateBadges(){
 const KNOWN_ING = new Set(ING_GROUPS.flatMap(g => g.items));
 // データの食材名 → チェックリストの食材名（名前ゆれ吸収）
 const ING_ALIAS = {
-  '豚ロース':['豚ロース薄切り','豚ロースブロック'],
+  // 2026-08-17 みかさん「豚ロースを、トンカツ用と薄切りと2パターンにしておいて」
+  //   スーパーの売り方に合わせた。データ側の3通りの書き方を、この2つのどちらかに必ず寄せる。
+  //   ⚠️ブロックが要る2品（煮豚・ローストポーク）は「とんかつ用」に寄せてある（厚切りで代用）。
+  '豚ロース':['豚ロース(とんかつ用)'],
+  '豚ロースブロック':['豚ロース(とんかつ用)'],
+  '豚ロース薄切り':['豚ロース(薄切り)'],
   '豚バラ薄切り':['豚バラ'],'豚バラブロック':['豚バラ'],
   'しめじ':['きのこ'],'なめこ':['きのこ'],
   'チンゲン菜':['ちんげん菜'],
@@ -1760,7 +1765,9 @@ function init(){
   const savedI=localStorage.getItem('kondate-i');
   if(savedS){try{JSON.parse(savedS).forEach(s=>st.seasonings.add(s));}catch(e){}}
   else{SEASONING_GROUPS.forEach(g=>g.items.forEach(i=>{if(i.on)st.seasonings.add(i.id);}));}
-  if(savedI){try{JSON.parse(savedI).forEach(i=>st.ingredients.add(i));}catch(e){}}
+  // 2026-08-17 食材名の変更に合わせて、保存済みのチェックを引き継ぐ
+  const ING_RENAME={'豚ロース薄切り':'豚ロース(薄切り)','豚ロースブロック':'豚ロース(とんかつ用)'};
+  if(savedI){try{JSON.parse(savedI).forEach(i=>st.ingredients.add(ING_RENAME[i]||i));}catch(e){}}
   const savedF=localStorage.getItem('kondate-fav');
   if(savedF){try{JSON.parse(savedF).forEach(f=>st.favorites.add(f));}catch(e){}}
   const savedO=localStorage.getItem('kondate-opts');
