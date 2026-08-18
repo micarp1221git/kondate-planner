@@ -164,7 +164,7 @@
     "玉ねぎ",
     "たまご"
    ],
-   "batch": true,
+   "batch": false,
    "carryover": [
     "親子丼",
     "うどんの具"
@@ -330,7 +330,7 @@
     "鶏むね肉",
     "たまご"
    ],
-   "batch": true,
+   "batch": false,
    "carryover": [
     "南蛮丼",
     "サンド"
@@ -695,7 +695,7 @@
     "たまご",
     "パン粉"
    ],
-   "batch": true,
+   "batch": false,
    "carryover": [
     "カツ丼",
     "カツサンド"
@@ -1489,7 +1489,7 @@
    "ingredients": [
     "カレイ切り身(骨なし)"
    ],
-   "batch": true,
+   "batch": false,
    "carryover": [
     "甘酢あんかけ",
     "南蛮漬け"
@@ -1658,7 +1658,7 @@
     "にんにく",
     "生姜"
    ],
-   "batch": true,
+   "batch": false,
    "carryover": [
     "甘酢あんかけ",
     "南蛮漬け",
@@ -1775,7 +1775,7 @@
     "たまご",
     "パン粉"
    ],
-   "batch": true,
+   "batch": false,
    "carryover": [
     "カツ丼",
     "カツサンド"
@@ -1898,7 +1898,7 @@
   },
   {
    "id": "yo-tonkatsu",
-   "name": "とんかつ（薄切り・揚げ焼き）",
+   "name": "ミルフィーユとんかつ",
    "genre": "洋",
    "protein": "豚ロース",
    "method": "揚げ焼き",
@@ -1913,7 +1913,7 @@
     "たまご",
     "パン粉"
    ],
-   "batch": true,
+   "batch": false,
    "carryover": [
     "カツ丼",
     "カツとじ",
@@ -1923,7 +1923,7 @@
     "kodomo": "ソース",
     "otona": "からし・黒こしょう"
    },
-   "point": "厚切りでなく薄切りロースを重ねて使う。半分つかる油で低温から、返しながら少し長めに"
+   "point": "薄切りロースを重ねて厚みを出す。厚切り肉は使わない。半分つかる油で低温から、返しながら少し長めに"
   },
   {
    "id": "wa-pork-misozuke",
@@ -2225,7 +2225,7 @@
     "玉ねぎ",
     "パン粉"
    ],
-   "batch": true,
+   "batch": false,
    "carryover": [
     "サンド",
     "丼"
@@ -2451,7 +2451,7 @@
     "たまご",
     "パン粉"
    ],
-   "batch": true,
+   "batch": false,
    "carryover": [
     "フィッシュサンド",
     "南蛮漬け"
@@ -3010,7 +3010,7 @@
     "ささみ",
     "パン粉"
    ],
-   "batch": true,
+   "batch": false,
    "carryover": [
     "サンドの具",
     "お弁当おかず"
@@ -3227,7 +3227,7 @@
    "method": "煮る",
    "ratio": "だし＋醤油大1:みりん大1",
    "seasonings": [
-    "だしの素",
+    "だし",
     "醤油",
     "みりん"
    ],
@@ -3311,7 +3311,7 @@
    "seasonings": [
     "カレー粉",
     "醤油",
-    "だしの素"
+    "だし"
    ],
    "ingredients": [
     "さば水煮缶",
@@ -3389,7 +3389,7 @@
    "method": "煮る",
    "ratio": "缶のたれ＋だし50ml",
    "seasonings": [
-    "だしの素",
+    "だし",
     "醤油"
    ],
    "ingredients": [
@@ -3461,6 +3461,1471 @@
     "otona": "一味を足す"
    },
    "keep_ok": true
+  },
+  {
+   "id": "chu-tori-cabbage-oyster",
+   "name": "鶏ももとキャベツのオイスター炒め",
+   "genre": "中",
+   "protein": "鶏もも",
+   "method": "炒める",
+   "ratio": "オイスター2:醤油1:酒1",
+   "seasonings": [
+    "オイスター",
+    "醤油",
+    "酒",
+    "ごま油"
+   ],
+   "ingredients": [
+    "鶏もも肉",
+    "キャベツ",
+    "ピーマン"
+   ],
+   "batch": true,
+   "carryover": [
+    "あんかけ丼",
+    "焼きそばの具"
+   ],
+   "toriwake": {
+    "kodomo": "野菜を小さめに",
+    "otona": "豆板醤・粗びき胡椒"
+   },
+   "keep_ok": true
+  },
+  {
+   "id": "chu-yurinchi",
+   "name": "油淋鶏",
+   "genre": "中",
+   "protein": "鶏もも",
+   "method": "揚げ焼き",
+   "ratio": "醤油2:酢2:砂糖1",
+   "seasonings": [
+    "醤油",
+    "酢",
+    "砂糖",
+    "ごま油",
+    "片栗粉"
+   ],
+   "ingredients": [
+    "鶏もも肉",
+    "長ねぎ"
+   ],
+   "batch": true,
+   "carryover": [
+    "油淋鶏丼",
+    "そうめんのせ"
+   ],
+   "toriwake": {
+    "kodomo": "タレ少なめ",
+    "otona": "ラー油・追い酢"
+   },
+   "keep_ok": true
+  },
+  {
+   "id": "chu-mune-broccoli",
+   "name": "鶏むねとブロッコリーの中華炒め",
+   "genre": "中",
+   "protein": "鶏むね",
+   "method": "炒める",
+   "ratio": "鶏ガラ+醤油+酒",
+   "seasonings": [
+    "鶏ガラ",
+    "醤油",
+    "酒",
+    "片栗粉",
+    "ごま油"
+   ],
+   "ingredients": [
+    "鶏むね肉",
+    "ブロッコリー"
+   ],
+   "batch": true,
+   "carryover": [
+    "中華丼の具",
+    "焼きそばの具"
+   ],
+   "toriwake": {
+    "kodomo": "そのまま",
+    "otona": "粗びき胡椒・ラー油"
+   },
+   "keep_ok": true
+  },
+  {
+   "id": "asia-mune-ethnic",
+   "name": "鶏むねのエスニック炒め",
+   "genre": "アジアン",
+   "protein": "鶏むね",
+   "method": "炒める",
+   "ratio": "ナンプラー1:砂糖1:レモン1",
+   "seasonings": [
+    "ナンプラー",
+    "砂糖",
+    "レモン",
+    "にんにく"
+   ],
+   "ingredients": [
+    "鶏むね肉",
+    "パプリカ",
+    "玉ねぎ"
+   ],
+   "batch": true,
+   "carryover": [
+    "エスニック丼",
+    "バインミー風サンド"
+   ],
+   "toriwake": {
+    "kodomo": "ナンプラー控えめ",
+    "otona": "ライム・唐辛子"
+   },
+   "keep_ok": true
+  },
+  {
+   "id": "yo-torihiki-tomato",
+   "name": "鶏ひきのトマト煮込み団子",
+   "genre": "洋",
+   "protein": "鶏ひき",
+   "method": "煮る",
+   "ratio": "トマト缶+コンソメ",
+   "seasonings": [
+    "コンソメ",
+    "塩",
+    "こしょう",
+    "にんにく"
+   ],
+   "ingredients": [
+    "鶏ひき肉",
+    "玉ねぎ",
+    "トマト缶"
+   ],
+   "batch": true,
+   "carryover": [
+    "パスタソース",
+    "チーズ焼き"
+   ],
+   "toriwake": {
+    "kodomo": "そのまま",
+    "otona": "粉チーズ・粗びき胡椒"
+   },
+   "keep_ok": true
+  },
+  {
+   "id": "yo-torihiki-gratin",
+   "name": "鶏ひきとじゃがいものグラタン",
+   "genre": "洋",
+   "protein": "鶏ひき",
+   "method": "焼く",
+   "ratio": "牛乳+コンソメ+チーズ",
+   "seasonings": [
+    "牛乳",
+    "コンソメ",
+    "チーズ",
+    "バター",
+    "塩"
+   ],
+   "ingredients": [
+    "鶏ひき肉",
+    "じゃがいも",
+    "玉ねぎ"
+   ],
+   "batch": true,
+   "carryover": [
+    "グラタンパン",
+    "ドリア"
+   ],
+   "toriwake": {
+    "kodomo": "そのまま",
+    "otona": "粗びき胡椒・タバスコ"
+   }
+  },
+  {
+   "id": "yo-torihiki-cream",
+   "name": "鶏ひきとブロッコリーのクリーム煮",
+   "genre": "洋",
+   "protein": "鶏ひき",
+   "method": "煮る",
+   "ratio": "牛乳+コンソメ",
+   "seasonings": [
+    "牛乳",
+    "コンソメ",
+    "バター",
+    "塩",
+    "こしょう"
+   ],
+   "ingredients": [
+    "鶏ひき肉",
+    "ブロッコリー",
+    "玉ねぎ"
+   ],
+   "batch": true,
+   "carryover": [
+    "クリームパスタ",
+    "ドリア"
+   ],
+   "toriwake": {
+    "kodomo": "そのまま",
+    "otona": "粗びき胡椒"
+   }
+  },
+  {
+   "id": "chu-torihiki-tofu",
+   "name": "鶏ひきと豆腐のうま煮",
+   "genre": "中",
+   "protein": "鶏ひき",
+   "method": "煮る",
+   "ratio": "鶏ガラ+醤油+オイスター",
+   "seasonings": [
+    "鶏ガラ",
+    "醤油",
+    "オイスター",
+    "片栗粉",
+    "ごま油"
+   ],
+   "ingredients": [
+    "鶏ひき肉",
+    "豆腐",
+    "長ねぎ"
+   ],
+   "batch": true,
+   "carryover": [
+    "あんかけ丼",
+    "うどんにかける"
+   ],
+   "toriwake": {
+    "kodomo": "辛みなし",
+    "otona": "ラー油・粗びき胡椒"
+   },
+   "keep_ok": true
+  },
+  {
+   "id": "chu-torihiki-soboro",
+   "name": "中華風そぼろ",
+   "genre": "中",
+   "protein": "鶏ひき",
+   "method": "炒める",
+   "ratio": "醤油2:酒1:砂糖1",
+   "seasonings": [
+    "醤油",
+    "酒",
+    "砂糖",
+    "ごま油",
+    "鶏ガラ"
+   ],
+   "ingredients": [
+    "鶏ひき肉",
+    "長ねぎ"
+   ],
+   "batch": true,
+   "carryover": [
+    "そぼろ丼",
+    "レタス包み",
+    "炒飯の具"
+   ],
+   "toriwake": {
+    "kodomo": "そのまま",
+    "otona": "ラー油・花椒"
+   },
+   "keep_ok": true
+  },
+  {
+   "id": "chu-torihiki-nasu-oyster",
+   "name": "鶏ひきとなすのオイスター炒め",
+   "genre": "中",
+   "protein": "鶏ひき",
+   "method": "炒める",
+   "ratio": "オイスター2:醤油1",
+   "seasonings": [
+    "オイスター",
+    "醤油",
+    "酒",
+    "ごま油"
+   ],
+   "ingredients": [
+    "鶏ひき肉",
+    "なす",
+    "ピーマン"
+   ],
+   "batch": true,
+   "carryover": [
+    "なす丼",
+    "そうめんのせ"
+   ],
+   "toriwake": {
+    "kodomo": "そのまま",
+    "otona": "豆板醤・ラー油"
+   },
+   "keep_ok": true
+  },
+  {
+   "id": "wa-tebamoto-potato",
+   "name": "手羽元とじゃがいもの照り煮",
+   "genre": "和",
+   "protein": "手羽元",
+   "method": "煮る",
+   "ratio": "醤油1:みりん1:酒1",
+   "seasonings": [
+    "醤油",
+    "みりん",
+    "酒",
+    "砂糖"
+   ],
+   "ingredients": [
+    "手羽元",
+    "じゃがいも"
+   ],
+   "batch": true,
+   "carryover": [
+    "照り煮丼",
+    "お弁当のおかず"
+   ],
+   "toriwake": {
+    "kodomo": "骨をはずして",
+    "otona": "七味・粗びき胡椒"
+   },
+   "keep_ok": true
+  },
+  {
+   "id": "yo-tebamoto-roast",
+   "name": "手羽元のローストチキン",
+   "genre": "洋",
+   "protein": "手羽元",
+   "method": "オーブン",
+   "ratio": "塩+にんにく+オリーブ油",
+   "seasonings": [
+    "塩",
+    "こしょう",
+    "にんにく",
+    "オリーブ油"
+   ],
+   "ingredients": [
+    "手羽元",
+    "じゃがいも"
+   ],
+   "batch": true,
+   "carryover": [
+    "サンドの具",
+    "サラダのせ"
+   ],
+   "toriwake": {
+    "kodomo": "骨をはずして",
+    "otona": "粗びき胡椒・レモン"
+   },
+   "keep_ok": true
+  },
+  {
+   "id": "yo-tebamoto-tomato",
+   "name": "手羽元とトマトの煮込み",
+   "genre": "洋",
+   "protein": "手羽元",
+   "method": "煮る",
+   "ratio": "トマト缶+コンソメ",
+   "seasonings": [
+    "コンソメ",
+    "塩",
+    "こしょう",
+    "にんにく"
+   ],
+   "ingredients": [
+    "手羽元",
+    "トマト缶",
+    "玉ねぎ"
+   ],
+   "batch": true,
+   "carryover": [
+    "パスタソース",
+    "チーズ焼き"
+   ],
+   "toriwake": {
+    "kodomo": "そのまま",
+    "otona": "粗びき胡椒・タバスコ"
+   },
+   "keep_ok": true
+  },
+  {
+   "id": "yo-tebamoto-herb",
+   "name": "手羽元のハーブグリル",
+   "genre": "洋",
+   "protein": "手羽元",
+   "method": "焼く",
+   "ratio": "塩+オリーブ油+レモン",
+   "seasonings": [
+    "塩",
+    "こしょう",
+    "オリーブ油",
+    "レモン"
+   ],
+   "ingredients": [
+    "手羽元",
+    "ブロッコリー"
+   ],
+   "batch": true,
+   "carryover": [
+    "サラダのせ",
+    "サンドの具"
+   ],
+   "toriwake": {
+    "kodomo": "骨をはずして",
+    "otona": "レモン・粗びき胡椒"
+   },
+   "keep_ok": true
+  },
+  {
+   "id": "chu-tebamoto-nikomi",
+   "name": "手羽元の中華風煮込み",
+   "genre": "中",
+   "protein": "手羽元",
+   "method": "煮る",
+   "ratio": "醤油2:酒2:砂糖1",
+   "seasonings": [
+    "醤油",
+    "酒",
+    "砂糖",
+    "ごま油",
+    "鶏ガラ"
+   ],
+   "ingredients": [
+    "手羽元",
+    "長ねぎ"
+   ],
+   "batch": true,
+   "carryover": [
+    "煮込み丼",
+    "ラーメンの具"
+   ],
+   "toriwake": {
+    "kodomo": "骨をはずして",
+    "otona": "ラー油・花椒"
+   },
+   "keep_ok": true
+  },
+  {
+   "id": "chu-tebamoto-hakusai",
+   "name": "手羽元と白菜の中華煮",
+   "genre": "中",
+   "protein": "手羽元",
+   "method": "煮る",
+   "ratio": "鶏ガラ+醤油",
+   "seasonings": [
+    "鶏ガラ",
+    "醤油",
+    "酒",
+    "ごま油",
+    "塩"
+   ],
+   "ingredients": [
+    "手羽元",
+    "白菜"
+   ],
+   "batch": true,
+   "carryover": [
+    "スープごはん",
+    "春雨を入れる"
+   ],
+   "toriwake": {
+    "kodomo": "そのまま",
+    "otona": "ラー油・粗びき胡椒"
+   },
+   "keep_ok": true
+  },
+  {
+   "id": "chu-tebamoto-oyster",
+   "name": "手羽元のオイスター煮",
+   "genre": "中",
+   "protein": "手羽元",
+   "method": "煮る",
+   "ratio": "オイスター2:醤油1:砂糖1",
+   "seasonings": [
+    "オイスター",
+    "醤油",
+    "砂糖",
+    "酒",
+    "ごま油"
+   ],
+   "ingredients": [
+    "手羽元",
+    "玉ねぎ"
+   ],
+   "batch": true,
+   "carryover": [
+    "オイスター丼",
+    "お弁当のおかず"
+   ],
+   "toriwake": {
+    "kodomo": "骨をはずして",
+    "otona": "ラー油・粗びき胡椒"
+   },
+   "keep_ok": true
+  },
+  {
+   "id": "chu-roast-cabbage-miso",
+   "name": "豚ロースとキャベツの味噌炒め",
+   "genre": "中",
+   "protein": "豚ロース",
+   "method": "炒める",
+   "ratio": "味噌2:砂糖1:酒1",
+   "seasonings": [
+    "味噌",
+    "砂糖",
+    "酒",
+    "醤油",
+    "ごま油"
+   ],
+   "ingredients": [
+    "豚ロース薄切り",
+    "キャベツ"
+   ],
+   "batch": true,
+   "carryover": [
+    "味噌炒め丼",
+    "焼きそばの具"
+   ],
+   "toriwake": {
+    "kodomo": "甘めに",
+    "otona": "豆板醤・ラー油"
+   },
+   "keep_ok": true
+  },
+  {
+   "id": "chu-roast-moyashi",
+   "name": "豚ロースともやしの中華炒め",
+   "genre": "中",
+   "protein": "豚ロース",
+   "method": "炒める",
+   "ratio": "鶏ガラ+醤油",
+   "seasonings": [
+    "鶏ガラ",
+    "醤油",
+    "酒",
+    "ごま油",
+    "こしょう"
+   ],
+   "ingredients": [
+    "豚ロース薄切り",
+    "もやし",
+    "にら"
+   ],
+   "batch": false,
+   "carryover": [
+    "焼きそばの具",
+    "ラーメンにのせる"
+   ],
+   "toriwake": {
+    "kodomo": "こしょう控えめ",
+    "otona": "ラー油・粗びき胡椒"
+   }
+  },
+  {
+   "id": "asia-roast-nampla",
+   "name": "豚ロースのナンプラー炒め",
+   "genre": "アジアン",
+   "protein": "豚ロース",
+   "method": "炒める",
+   "ratio": "ナンプラー1:砂糖1",
+   "seasonings": [
+    "ナンプラー",
+    "砂糖",
+    "にんにく",
+    "こしょう"
+   ],
+   "ingredients": [
+    "豚ロース薄切り",
+    "パプリカ",
+    "玉ねぎ"
+   ],
+   "batch": true,
+   "carryover": [
+    "エスニック丼",
+    "バインミー風サンド"
+   ],
+   "toriwake": {
+    "kodomo": "ナンプラー控えめ",
+    "otona": "唐辛子・ライム"
+   },
+   "keep_ok": true
+  },
+  {
+   "id": "yo-bara-cabbage-pepe",
+   "name": "豚バラとキャベツのペペロン炒め",
+   "genre": "洋",
+   "protein": "豚バラ",
+   "method": "炒める",
+   "ratio": "にんにく+塩+オリーブ油",
+   "seasonings": [
+    "にんにく",
+    "塩",
+    "こしょう",
+    "オリーブ油"
+   ],
+   "ingredients": [
+    "豚バラ",
+    "キャベツ"
+   ],
+   "batch": false,
+   "carryover": [
+    "パスタにあえる",
+    "サンドの具"
+   ],
+   "toriwake": {
+    "kodomo": "にんにく少なめ",
+    "otona": "唐辛子・粗びき胡椒"
+   }
+  },
+  {
+   "id": "yo-bara-potaufeu",
+   "name": "豚バラと野菜のポトフ",
+   "genre": "洋",
+   "protein": "豚バラ",
+   "method": "煮る",
+   "ratio": "コンソメ+塩",
+   "seasonings": [
+    "コンソメ",
+    "塩",
+    "こしょう"
+   ],
+   "ingredients": [
+    "豚バラ",
+    "じゃがいも",
+    "にんじん",
+    "玉ねぎ"
+   ],
+   "batch": true,
+   "carryover": [
+    "カレーにする",
+    "スープパスタ"
+   ],
+   "toriwake": {
+    "kodomo": "具を小さく",
+    "otona": "粗びき胡椒・マスタード"
+   },
+   "keep_ok": true
+  },
+  {
+   "id": "yo-bara-potato-cheese",
+   "name": "豚バラとじゃがいものチーズ焼き",
+   "genre": "洋",
+   "protein": "豚バラ",
+   "method": "焼く",
+   "ratio": "塩+こしょう+チーズ",
+   "seasonings": [
+    "塩",
+    "こしょう",
+    "チーズ",
+    "オリーブ油"
+   ],
+   "ingredients": [
+    "豚バラ",
+    "じゃがいも"
+   ],
+   "batch": false,
+   "carryover": [
+    "パンにのせる",
+    "オムレツの具"
+   ],
+   "toriwake": {
+    "kodomo": "そのまま",
+    "otona": "粗びき胡椒・タバスコ"
+   }
+  },
+  {
+   "id": "asia-bara-amakara",
+   "name": "豚バラのエスニック甘辛炒め",
+   "genre": "アジアン",
+   "protein": "豚バラ",
+   "method": "炒める",
+   "ratio": "ナンプラー1:砂糖1:醤油1",
+   "seasonings": [
+    "ナンプラー",
+    "砂糖",
+    "醤油",
+    "にんにく"
+   ],
+   "ingredients": [
+    "豚バラ",
+    "玉ねぎ",
+    "パプリカ"
+   ],
+   "batch": true,
+   "carryover": [
+    "エスニック丼",
+    "レタス包み"
+   ],
+   "toriwake": {
+    "kodomo": "ナンプラー控えめ",
+    "otona": "唐辛子・ライム"
+   },
+   "keep_ok": true
+  },
+  {
+   "id": "wa-koma-shigure",
+   "name": "豚こまのしぐれ煮",
+   "genre": "和",
+   "protein": "豚こま",
+   "method": "煮る",
+   "ratio": "醤油2:みりん2:砂糖1",
+   "seasonings": [
+    "醤油",
+    "みりん",
+    "砂糖",
+    "酒"
+   ],
+   "ingredients": [
+    "豚こま",
+    "生姜"
+   ],
+   "batch": true,
+   "carryover": [
+    "しぐれ煮丼",
+    "おにぎりの具",
+    "お弁当のおかず"
+   ],
+   "toriwake": {
+    "kodomo": "生姜少なめ",
+    "otona": "七味・山椒"
+   },
+   "keep_ok": true
+  },
+  {
+   "id": "yo-koma-ketchup",
+   "name": "豚こまのケチャップ炒め",
+   "genre": "洋",
+   "protein": "豚こま",
+   "method": "炒める",
+   "ratio": "ケチャップ2:ソース1",
+   "seasonings": [
+    "ケチャップ",
+    "ソース",
+    "塩",
+    "こしょう"
+   ],
+   "ingredients": [
+    "豚こま",
+    "玉ねぎ",
+    "ピーマン"
+   ],
+   "batch": true,
+   "carryover": [
+    "ケチャップ丼",
+    "パンにはさむ"
+   ],
+   "toriwake": {
+    "kodomo": "そのまま",
+    "otona": "タバスコ・粗びき胡椒"
+   },
+   "keep_ok": true
+  },
+  {
+   "id": "yo-koma-curry-potato",
+   "name": "豚こまとじゃがいものカレー炒め",
+   "genre": "洋",
+   "protein": "豚こま",
+   "method": "炒める",
+   "ratio": "カレー粉+塩",
+   "seasonings": [
+    "カレー粉",
+    "塩",
+    "こしょう",
+    "にんにく"
+   ],
+   "ingredients": [
+    "豚こま",
+    "じゃがいも",
+    "玉ねぎ"
+   ],
+   "batch": true,
+   "carryover": [
+    "カレーピラフ",
+    "サンドの具"
+   ],
+   "toriwake": {
+    "kodomo": "カレー粉少なめ",
+    "otona": "追いカレー粉・粗びき胡椒"
+   },
+   "keep_ok": true
+  },
+  {
+   "id": "yo-koma-hakusai-milk",
+   "name": "豚こまと白菜のミルク煮",
+   "genre": "洋",
+   "protein": "豚こま",
+   "method": "煮る",
+   "ratio": "牛乳+コンソメ",
+   "seasonings": [
+    "牛乳",
+    "コンソメ",
+    "塩",
+    "こしょう",
+    "バター"
+   ],
+   "ingredients": [
+    "豚こま",
+    "白菜"
+   ],
+   "batch": true,
+   "carryover": [
+    "クリームパスタ",
+    "ドリア"
+   ],
+   "toriwake": {
+    "kodomo": "そのまま",
+    "otona": "粗びき胡椒"
+   }
+  },
+  {
+   "id": "yo-gyu-hashed",
+   "name": "ハッシュドビーフ",
+   "genre": "洋",
+   "protein": "牛こま",
+   "method": "煮る",
+   "ratio": "ケチャップ+ソース+コンソメ",
+   "seasonings": [
+    "ケチャップ",
+    "ソース",
+    "コンソメ",
+    "バター",
+    "塩"
+   ],
+   "ingredients": [
+    "牛こま",
+    "玉ねぎ",
+    "きのこ"
+   ],
+   "batch": true,
+   "carryover": [
+    "オムハヤシ",
+    "グラタン"
+   ],
+   "toriwake": {
+    "kodomo": "そのまま",
+    "otona": "粗びき胡椒"
+   },
+   "keep_ok": true
+  },
+  {
+   "id": "yo-gyu-broccoli-garlic",
+   "name": "牛こまとブロッコリーのガーリック炒め",
+   "genre": "洋",
+   "protein": "牛こま",
+   "method": "炒める",
+   "ratio": "にんにく+塩+こしょう",
+   "seasonings": [
+    "にんにく",
+    "塩",
+    "こしょう",
+    "オリーブ油",
+    "醤油"
+   ],
+   "ingredients": [
+    "牛こま",
+    "ブロッコリー"
+   ],
+   "batch": false,
+   "carryover": [
+    "パスタにあえる",
+    "サラダのせ"
+   ],
+   "toriwake": {
+    "kodomo": "にんにく少なめ",
+    "otona": "粗びき胡椒・レモン"
+   }
+  },
+  {
+   "id": "yo-gyu-stroganoff",
+   "name": "牛こまのストロガノフ風",
+   "genre": "洋",
+   "protein": "牛こま",
+   "method": "煮る",
+   "ratio": "牛乳+コンソメ+ケチャップ",
+   "seasonings": [
+    "牛乳",
+    "コンソメ",
+    "ケチャップ",
+    "バター",
+    "塩"
+   ],
+   "ingredients": [
+    "牛こま",
+    "きのこ",
+    "玉ねぎ"
+   ],
+   "batch": true,
+   "carryover": [
+    "ごはんにかける",
+    "パスタソース"
+   ],
+   "toriwake": {
+    "kodomo": "そのまま",
+    "otona": "粗びき胡椒"
+   }
+  },
+  {
+   "id": "chu-gyu-moyashi-oyster",
+   "name": "牛こまともやしのオイスター炒め",
+   "genre": "中",
+   "protein": "牛こま",
+   "method": "炒める",
+   "ratio": "オイスター2:醤油1",
+   "seasonings": [
+    "オイスター",
+    "醤油",
+    "酒",
+    "ごま油",
+    "こしょう"
+   ],
+   "ingredients": [
+    "牛こま",
+    "もやし",
+    "にら"
+   ],
+   "batch": false,
+   "carryover": [
+    "焼きそばの具",
+    "ビビンバ風丼"
+   ],
+   "toriwake": {
+    "kodomo": "こしょう控えめ",
+    "otona": "ラー油・粗びき胡椒"
+   }
+  },
+  {
+   "id": "chu-gyu-hakusai",
+   "name": "牛こまと白菜の中華炒め",
+   "genre": "中",
+   "protein": "牛こま",
+   "method": "炒める",
+   "ratio": "鶏ガラ+醤油+酒",
+   "seasonings": [
+    "鶏ガラ",
+    "醤油",
+    "酒",
+    "ごま油",
+    "片栗粉"
+   ],
+   "ingredients": [
+    "牛こま",
+    "白菜"
+   ],
+   "batch": true,
+   "carryover": [
+    "中華丼の具",
+    "うどんにかける"
+   ],
+   "toriwake": {
+    "kodomo": "そのまま",
+    "otona": "ラー油・粗びき胡椒"
+   },
+   "keep_ok": true
+  },
+  {
+   "id": "asia-gyu-ethnic",
+   "name": "牛こまのエスニック炒め",
+   "genre": "アジアン",
+   "protein": "牛こま",
+   "method": "炒める",
+   "ratio": "ナンプラー1:醤油1:砂糖1",
+   "seasonings": [
+    "ナンプラー",
+    "醤油",
+    "砂糖",
+    "にんにく"
+   ],
+   "ingredients": [
+    "牛こま",
+    "玉ねぎ",
+    "パプリカ"
+   ],
+   "batch": true,
+   "carryover": [
+    "エスニック丼",
+    "レタス包み"
+   ],
+   "toriwake": {
+    "kodomo": "ナンプラー控えめ",
+    "otona": "唐辛子・ライム"
+   },
+   "keep_ok": true
+  },
+  {
+   "id": "wa-butahiki-hakusai",
+   "name": "豚ひきと白菜のそぼろ煮",
+   "genre": "和",
+   "protein": "合いびき/豚ひき",
+   "method": "煮る",
+   "ratio": "醤油1:みりん1:だし",
+   "seasonings": [
+    "醤油",
+    "みりん",
+    "だし",
+    "酒",
+    "片栗粉"
+   ],
+   "ingredients": [
+    "豚ひき肉",
+    "白菜"
+   ],
+   "batch": true,
+   "carryover": [
+    "そぼろ煮丼",
+    "うどんにかける"
+   ],
+   "toriwake": {
+    "kodomo": "そのまま",
+    "otona": "七味・生姜"
+   },
+   "keep_ok": true
+  },
+  {
+   "id": "wa-oroshi-hamburg",
+   "name": "和風おろしハンバーグ",
+   "genre": "和",
+   "protein": "合いびき/豚ひき",
+   "method": "焼く",
+   "ratio": "ポン酢+大根おろし",
+   "seasonings": [
+    "ポン酢",
+    "塩",
+    "こしょう",
+    "酒"
+   ],
+   "ingredients": [
+    "合いびき肉",
+    "玉ねぎ",
+    "大根"
+   ],
+   "batch": true,
+   "carryover": [
+    "ハンバーグ丼",
+    "サンドの具"
+   ],
+   "toriwake": {
+    "kodomo": "おろし少なめ",
+    "otona": "大葉・七味"
+   },
+   "keep_ok": true
+  },
+  {
+   "id": "chu-butahiki-moyashi",
+   "name": "豚ひきともやしの中華炒め",
+   "genre": "中",
+   "protein": "合いびき/豚ひき",
+   "method": "炒める",
+   "ratio": "鶏ガラ+醤油+オイスター",
+   "seasonings": [
+    "鶏ガラ",
+    "醤油",
+    "オイスター",
+    "ごま油",
+    "こしょう"
+   ],
+   "ingredients": [
+    "豚ひき肉",
+    "もやし",
+    "にら"
+   ],
+   "batch": false,
+   "carryover": [
+    "焼きそばの具",
+    "ラーメンにのせる"
+   ],
+   "toriwake": {
+    "kodomo": "こしょう控えめ",
+    "otona": "ラー油・豆板醤"
+   }
+  },
+  {
+   "id": "yo-tofu-gratin",
+   "name": "豆腐のトマトグラタン",
+   "genre": "洋",
+   "protein": "豆腐",
+   "method": "焼く",
+   "ratio": "トマト缶+コンソメ+チーズ",
+   "seasonings": [
+    "コンソメ",
+    "チーズ",
+    "塩",
+    "こしょう",
+    "にんにく"
+   ],
+   "ingredients": [
+    "豆腐",
+    "トマト缶"
+   ],
+   "batch": false,
+   "carryover": [
+    "パンにのせる",
+    "パスタソース"
+   ],
+   "toriwake": {
+    "kodomo": "そのまま",
+    "otona": "粗びき胡椒・タバスコ"
+   }
+  },
+  {
+   "id": "yo-tofu-steak",
+   "name": "豆腐ステーキ きのこソース",
+   "genre": "洋",
+   "protein": "豆腐",
+   "method": "焼く",
+   "ratio": "バター醤油+きのこ",
+   "seasonings": [
+    "バター",
+    "醤油",
+    "塩",
+    "こしょう",
+    "片栗粉"
+   ],
+   "ingredients": [
+    "豆腐",
+    "きのこ"
+   ],
+   "batch": false,
+   "carryover": [
+    "丼にする",
+    "パスタにあえる"
+   ],
+   "toriwake": {
+    "kodomo": "そのまま",
+    "otona": "粗びき胡椒・レモン"
+   }
+  },
+  {
+   "id": "yo-tofu-cream",
+   "name": "豆腐とほうれん草のクリーム煮",
+   "genre": "洋",
+   "protein": "豆腐",
+   "method": "煮る",
+   "ratio": "牛乳+コンソメ",
+   "seasonings": [
+    "牛乳",
+    "コンソメ",
+    "バター",
+    "塩",
+    "こしょう"
+   ],
+   "ingredients": [
+    "豆腐",
+    "ほうれん草"
+   ],
+   "batch": true,
+   "carryover": [
+    "ドリア",
+    "スープパスタ"
+   ],
+   "toriwake": {
+    "kodomo": "そのまま",
+    "otona": "粗びき胡椒"
+   }
+  },
+  {
+   "id": "chu-tofu-hakusai",
+   "name": "豆腐と白菜の中華煮",
+   "genre": "中",
+   "protein": "豆腐",
+   "method": "煮る",
+   "ratio": "鶏ガラ+醤油",
+   "seasonings": [
+    "鶏ガラ",
+    "醤油",
+    "酒",
+    "ごま油",
+    "片栗粉"
+   ],
+   "ingredients": [
+    "豆腐",
+    "白菜"
+   ],
+   "batch": true,
+   "carryover": [
+    "中華丼の具",
+    "うどんにかける"
+   ],
+   "toriwake": {
+    "kodomo": "そのまま",
+    "otona": "ラー油・粗びき胡椒"
+   },
+   "keep_ok": true
+  },
+  {
+   "id": "chu-tofu-nira-tamago",
+   "name": "豆腐とにらの中華炒め",
+   "genre": "中",
+   "protein": "豆腐",
+   "method": "炒める",
+   "ratio": "鶏ガラ+醤油",
+   "seasonings": [
+    "鶏ガラ",
+    "醤油",
+    "ごま油",
+    "塩",
+    "こしょう"
+   ],
+   "ingredients": [
+    "豆腐",
+    "にら",
+    "たまご"
+   ],
+   "batch": false,
+   "carryover": [
+    "丼にする",
+    "チャーハンの具"
+   ],
+   "toriwake": {
+    "kodomo": "そのまま",
+    "otona": "ラー油・粗びき胡椒"
+   }
+  },
+  {
+   "id": "asia-tofu-ethnic",
+   "name": "豆腐のエスニック炒め",
+   "genre": "アジアン",
+   "protein": "豆腐",
+   "method": "炒める",
+   "ratio": "ナンプラー1:砂糖1",
+   "seasonings": [
+    "ナンプラー",
+    "砂糖",
+    "にんにく",
+    "こしょう",
+    "片栗粉"
+   ],
+   "ingredients": [
+    "豆腐",
+    "パプリカ",
+    "玉ねぎ"
+   ],
+   "batch": true,
+   "carryover": [
+    "エスニック丼",
+    "レタス包み"
+   ],
+   "toriwake": {
+    "kodomo": "ナンプラー控えめ",
+    "otona": "唐辛子・ライム"
+   },
+   "keep_ok": true
+  },
+  {
+   "id": "wa-dashimaki",
+   "name": "だし巻き卵",
+   "genre": "和",
+   "protein": "卵",
+   "method": "焼く",
+   "ratio": "だし+醤油少々",
+   "seasonings": [
+    "だし",
+    "醤油",
+    "みりん",
+    "塩"
+   ],
+   "ingredients": [
+    "たまご"
+   ],
+   "batch": true,
+   "carryover": [
+    "お弁当のおかず",
+    "のり巻きの具"
+   ],
+   "toriwake": {
+    "kodomo": "そのまま",
+    "otona": "大根おろし・醤油"
+   },
+   "keep_ok": true
+  },
+  {
+   "id": "wa-tamago-komatsuna",
+   "name": "卵と小松菜の煮浸し",
+   "genre": "和",
+   "protein": "卵",
+   "method": "煮る",
+   "ratio": "めんつゆ+だし",
+   "seasonings": [
+    "めんつゆ",
+    "だし",
+    "醤油",
+    "みりん"
+   ],
+   "ingredients": [
+    "たまご",
+    "小松菜"
+   ],
+   "batch": true,
+   "carryover": [
+    "うどんにのせる",
+    "丼にする"
+   ],
+   "toriwake": {
+    "kodomo": "そのまま",
+    "otona": "七味・生姜"
+   },
+   "keep_ok": true
+  },
+  {
+   "id": "yo-spanish-omelette",
+   "name": "スパニッシュオムレツ",
+   "genre": "洋",
+   "protein": "卵",
+   "method": "焼く",
+   "ratio": "塩+こしょう+オリーブ油",
+   "seasonings": [
+    "塩",
+    "こしょう",
+    "オリーブ油",
+    "コンソメ"
+   ],
+   "ingredients": [
+    "たまご",
+    "じゃがいも",
+    "玉ねぎ"
+   ],
+   "batch": true,
+   "carryover": [
+    "サンドの具",
+    "お弁当のおかず"
+   ],
+   "toriwake": {
+    "kodomo": "そのまま",
+    "otona": "ケチャップ・タバスコ"
+   },
+   "keep_ok": true
+  },
+  {
+   "id": "yo-quiche-fu",
+   "name": "たまごとほうれん草のキッシュ風",
+   "genre": "洋",
+   "protein": "卵",
+   "method": "焼く",
+   "ratio": "牛乳+チーズ+コンソメ",
+   "seasonings": [
+    "牛乳",
+    "チーズ",
+    "コンソメ",
+    "塩",
+    "こしょう"
+   ],
+   "ingredients": [
+    "たまご",
+    "ほうれん草",
+    "玉ねぎ"
+   ],
+   "batch": true,
+   "carryover": [
+    "サンドの具",
+    "お弁当のおかず"
+   ],
+   "toriwake": {
+    "kodomo": "そのまま",
+    "otona": "粗びき胡椒"
+   },
+   "keep_ok": true
+  },
+  {
+   "id": "chu-tamago-kinoko",
+   "name": "たまごときのこの中華炒め",
+   "genre": "中",
+   "protein": "卵",
+   "method": "炒める",
+   "ratio": "鶏ガラ+醤油",
+   "seasonings": [
+    "鶏ガラ",
+    "醤油",
+    "ごま油",
+    "塩",
+    "こしょう"
+   ],
+   "ingredients": [
+    "たまご",
+    "きのこ",
+    "長ねぎ"
+   ],
+   "batch": false,
+   "carryover": [
+    "丼にする",
+    "チャーハンの具"
+   ],
+   "toriwake": {
+    "kodomo": "そのまま",
+    "otona": "ラー油・粗びき胡椒"
+   }
+  },
+  {
+   "id": "chu-tamago-moyashi",
+   "name": "たまごともやしの中華炒め",
+   "genre": "中",
+   "protein": "卵",
+   "method": "炒める",
+   "ratio": "鶏ガラ+塩",
+   "seasonings": [
+    "鶏ガラ",
+    "塩",
+    "こしょう",
+    "ごま油",
+    "醤油"
+   ],
+   "ingredients": [
+    "たまご",
+    "もやし"
+   ],
+   "batch": false,
+   "carryover": [
+    "焼きそばの具",
+    "丼にする"
+   ],
+   "toriwake": {
+    "kodomo": "そのまま",
+    "otona": "ラー油・粗びき胡椒"
+   }
+  },
+  {
+   "id": "asia-thai-omelette",
+   "name": "タイ風オムレツ",
+   "genre": "アジアン",
+   "protein": "卵",
+   "method": "焼く",
+   "ratio": "ナンプラー+こしょう",
+   "seasonings": [
+    "ナンプラー",
+    "こしょう",
+    "にんにく"
+   ],
+   "ingredients": [
+    "たまご",
+    "玉ねぎ"
+   ],
+   "batch": false,
+   "carryover": [
+    "ごはんにのせる",
+    "サンドの具"
+   ],
+   "toriwake": {
+    "kodomo": "ナンプラー控えめ",
+    "otona": "スイートチリ・唐辛子"
+   }
+  },
+  {
+   "id": "yo-tonkatsu-atsu",
+   "name": "とんかつ",
+   "genre": "洋",
+   "protein": "豚ロース",
+   "method": "揚げ焼き",
+   "ratio": "塩こしょう+パン粉+ソース",
+   "seasonings": [
+    "塩",
+    "こしょう",
+    "ソース"
+   ],
+   "ingredients": [
+    "豚ロース",
+    "たまご",
+    "パン粉"
+   ],
+   "batch": false,
+   "carryover": [
+    "カツ丼",
+    "カツとじ",
+    "カツサンド"
+   ],
+   "toriwake": {
+    "kodomo": "ソース",
+    "otona": "からし・黒こしょう"
+   },
+   "point": "とんかつ用の厚切りロースで。筋を切ってから衣をつけると反らない。低めの温度でじっくり"
   }
  ],
  "side": [
@@ -5051,7 +6516,7 @@
    "batch": false,
    "seasonings": [
     "味噌",
-    "だしの素"
+    "だし"
    ],
    "ingredients": [
     "さば水煮缶",
@@ -5903,7 +7368,7 @@
    "type": "丼",
    "protein": "鶏(缶詰)",
    "seasonings": [
-    "だしの素",
+    "だし",
     "醤油"
    ],
    "ingredients": [

@@ -1,0 +1,9 @@
+{
+	"appId": "com.experisent.kondate",
+	"appName": "献立まるっとプランナー",
+	"webDir": "www",
+	"packageClassList": [
+		"AdMobPlugin",
+		"LocalNotificationsPlugin"
+	]
+}
