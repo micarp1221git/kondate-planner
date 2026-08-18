@@ -94,6 +94,8 @@ details[open]>.group-summary::before{transform:rotate(90deg)}
 .buy-note{display:inline-block;margin-top:8px;padding:5px 12px;border-radius:14px;background:#fff3e6;color:#a8590f;font-weight:700;font-size:.78rem}
 .cand-near{border-style:dashed}
 .cand-miss{margin-top:6px;font-size:.72rem;color:#a8590f;background:#fff3e6;border-radius:10px;padding:3px 8px;line-height:1.4}
+.cand-sub{margin-top:6px;font-size:.72rem;color:#4a6b3a;background:#eef5e8;border-radius:10px;padding:3px 8px;line-height:1.4}
+.sub-note{display:inline-block;margin-top:8px;padding:5px 12px;border-radius:14px;background:#eef5e8;color:#4a6b3a;font-weight:700;font-size:.78rem}
 .status-bar small{display:block;font-size:.72rem;color:var(--text-light);margin-top:2px;font-weight:400}
 
 /* ── Day cards ── */
@@ -887,12 +889,38 @@ const ING_ALIAS = {
   'カレイ切り身':['カレイ切り身(骨なし)']
 };
 // データ側の食材名 i が、いま指定中の「初日のメイン食材」と同じものを指すか
+// 2026-08-18 みかさん「例えば青梗菜と小松菜とか、似てるやつはどっちでもいいようにしよう」
+//   入れ替えても料理として成立するものだけをグループにする。
+//   ⚠️ 代用したことは画面に出す（レシピ本文には元の食材名が書いてあるので、黙って置き換えると嘘になる）
+//   ⚠️ 玉ねぎ/長ねぎ・じゃがいも/さつまいも は「似ているが別物」なので入れない。
+const SUBSTITUTE_GROUPS = [
+  ['小松菜','ほうれん草','ちんげん菜','水菜'],                 // 葉物（おひたし・炒め物）
+  ['豚こま','豚バラ','豚ロース(薄切り)'],                      // 薄切りの豚（炒め物・煮物）
+  ['鶏ひき肉','豚ひき肉','合いびき肉'],                        // ひき肉
+  ['タラ切り身','カレイ切り身(骨なし)','サワラ切り身','鯛切り身'] // 白身魚の切り身
+];
+// 食材 i の代わりになるもののうち、いま持っているものを1つ返す（無ければ null）
+function subFor(i){
+  const g = SUBSTITUTE_GROUPS.find(g => g.includes(i));
+  if(!g) return null;
+  return g.find(x => x !== i && (st.ingredients.has(x) || x === st.mainIng)) || null;
+}
+// この料理で「何を何で代用するか」の一覧
+function substitutions(item){
+  if(!item.ingredients) return [];
+  return item.ingredients
+    .filter(i => !st.ingredients.has(i) && !isMainIng(i) && !(ING_ALIAS[i]||[]).some(x=>st.ingredients.has(x)))
+    .map(i => { const s = subFor(i); return s ? {from:i, to:s} : null; })
+    .filter(Boolean);
+}
+
 function isMainIng(i){
   return !!st.mainIng&&(i===st.mainIng||(ING_ALIAS[i]||[]).includes(st.mainIng));
 }
 function ingredientOK(i){
   if(st.ingredients.has(i))return true;
   if(isMainIng(i))return true; // 検索欄で指定した食材は「持っている」扱い（自分で打った＝あるから打った）
+  if(subFor(i))return true;    // 似たもので代用できる（画面に「◯◯で代用」と出す）
   const al=ING_ALIAS[i];
   if(al)return al.some(x=>st.ingredients.has(x));
   // チェックリストに無い食材（主食・薬味・特殊食材など）は献立を妨げない＝常備扱い
@@ -1399,11 +1427,18 @@ function renderThreeDayResults(plan){
 
   // 「あと1つ足りない」メインを選んで3日分にした場合、買い足すものを最初に出す
   const buyMiss=missingIngredients(plan.day1.main);
+  // 代用しているものは3日ぶんまとめて出す（レシピ本文は元の食材名のままなので必ず知らせる）
+  const subAll=[];
+  [plan.day1.main,plan.day1.side,plan.day1.soup,plan.day2.newMain,plan.day2.side,plan.day2.soup,plan.day3.side,plan.day3.soup]
+    .filter(Boolean).forEach(x=>substitutions(x).forEach(v=>{
+      if(!subAll.some(y=>y.from===v.from))subAll.push(v);
+    }));
   el.innerHTML=`
     <div class="results-header">
       <h2>🍽️ 3日分の献立｜${plan.genreLabel}</h2>
       <p>メインを繰り越して明日の1品へ。3品あるのにラクできる。</p>
       ${buyMiss.length?`<p class="buy-note">🛒 買い足し：${buyMiss.join('・')}</p>`:''}
+      ${subAll.length?`<p class="sub-note">🔄 ${subAll.map(x=>x.from+'→'+x.to).join('・')} で代用します</p>`:''}
     </div>
     <div class="day-cards">
       <div class="day-card day1">
@@ -1610,10 +1645,12 @@ function renderFlowStep(){
     <div class="cand-grid">
       ${flow.cands.map((c,i)=>{
         const miss=missingIngredients(c);
+        const sub=substitutions(c);
         return `
         <button class="cand-card${miss.length?' cand-near':''}" onclick="selectCand(${i})">
           <div class="cand-name">${c.name}</div>
           <div class="cand-meta">${c.genre||''}${c.ingredients&&c.ingredients.length?'｜'+c.ingredients.slice(0,3).join('・'):''}</div>
+          ${sub.length?`<div class="cand-sub">🔄 ${sub.map(x=>x.from+'→'+x.to).join('・')} で代用</div>`:''}
           ${miss.length?`<div class="cand-miss">🛒 ${miss.join('・')} があれば作れます</div>`:''}
         </button>`;}).join('')}
     </div>
