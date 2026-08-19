@@ -120,6 +120,13 @@ details[open]>.group-summary::before{transform:rotate(90deg)}
 .menu-note{font-size:.76rem;color:var(--text-light);margin-top:2px}
 .nutri-badge{font-size:.8rem;color:#5c5148;background:#f6f2ea;border-radius:8px;padding:7px 10px;margin-top:10px}
 .nutri-note{display:block;font-size:.68rem;color:#a39a8f;margin-top:3px}
+.micro-row{display:flex;gap:6px;flex-wrap:wrap;justify-content:center;margin-top:10px}
+.micro{font-size:.76rem;padding:5px 10px;border-radius:12px;background:#f6f2ea;color:#5c5148;font-weight:600}
+.micro small{display:block;font-size:.64rem;font-weight:400;color:#a39a8f;margin-top:1px}
+.micro.good{background:#eef5e8;color:#4a6b3a}
+.micro.none{background:#fff3e6;color:#a8590f}
+.micro-note{flex-basis:100%;text-align:center;font-size:.66rem;color:#a39a8f;margin-top:2px}
+.micro-hint{margin-top:8px;font-size:.74rem;color:#a8590f;background:#fff3e6;border-radius:10px;padding:6px 12px;display:inline-block}
 .toriwake{font-size:.76rem;color:var(--green);margin-top:3px}
 .carryover-row{border-left:2px solid var(--green);padding-left:12px;margin-left:0}
 .new-dish-row{border-left:2px solid var(--primary);padding-left:12px;margin-left:0}
@@ -626,6 +633,21 @@ function shuffle(arr) { const a=[...arr]; for(let i=a.length-1;i>0;i--){const j=
 const NUTRI_RED=['鶏','豚','牛','ひき','ミンチ','ベーコン','ハム','ソーセージ','ウインナー','たまご','卵','豆腐','厚揚げ','油揚げ','大豆','ビーンズ','鮭','さば','鯖','ぶり','たら','えび','海老','いか','ツナ','しらす','ちくわ','かにかま','はんぺん','納豆','チーズ','牛乳','ヨーグルト','あさり','肉'];
 const NUTRI_GREEN=['ほうれん草','小松菜','キャベツ','レタス','白菜','ブロッコリー','トマト','きゅうり','なす','ピーマン','パプリカ','にんじん','人参','玉ねぎ','ねぎ','大根','かぶ','ごぼう','れんこん','もやし','オクラ','アスパラ','ズッキーニ','セロリ','水菜','チンゲン菜','ニラ','にら','しめじ','えのき','まいたけ','しいたけ','エリンギ','きのこ','わかめ','ひじき','海藻','豆苗','枝豆','いんげん','スナップ','とうもろこし','コーン','春菊','三つ葉','大葉','青梗菜','野菜'];
 const NUTRI_YELLOW=['ごはん','ご飯','米','麺','うどん','そば','パスタ','スパゲ','パン','じゃがいも','さつまいも','里芋','いも','餅','春雨','皮','小麦粉'];
+// 2026-08-19 みかさん「タンパク質・カルシウム・鉄・亜鉛などを普通の食事から摂る」
+//   ⚠️数値（mg等）は出さない。3色判定と同じ「その食材が入っているか」の目安のみ。
+//   ⚠️リストはdata.jsonに実在する食材だけで作った（実在しない名前は判定に効かず、嘘の安心になる）
+const NUTRI_CA=['牛乳','チーズ','粉チーズ','モッツァレラ','ヨーグルト','しらす','ちりめんじゃこ','豆腐','厚揚げ','油揚げ','小松菜','ちんげん菜','チンゲン菜','水菜','ひじき','わかめ','高野豆腐','大豆','ブロッコリー','さば水煮缶','サバ缶','骨取りサバ','はんぺん','切り干し大根'];
+const NUTRI_FE=['牛こま','合いびき肉','あさり','ひじき','小松菜','ほうれん草','大豆','納豆','厚揚げ','豆腐','高野豆腐','ブリ切り身','ブリ','かつお節','たまご','水菜','切り干し大根','大豆水煮缶','ミックスビーンズ'];
+const NUTRI_ZN=['牛こま','豚こま','豚バラ','豚ロース','鶏もも肉','鶏むね肉','合いびき肉','豚ひき肉','鶏ひき肉','たまご','チーズ','納豆','高野豆腐','大豆','ホタテ','むきえび','たらこ','切り干し大根','あさり'];
+// その料理に、その栄養の食材が入っているか（入っている食材名を返す）
+function microHits(dish,key){
+  const list = key==='ca'?NUTRI_CA : key==='fe'?NUTRI_FE : NUTRI_ZN;
+  const ings=(dish&&dish.ingredients)||[];
+  const hits=new Set();
+  ings.forEach(i=>list.forEach(k=>{if(String(i).includes(k))hits.add(i);}));
+  return [...hits];
+}
+
 function nutriCount(dish,color){const list=color==='red'?NUTRI_RED:color==='green'?NUTRI_GREEN:NUTRI_YELLOW;const ings=(dish&&dish.ingredients)||[];const hits=new Set();ings.forEach(i=>{list.forEach(k=>{if(String(i).includes(k))hits.add(i);});});return hits.size;}
 function nutriBadge(dishes,riceIncluded){
   let red=0,green=0,yellow=0;
@@ -1145,6 +1167,17 @@ function generateThreeDay(opts,bentoIds,forcedMain){
   const day2Side=pickSide(d2SidePool);
   let d3SidePool=allSidesShuffled.filter(s=>genreMatch(s,day2NewMain.genre)&&!usedSideIds.has(s.id));
   if(nutriCount(day2NewMain,'green')===0){const gp=d3SidePool.filter(s=>nutriCount(s,'green')>0);if(gp.length>0)d3SidePool=gp;}
+  // 2026-08-19 みかさん「カルシウム・鉄・亜鉛を普通の食事から」
+  //   ここまでで一度も出ていない栄養があれば、3日目の副菜でそれを補えるものを優先する
+  //   ⚠️候補が無ければ元のプールのまま（無理に入れて変な献立にしない）
+  {
+    const so_far=[day1Main,day1Side,day2NewMain,day2Side].filter(Boolean);
+    const lacking=['ca','fe','zn'].filter(k=>so_far.every(x=>microHits(x,k).length===0));
+    if(lacking.length){
+      const fix=d3SidePool.filter(s=>lacking.some(k=>microHits(s,k).length>0));
+      if(fix.length>0)d3SidePool=fix;
+    }
+  }
   const day3Side=pickSide(d3SidePool.length>0?d3SidePool:allSidesShuffled);
   const usedSoupIds=new Set();
   function pickSoup(pool){const av=pool.filter(s=>!usedSoupIds.has(s.id));if(av.length===0)return pick(pool.length>0?pool:soups);const s=pick(av);usedSoupIds.add(s.id);return s;}
@@ -1444,6 +1477,19 @@ function renderThreeDayResults(plan){
 
   // 「あと1つ足りない」メインを選んで3日分にした場合、買い足すものを最初に出す
   const buyMiss=missingIngredients(plan.day1.main);
+  // 3日ぶんまとめて、カルシウム・鉄・亜鉛が何日ぶん入っているかを見る（みかさん2026-08-19）
+  const days3=[[plan.day1.main,plan.day1.side,plan.day1.soup],
+               [plan.day2.newMain,plan.day2.side,plan.day2.soup],
+               [plan.day3.side,plan.day3.soup]];
+  const micro={};
+  [['ca','カルシウム'],['fe','鉄'],['zn','亜鉛']].forEach(([k,label])=>{
+    const src=new Set(); let days=0;
+    days3.forEach(d=>{
+      const h=d.filter(Boolean).flatMap(x=>microHits(x,k));
+      if(h.length){days++; h.forEach(x=>src.add(x));}
+    });
+    micro[k]={label,days,src:[...src].slice(0,3)};
+  });
   // 代用しているものは3日ぶんまとめて出す（レシピ本文は元の食材名のままなので必ず知らせる）
   const subAll=[];
   [plan.day1.main,plan.day1.side,plan.day1.soup,plan.day2.newMain,plan.day2.side,plan.day2.soup,plan.day3.side,plan.day3.soup]
@@ -1456,6 +1502,12 @@ function renderThreeDayResults(plan){
       <p>メインを繰り越して明日の1品へ。3品あるのにラクできる。</p>
       ${buyMiss.length?`<p class="buy-note">🛒 買い足し：${buyMiss.join('・')}</p>`:''}
       ${subAll.length?`<p class="sub-note">🔄 ${subAll.map(x=>x.from+'→'+x.to).join('・')} で代用します</p>`:''}
+      <div class="micro-row">${[micro.ca,micro.fe,micro.zn].map(m=>
+        `<span class="micro ${m.days>=2?'good':m.days===1?'some':'none'}">${m.label} ${m.days>=2?'◎':m.days===1?'○':'△'}${m.src.length?`<small>${m.src.join('・')}</small>`:''}</span>`).join('')}
+        <span class="micro-note">3日ぶんの目安（材料名から自動判定）。△の日は、下の「補える食材」からどうぞ</span>
+      </div>
+      ${[micro.ca,micro.fe,micro.zn].some(m=>m.days===0)?`<p class="micro-hint">🥛 ${[micro.ca,micro.fe,micro.zn].filter(m=>m.days===0).map(m=>
+        m.label+'を補うなら'+(m.label==='カルシウム'?'：牛乳・チーズ・豆腐・小松菜・しらす':m.label==='鉄'?'：ほうれん草・小松菜・納豆・あさり・牛こま':'：たまご・納豆・チーズ・牛こま・えび')).join(' / ')}</p>`:''}
     </div>
     <div class="day-cards">
       <div class="day-card day1">
