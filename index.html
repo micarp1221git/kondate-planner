@@ -166,8 +166,21 @@ details[open]>.group-summary::before{transform:rotate(90deg)}
 .ing-chip.on{background:var(--primary);border-color:var(--primary);color:#fff;font-weight:700}
 .ing-chip.omakase{border-style:dashed}
 .mainpick-empty{font-size:.8rem;color:var(--text-light);line-height:1.6}
-.panel{margin-top:14px}
 .panel.hidden{display:none}
+/* ボトムシート: 下から出る。背景の位置は変わらない */
+.panel{position:fixed;left:0;right:0;bottom:0;z-index:60;margin:0;border-radius:16px 16px 0 0;
+  min-height:46vh;max-height:82vh;overflow-y:auto;-webkit-overflow-scrolling:touch;
+  box-shadow:0 -6px 24px rgba(0,0,0,.18);padding-top:8px;
+  animation:sheetUp .22s ease-out}
+@keyframes sheetUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
+.sheet-grip{width:40px;height:4px;border-radius:2px;background:var(--border);margin:4px auto 10px;cursor:pointer}
+.sheet-x{position:absolute;top:10px;right:14px;width:32px;height:32px;border:none;border-radius:50%;
+  background:var(--surface);color:var(--text-mid);font-size:1rem;cursor:pointer;line-height:1}
+.sheet-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.32);z-index:59;opacity:0;pointer-events:none;transition:opacity .2s}
+.sheet-backdrop.show{opacity:1;pointer-events:auto}
+body.sheet-open{overflow:hidden}
+/* ⚠️2026-08-20: body に position:fixed を使ったら、中のシートが幅0になった（実測）。
+   背景固定は overflow:hidden で足りる。 */
 .panel-close{display:block;width:100%;max-width:240px;margin:16px auto 0;padding:11px;background:var(--primary-light);color:var(--primary);border:1.5px solid var(--primary);border-radius:8px;font-size:.88rem;font-weight:700;cursor:pointer}
 .opt-details{margin:20px 0 0;border:1.5px solid var(--border);border-radius:10px;background:var(--card);overflow:hidden}
 .opt-details>summary{padding:13px 16px;font-size:.88rem;font-weight:600;color:var(--text-mid);cursor:pointer;list-style:none}
@@ -396,17 +409,22 @@ details[open]>.workflow-summary::before{transform:rotate(90deg)}
   <div id="results" class="results hidden"></div>
 
   <!-- 引き出し: ふだんは閉じている -->
+  <div id="sheet-backdrop" class="sheet-backdrop"></div>
   <section class="section panel hidden" id="ingredient-section">
+    <div class="sheet-grip" onclick="closeSheet()"></div>
+    <button class="sheet-x" onclick="closeSheet()" aria-label="閉じる">✕</button>
     <h2>🧊 冷蔵庫の中身</h2>
     <p class="section-desc">今あるものにチェック。この食材だけで献立を組みます。</p>
     <div id="ingredient-groups"></div>
-    <button class="panel-close" onclick="togglePanel('ingredient')">✅ 閉じる</button>
+    <button class="panel-close" onclick="closeSheet()">✅ 決定して閉じる</button>
   </section>
   <section class="section panel hidden" id="seasoning-section">
+    <div class="sheet-grip" onclick="closeSheet()"></div>
+    <button class="sheet-x" onclick="closeSheet()" aria-label="閉じる">✕</button>
     <h2>🧂 手持ちの調味料</h2>
     <p class="section-desc">あるものにチェック。ここで作れる料理が決まります。</p>
     <div id="seasoning-groups"></div>
-    <button class="panel-close" onclick="togglePanel('seasoning')">✅ 閉じる</button>
+    <button class="panel-close" onclick="closeSheet()">✅ 決定して閉じる</button>
   </section>
   <p class="save-hint">💡 チェック内容はブラウザに自動保存。次に開いてもそのまま使えます。</p>
 
@@ -735,16 +753,55 @@ function saveState(){
 // ── トップページの道具立て（2026-08-16 みかさん「毎日使うページを快適にしたい」）──
 
 // 調味料・冷蔵庫は毎日いじるものではないので引き出しに片付け、アイコンから開く
+// 2026-08-20 みかさん「冷蔵庫押して下までスクロールされるのいやだな」
+//   → ボトムシートに変更。押した場所と開く場所が離れているのが原因だった。
+//   ⭐ボトムシートの肝は「背景のページ位置を保つ」こと（LogRocket）。閉じると元の場所に戻る。
+//   ⚠️背景タップでは閉じない（誤操作でチェックが消えたように見えるため）。閉じるのは ✕ と下スワイプ。
+let sheetScrollY = 0;
 function togglePanel(which){
   const sec=document.getElementById(which+'-section');
   const btn=document.getElementById(which==='ingredient'?'tool-fridge':'tool-seasoning');
   const other=document.getElementById((which==='ingredient'?'seasoning':'ingredient')+'-section');
   const otherBtn=document.getElementById(which==='ingredient'?'tool-seasoning':'tool-fridge');
+  const backdrop=document.getElementById('sheet-backdrop');
   const opening=sec.classList.contains('hidden');
   other.classList.add('hidden'); otherBtn.classList.remove('open'); // 引き出しは一度に1つ
   sec.classList.toggle('hidden',!opening);
   btn.classList.toggle('open',opening);
-  if(opening)sec.scrollIntoView({behavior:'smooth',block:'start'});
+  backdrop.classList.toggle('show',opening);
+  if(opening){
+    sheetScrollY = window.scrollY;          // いまの位置を覚える
+    document.body.classList.add('sheet-open'); // 背景が動かないよう固定
+    sec.classList.remove('collapsed');   // 旧仕様の名残が付いていても中身を出す
+    sec.scrollTop = 0;
+    // ⚠️中のグループが全部閉じていると、シートが空に見える（145pxしかなかった）
+    const groups=[...sec.querySelectorAll('.group-details')];
+    if(groups.length && !groups.some(g=>g.open)) groups[0].open = true;
+  }else{
+    closeSheetChrome();
+  }
+}
+function closeSheetChrome(){
+  document.body.classList.remove('sheet-open');
+  window.scrollTo(0, sheetScrollY);        // 元の位置へ戻す
+  document.getElementById('sheet-backdrop').classList.remove('show');
+  document.querySelectorAll('.tool-btn.open').forEach(b=>b.classList.remove('open'));
+}
+// 下スワイプで閉じる。⚠️シートを上までスクロールしている時だけ効かせる（中のスクロールと喧嘩しないため）
+function initSheetSwipe(){
+  document.querySelectorAll('.panel').forEach(sec=>{
+    let y0=null;
+    sec.addEventListener('touchstart',e=>{ y0 = sec.scrollTop<=0 ? e.touches[0].clientY : null; },{passive:true});
+    sec.addEventListener('touchmove',e=>{
+      if(y0===null)return;
+      if(e.touches[0].clientY - y0 > 70){ y0=null; closeSheet(); }
+    },{passive:true});
+  });
+}
+
+function closeSheet(){
+  document.querySelectorAll('.panel:not(.hidden)').forEach(x=>x.classList.add('hidden'));
+  closeSheetChrome();
 }
 
 function updateToolbar(){
@@ -1786,18 +1843,9 @@ function setupReturningUser(){
     const hint=document.querySelector('.save-hint');
     if(hint)hint.textContent='💡 チェック内容はこの端末に自動保存。次に開いてもそのまま使えます。';
   }
-  // 2回目以降は調味料・冷蔵庫を折りたたみ、すぐ「献立をつくる」へ
-  const visited=localStorage.getItem('kondate_visited');
-  if(visited){
-    ['seasoning-section','ingredient-section'].forEach(id=>{
-      const sec=document.getElementById(id);
-      if(sec)sec.classList.add('collapsed');
-    });
-  }
+  // ⚠️2026-08-20: 旧「collapsed」（ページ内で折りたたむ仕組み）は廃止。
+  //   ボトムシート化で役目を終えたのに残っていて、シートの中身を display:none で隠していた。
   localStorage.setItem('kondate_visited','1');
-  document.querySelectorAll('#seasoning-section h2,#ingredient-section h2').forEach(h=>{
-    h.addEventListener('click',()=>h.closest('.section').classList.toggle('collapsed'));
-  });
 }
 
 // 初見ユーザー向けガイド（①調味料確認→②冷蔵庫3つ以上→③つくる、を連れて行く）
@@ -1906,9 +1954,10 @@ function init(){
   renderMainPick();
   updateCount();
   updateFavBtn();
+  initSheetSwipe();
   // はじめて開いた人は、まず冷蔵庫にチェックを入れないと何も始まらないので開けておく。
   // すでに登録済みの人（＝毎日使う人）は、紹介文を畳んでボタンをすぐ押せる位置に上げる。
-  if(st.ingredients.size===0)togglePanel('ingredient');
+  if(st.ingredients.size===0)setTimeout(()=>togglePanel('ingredient'),400);
   else document.body.classList.add('returning');
 }
 
