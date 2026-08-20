@@ -109,7 +109,7 @@
    "carryover": [
     "照り焼き丼",
     "照り焼きサンド",
-    "サラダのせ"
+    "のせサラダ"
    ],
    "toriwake": {
     "kodomo": "そのまま",
@@ -139,7 +139,7 @@
    "batch": true,
    "carryover": [
     "卵とじ",
-    "炊き込みご飯の具"
+    "炊き込みご飯"
    ],
    "toriwake": {
     "kodomo": "そのまま",
@@ -167,7 +167,7 @@
    "batch": false,
    "carryover": [
     "親子丼",
-    "うどんの具"
+    "うどん"
    ],
    "toriwake": {
     "kodomo": "そのまま",
@@ -192,7 +192,7 @@
    ],
    "batch": true,
    "carryover": [
-    "サラダのせ",
+    "のせサラダ",
     "トマト煮込み",
     "サンド"
    ],
@@ -221,8 +221,7 @@
    ],
    "batch": true,
    "carryover": [
-    "甘酢丼",
-    "お弁当おかず"
+    "甘酢丼"
    ],
    "toriwake": {
     "kodomo": "そのまま",
@@ -557,7 +556,7 @@
    "batch": true,
    "carryover": [
     "チャーシュー丼",
-    "ラーメンの具",
+    "のせラーメン",
     "炒飯"
    ],
    "toriwake": {
@@ -642,7 +641,7 @@
    "batch": true,
    "carryover": [
     "回鍋肉丼",
-    "焼きそばの具"
+    "焼きそば"
    ],
    "toriwake": {
     "kodomo": "そのまま",
@@ -1051,7 +1050,7 @@
    "batch": true,
    "carryover": [
     "卵とじ",
-    "うどんの具"
+    "うどん"
    ],
    "toriwake": {
     "kodomo": "そのまま",
@@ -1228,7 +1227,7 @@
    ],
    "batch": false,
    "carryover": [
-    "お弁当"
+    "炒めそうめん"
    ],
    "toriwake": {
     "kodomo": "そのまま",
@@ -1385,8 +1384,7 @@
    ],
    "batch": true,
    "carryover": [
-    "甘酢丼",
-    "お弁当"
+    "甘酢丼"
    ],
    "toriwake": {
     "kodomo": "そのまま",
@@ -1465,8 +1463,7 @@
    ],
    "batch": true,
    "carryover": [
-    "ほぐして混ぜご飯",
-    "お弁当"
+    "ほぐして混ぜご飯"
    ],
    "toriwake": {
     "kodomo": "そのまま",
@@ -1690,8 +1687,7 @@
    ],
    "batch": true,
    "carryover": [
-    "丼",
-    "お弁当"
+    "丼"
    ],
    "toriwake": {
     "kodomo": "そのまま",
@@ -1943,7 +1939,7 @@
    "batch": true,
    "carryover": [
     "丼",
-    "おにぎりの具"
+    "おにぎり"
    ],
    "toriwake": {
     "kodomo": "そのまま",
@@ -1973,7 +1969,7 @@
    "batch": true,
    "carryover": [
     "角煮丼",
-    "ラーメンの具",
+    "のせラーメン",
     "卵と煮る"
    ],
    "toriwake": {
@@ -2027,7 +2023,7 @@
    "batch": false,
    "carryover": [
     "サラダ",
-    "そうめんのせ"
+    "のせそうめん"
    ],
    "toriwake": {
     "kodomo": "ごまだれ",
@@ -2084,8 +2080,7 @@
    ],
    "batch": true,
    "carryover": [
-    "甘酢丼",
-    "お弁当"
+    "甘酢丼"
    ],
    "toriwake": {
     "kodomo": "そのまま",
@@ -2342,7 +2337,7 @@
    "batch": true,
    "carryover": [
     "丼",
-    "春雨追加"
+    "春雨スープ"
    ],
    "toriwake": {
     "kodomo": "そのまま(辛味なし)",
@@ -2424,7 +2419,6 @@
    ],
    "batch": true,
    "carryover": [
-    "お弁当",
     "丼"
    ],
    "toriwake": {
@@ -2782,8 +2776,7 @@
    ],
    "batch": true,
    "carryover": [
-    "甘酢丼",
-    "お弁当"
+    "甘酢丼"
    ],
    "toriwake": {
     "kodomo": "そのまま",
@@ -2866,7 +2859,7 @@
    "carryover": [
     "サラダ",
     "サンド",
-    "おにぎりの具"
+    "おにぎり"
    ],
    "toriwake": {
     "kodomo": "そのまま",
@@ -2894,8 +2887,7 @@
    "batch": true,
    "carryover": [
     "肉巻き丼",
-    "お弁当おかず",
-    "サラダのせ"
+    "のせサラダ"
    ],
    "toriwake": {
     "kodomo": "そのまま",
@@ -2922,8 +2914,8 @@
    ],
    "batch": true,
    "carryover": [
-    "パスタの具",
-    "オムレツの具"
+    "パスタ",
+    "オムレツ"
    ],
    "toriwake": {
     "kodomo": "そのまま",
@@ -3012,8 +3004,7 @@
    ],
    "batch": false,
    "carryover": [
-    "サンドの具",
-    "お弁当おかず"
+    "サンドイッチ"
    ],
    "toriwake": {
     "kodomo": "そのまま",
@@ -3041,7 +3032,7 @@
    "batch": true,
    "carryover": [
     "棒々鶏サラダ",
-    "春雨サラダの具"
+    "春雨サラダ"
    ],
    "toriwake": {
     "kodomo": "たれ少なめ",
@@ -3069,7 +3060,7 @@
    "batch": true,
    "carryover": [
     "ほぐして混ぜごはん",
-    "うどんにかける"
+    "かけうどん"
    ],
    "toriwake": {
     "kodomo": "そのまま",
@@ -3154,8 +3145,8 @@
    ],
    "batch": true,
    "carryover": [
-    "骨を外してチャーハンの具",
-    "スープの具"
+    "チャーハン",
+    "具だくさんスープ"
    ],
    "toriwake": {
     "kodomo": "甘め",
@@ -3184,7 +3175,7 @@
    "batch": true,
    "carryover": [
     "ごはんにかけてあんかけ丼",
-    "うどんにかける"
+    "かけうどん"
    ],
    "toriwake": {
     "kodomo": "そのまま",
@@ -3373,7 +3364,7 @@
    ],
    "batch": false,
    "carryover": [
-    "パンにのせる"
+    "のせトースト"
    ],
    "toriwake": {
     "kodomo": "そのまま",
@@ -3483,7 +3474,7 @@
    "batch": true,
    "carryover": [
     "あんかけ丼",
-    "焼きそばの具"
+    "焼きそば"
    ],
    "toriwake": {
     "kodomo": "野菜を小さめに",
@@ -3512,7 +3503,7 @@
    "batch": true,
    "carryover": [
     "油淋鶏丼",
-    "そうめんのせ"
+    "のせそうめん"
    ],
    "toriwake": {
     "kodomo": "タレ少なめ",
@@ -3540,8 +3531,8 @@
    ],
    "batch": true,
    "carryover": [
-    "中華丼の具",
-    "焼きそばの具"
+    "中華丼",
+    "焼きそば"
    ],
    "toriwake": {
     "kodomo": "そのまま",
@@ -3687,7 +3678,7 @@
    "batch": true,
    "carryover": [
     "あんかけ丼",
-    "うどんにかける"
+    "かけうどん"
    ],
    "toriwake": {
     "kodomo": "辛みなし",
@@ -3717,7 +3708,7 @@
    "carryover": [
     "そぼろ丼",
     "レタス包み",
-    "炒飯の具"
+    "炒飯"
    ],
    "toriwake": {
     "kodomo": "そのまま",
@@ -3746,7 +3737,7 @@
    "batch": true,
    "carryover": [
     "なす丼",
-    "そうめんのせ"
+    "のせそうめん"
    ],
    "toriwake": {
     "kodomo": "そのまま",
@@ -3773,8 +3764,7 @@
    ],
    "batch": true,
    "carryover": [
-    "照り煮丼",
-    "お弁当のおかず"
+    "照り煮丼"
    ],
    "toriwake": {
     "kodomo": "骨をはずして",
@@ -3801,8 +3791,8 @@
    ],
    "batch": true,
    "carryover": [
-    "サンドの具",
-    "サラダのせ"
+    "サンドイッチ",
+    "のせサラダ"
    ],
    "toriwake": {
     "kodomo": "骨をはずして",
@@ -3858,8 +3848,8 @@
    ],
    "batch": true,
    "carryover": [
-    "サラダのせ",
-    "サンドの具"
+    "のせサラダ",
+    "サンドイッチ"
    ],
    "toriwake": {
     "kodomo": "骨をはずして",
@@ -3888,7 +3878,7 @@
    "batch": true,
    "carryover": [
     "煮込み丼",
-    "ラーメンの具"
+    "のせラーメン"
    ],
    "toriwake": {
     "kodomo": "骨をはずして",
@@ -3945,8 +3935,7 @@
    ],
    "batch": true,
    "carryover": [
-    "オイスター丼",
-    "お弁当のおかず"
+    "オイスター丼"
    ],
    "toriwake": {
     "kodomo": "骨をはずして",
@@ -3975,7 +3964,7 @@
    "batch": true,
    "carryover": [
     "味噌炒め丼",
-    "焼きそばの具"
+    "焼きそば"
    ],
    "toriwake": {
     "kodomo": "甘めに",
@@ -4004,7 +3993,7 @@
    ],
    "batch": false,
    "carryover": [
-    "焼きそばの具",
+    "焼きそば",
     "ラーメンにのせる"
    ],
    "toriwake": {
@@ -4061,7 +4050,7 @@
    "batch": false,
    "carryover": [
     "パスタにあえる",
-    "サンドの具"
+    "サンドイッチ"
    ],
    "toriwake": {
     "kodomo": "にんにく少なめ",
@@ -4116,8 +4105,8 @@
    ],
    "batch": false,
    "carryover": [
-    "パンにのせる",
-    "オムレツの具"
+    "のせトースト",
+    "オムレツ"
    ],
    "toriwake": {
     "kodomo": "そのまま",
@@ -4173,8 +4162,7 @@
    "batch": true,
    "carryover": [
     "しぐれ煮丼",
-    "おにぎりの具",
-    "お弁当のおかず"
+    "おにぎり"
    ],
    "toriwake": {
     "kodomo": "生姜少なめ",
@@ -4232,7 +4220,7 @@
    "batch": true,
    "carryover": [
     "カレーピラフ",
-    "サンドの具"
+    "サンドイッチ"
    ],
    "toriwake": {
     "kodomo": "カレー粉少なめ",
@@ -4319,7 +4307,7 @@
    "batch": false,
    "carryover": [
     "パスタにあえる",
-    "サラダのせ"
+    "のせサラダ"
    ],
    "toriwake": {
     "kodomo": "にんにく少なめ",
@@ -4347,7 +4335,7 @@
    ],
    "batch": true,
    "carryover": [
-    "ごはんにかける",
+    "かけごはん",
     "パスタソース"
    ],
    "toriwake": {
@@ -4376,7 +4364,7 @@
    ],
    "batch": false,
    "carryover": [
-    "焼きそばの具",
+    "焼きそば",
     "ビビンバ風丼"
    ],
    "toriwake": {
@@ -4404,8 +4392,8 @@
    ],
    "batch": true,
    "carryover": [
-    "中華丼の具",
-    "うどんにかける"
+    "中華丼",
+    "かけうどん"
    ],
    "toriwake": {
     "kodomo": "そのまま",
@@ -4463,7 +4451,7 @@
    "batch": true,
    "carryover": [
     "そぼろ煮丼",
-    "うどんにかける"
+    "かけうどん"
    ],
    "toriwake": {
     "kodomo": "そのまま",
@@ -4492,7 +4480,7 @@
    "batch": true,
    "carryover": [
     "ハンバーグ丼",
-    "サンドの具"
+    "サンドイッチ"
    ],
    "toriwake": {
     "kodomo": "おろし少なめ",
@@ -4521,7 +4509,7 @@
    ],
    "batch": false,
    "carryover": [
-    "焼きそばの具",
+    "焼きそば",
     "ラーメンにのせる"
    ],
    "toriwake": {
@@ -4549,7 +4537,7 @@
    ],
    "batch": false,
    "carryover": [
-    "パンにのせる",
+    "のせトースト",
     "パスタソース"
    ],
    "toriwake": {
@@ -4633,8 +4621,8 @@
    ],
    "batch": true,
    "carryover": [
-    "中華丼の具",
-    "うどんにかける"
+    "中華丼",
+    "かけうどん"
    ],
    "toriwake": {
     "kodomo": "そのまま",
@@ -4664,7 +4652,7 @@
    "batch": false,
    "carryover": [
     "丼にする",
-    "チャーハンの具"
+    "チャーハン"
    ],
    "toriwake": {
     "kodomo": "そのまま",
@@ -4719,8 +4707,7 @@
    ],
    "batch": true,
    "carryover": [
-    "お弁当のおかず",
-    "のり巻きの具"
+    "のり巻き"
    ],
    "toriwake": {
     "kodomo": "そのまま",
@@ -4776,8 +4763,7 @@
    ],
    "batch": true,
    "carryover": [
-    "サンドの具",
-    "お弁当のおかず"
+    "サンドイッチ"
    ],
    "toriwake": {
     "kodomo": "そのまま",
@@ -4806,8 +4792,7 @@
    ],
    "batch": true,
    "carryover": [
-    "サンドの具",
-    "お弁当のおかず"
+    "サンドイッチ"
    ],
    "toriwake": {
     "kodomo": "そのまま",
@@ -4837,7 +4822,7 @@
    "batch": false,
    "carryover": [
     "丼にする",
-    "チャーハンの具"
+    "チャーハン"
    ],
    "toriwake": {
     "kodomo": "そのまま",
@@ -4864,7 +4849,7 @@
    ],
    "batch": false,
    "carryover": [
-    "焼きそばの具",
+    "焼きそば",
     "丼にする"
    ],
    "toriwake": {
@@ -4890,8 +4875,8 @@
    ],
    "batch": false,
    "carryover": [
-    "ごはんにのせる",
-    "サンドの具"
+    "のせごはん",
+    "サンドイッチ"
    ],
    "toriwake": {
     "kodomo": "ナンプラー控えめ",
