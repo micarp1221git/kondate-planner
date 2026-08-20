@@ -95,6 +95,8 @@ details[open]>.group-summary::before{transform:rotate(90deg)}
 .cand-near{border-style:dashed}
 .cand-miss{margin-top:6px;font-size:.72rem;color:#a8590f;background:#fff3e6;border-radius:10px;padding:3px 8px;line-height:1.4}
 .cand-sub{margin-top:6px;font-size:.72rem;color:#4a6b3a;background:#eef5e8;border-radius:10px;padding:3px 8px;line-height:1.4}
+.cand-sub small{display:block;font-size:.66rem;color:#6b8a5a;font-weight:400;margin-top:1px}
+.sub-note small{display:block;font-size:.68rem;font-weight:400;color:#6b8a5a;margin-top:2px}
 .sub-note{display:inline-block;margin-top:8px;padding:5px 12px;border-radius:14px;background:#eef5e8;color:#4a6b3a;font-weight:700;font-size:.78rem}
 .status-bar small{display:block;font-size:.72rem;color:var(--text-light);margin-top:2px;font-weight:400}
 
@@ -931,24 +933,37 @@ const ING_ALIAS = {
 //   入れ替えても料理として成立するものだけをグループにする。
 //   ⚠️ 代用したことは画面に出す（レシピ本文には元の食材名が書いてあるので、黙って置き換えると嘘になる）
 //   ⚠️ 玉ねぎ/長ねぎ・じゃがいも/さつまいも は「似ているが別物」なので入れない。
+// 2026-08-20 みかさん「置き換えればいいんだって頭にならない人もいるかもしれない」
+//   → 調べたら、海外でも「代用機能はあるのに使われない」が未解決の課題だった（Plant Jammerが
+//     UXコンテストの題材にしている）。⭐うちは「提案」せず最初から候補に混ぜる方式なので、
+//     残る仕事は「置き換えても大丈夫な理由」を1行そえること（海外の作法③）。
 const SUBSTITUTE_GROUPS = [
-  ['小松菜','ほうれん草','ちんげん菜','水菜'],                 // 葉物（おひたし・炒め物）
-  ['豚こま','豚バラ','豚ロース(薄切り)'],                      // 薄切りの豚（炒め物・煮物）
-  ['鶏ひき肉','豚ひき肉','合いびき肉'],                        // ひき肉
-  ['タラ切り身','カレイ切り身(骨なし)','サワラ切り身','鯛切り身'] // 白身魚の切り身
+  { items:['小松菜','ほうれん草','ちんげん菜','水菜'],
+    why:'どれも同じ葉物。ゆで時間だけ少し変わります' },
+  { items:['豚こま','豚バラ','豚ロース(薄切り)'],
+    why:'どれも薄切りの豚。脂の多さが少し違うだけです' },
+  { items:['鶏ひき肉','豚ひき肉','合いびき肉'],
+    why:'どれもひき肉。味の濃さが少し変わります' },
+  { items:['タラ切り身','カレイ切り身(骨なし)','サワラ切り身','鯛切り身'],
+    why:'どれも白身魚。焼き時間はそのままで大丈夫です' }
 ];
 // 食材 i の代わりになるもののうち、いま持っているものを1つ返す（無ければ null）
 function subFor(i){
-  const g = SUBSTITUTE_GROUPS.find(g => g.includes(i));
+  const g = SUBSTITUTE_GROUPS.find(g => g.items.includes(i));
   if(!g) return null;
-  return g.find(x => x !== i && (st.ingredients.has(x) || x === st.mainIng)) || null;
+  return g.items.find(x => x !== i && (st.ingredients.has(x) || x === st.mainIng)) || null;
+}
+// その食材の代用が「なぜ大丈夫か」（同じグループの理由）
+function subWhy(i){
+  const g = SUBSTITUTE_GROUPS.find(g => g.items.includes(i));
+  return g ? g.why : '';
 }
 // この料理で「何を何で代用するか」の一覧
 function substitutions(item){
   if(!item.ingredients) return [];
   return item.ingredients
     .filter(i => !st.ingredients.has(i) && !isMainIng(i) && !(ING_ALIAS[i]||[]).some(x=>st.ingredients.has(x)))
-    .map(i => { const s = subFor(i); return s ? {from:i, to:s} : null; })
+    .map(i => { const s = subFor(i); return s ? {from:i, to:s, why:subWhy(i)} : null; })
     .filter(Boolean);
 }
 
@@ -1501,7 +1516,7 @@ function renderThreeDayResults(plan){
       <h2>🍽️ 3日分の献立｜${plan.genreLabel}</h2>
       <p>メインを繰り越して明日の1品へ。3品あるのにラクできる。</p>
       ${buyMiss.length?`<p class="buy-note">🛒 買い足し：${buyMiss.join('・')}</p>`:''}
-      ${subAll.length?`<p class="sub-note">🔄 ${subAll.map(x=>x.from+'→'+x.to).join('・')} で代用します</p>`:''}
+      ${subAll.length?`<p class="sub-note">🔄 ${subAll.map(x=>x.from+'→'+x.to).join('・')} で代用します<small>${[...new Set(subAll.map(x=>x.why))].join(' / ')}</small></p>`:''}
       <div class="micro-row">${[micro.ca,micro.fe,micro.zn].map(m=>
         `<span class="micro ${m.days>=2?'good':m.days===1?'some':'none'}">${m.label} ${m.days>=2?'◎':m.days===1?'○':'△'}${m.src.length?`<small>${m.src.join('・')}</small>`:''}</span>`).join('')}
         <span class="micro-note">3日ぶんの目安（材料名から自動判定）。△の日は、下の「補える食材」からどうぞ</span>
@@ -1719,7 +1734,7 @@ function renderFlowStep(){
         <button class="cand-card${miss.length?' cand-near':''}" onclick="selectCand(${i})">
           <div class="cand-name">${c.name}</div>
           <div class="cand-meta">${c.genre||''}${c.ingredients&&c.ingredients.length?'｜'+c.ingredients.slice(0,3).join('・'):''}</div>
-          ${sub.length?`<div class="cand-sub">🔄 ${sub.map(x=>x.from+'→'+x.to).join('・')} で代用</div>`:''}
+          ${sub.length?`<div class="cand-sub">🔄 ${sub.map(x=>x.from+'→'+x.to).join('・')} で代用<small>${sub[0].why}</small></div>`:''}
           ${miss.length?`<div class="cand-miss">🛒 ${miss.join('・')} があれば作れます</div>`:''}
         </button>`;}).join('')}
     </div>
