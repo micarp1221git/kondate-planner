@@ -1502,6 +1502,31 @@ function carryoverExtraHtml(co,from){
 
 let curPlan=null,planCtx=null;
 
+// 🆕2026-08-23みかさん「メインは固定して副菜以降を別メニュー探したいときある」
+//   rerollDay() は**メインごと**替えてしまうので、メインが気に入ったときに使えなかった。
+//   こちらは**メインと繰り越しには一切触らず**、副菜と汁物だけ振り直す。
+function rerollSides(n){
+  if(!curPlan||!planCtx)return;
+  const p=curPlan,{sides,soups}=planCtx;
+  const excl=(pool,id)=>{const f=pool.filter(x=>x.id!==id);return f.length>0?f:pool;};
+  if(sides.length<2&&soups.length<2){showError('他に出せる副菜・汁物が今の条件にありません。チェックを増やすと候補が増えます。');return;}
+  if(n===1){
+    const ms=sides.filter(x=>x.makeahead);
+    p.day1.side=pick(excl(ms.length>0?ms:sides,p.day1.side.id));
+    const bs=soups.filter(x=>x.batch);
+    const wasCont=p.day2.soupNote&&p.day2.soupNote.includes('続き');
+    p.day1.soup=pick(excl(bs.length>0?bs:soups,p.day1.soup.id));
+    if(wasCont)p.day2.soup=p.day1.soup;   // 2日目に持ち越している汁物は、ずれないように合わせる
+  }else if(n===2){
+    p.day2.side=pick(excl(sides,p.day2.side.id));
+    if(!(p.day2.soupNote&&p.day2.soupNote.includes('続き'))){p.day2.soup=pick(excl(soups,p.day2.soup.id));}
+  }else{
+    p.day3.side=pick(excl(sides,p.day3.side.id));
+    p.day3.soup=pick(excl(soups,p.day3.soup.id));
+  }
+  renderThreeDayResults(p);   // ⚠️メインを触っていないので genreLabel は作り直さない
+}
+
 function rerollDay(n){
   if(!curPlan||!planCtx)return;
   const p=curPlan,{batchMains,sides,soups}=planCtx;
@@ -1583,7 +1608,7 @@ function renderThreeDayResults(plan){
     </div>
     <div class="day-cards">
       <div class="day-card day1">
-        <div class="day-label">🔪 Day1<small>仕込み・多めに作る</small><button class="reroll-btn" onclick="rerollDay(1)">🎲 別メニューを提案し直す</button></div>
+        <div class="day-label">🔪 Day1<small>仕込み・多めに作る</small><button class="reroll-btn" onclick="rerollDay(1)">🎲 別メニューを提案し直す</button><button class="reroll-btn" onclick="rerollSides(1)">🥗 副菜・汁物だけ替える</button></div>
         <div class="day-body">
           ${combinedHtml(wf1Items)}
           <div class="dish-extras">
@@ -1596,7 +1621,7 @@ function renderThreeDayResults(plan){
       </div>
       <div class="carryover-flow">${plan.day1.main.name} → ${plan.day2.carryover.n}</div>
       <div class="day-card day2">
-        <div class="day-label">🍳 Day2<small>繰り越し＋もうひと品</small><button class="reroll-btn" onclick="rerollDay(2)">🎲 別メニューを提案し直す</button></div>
+        <div class="day-label">🍳 Day2<small>繰り越し＋もうひと品</small><button class="reroll-btn" onclick="rerollDay(2)">🎲 別メニューを提案し直す</button><button class="reroll-btn" onclick="rerollSides(2)">🥗 副菜・汁物だけ替える</button></div>
         <div class="day-body">
           ${combinedHtml(wf2Items)}
           <div class="dish-extras">
@@ -1610,7 +1635,7 @@ function renderThreeDayResults(plan){
       </div>
       <div class="carryover-flow">${plan.day2.newMain.name} → ${plan.day3.carryover.n}</div>
       <div class="day-card day3">
-        <div class="day-label">✨ Day3<small>繰り越し・ラクする日</small><button class="reroll-btn" onclick="rerollDay(3)">🎲 別メニューを提案し直す</button></div>
+        <div class="day-label">✨ Day3<small>繰り越し・ラクする日</small><button class="reroll-btn" onclick="rerollDay(3)">🎲 別メニューを提案し直す</button><button class="reroll-btn" onclick="rerollSides(3)">🥗 副菜・汁物だけ替える</button></div>
         <div class="day-body">
           ${combinedHtml(wf3Items)}
           <div class="dish-extras">
