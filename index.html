@@ -2038,7 +2038,7 @@ async function setupDailyReminder(){
     if(has(2)) return;
     await LN.schedule({ notifications: [{
       id: 2,
-      title: '今日の夕飯、まだ白紙？ 🍚',
+      title: '今日の夕飯、まだ決まってない？ 🍚',
       body: '押すだけで3日分。買い物に行く前に、まるっと決めちゃおう',
       schedule: { on: { hour: 16, minute: 0 }, allowWhileIdle: true }
     }] });
