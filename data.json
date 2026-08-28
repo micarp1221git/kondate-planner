@@ -4405,35 +4405,6 @@
    "keep_ok": true
   },
   {
-   "id": "asia-gyu-ethnic",
-   "name": "牛こまのエスニック炒め",
-   "genre": "アジアン",
-   "protein": "牛こま",
-   "method": "炒める",
-   "ratio": "ナンプラー1:醤油1:砂糖1",
-   "seasonings": [
-    "ナンプラー",
-    "醤油",
-    "砂糖",
-    "にんにく"
-   ],
-   "ingredients": [
-    "牛こま",
-    "玉ねぎ",
-    "パプリカ"
-   ],
-   "batch": true,
-   "carryover": [
-    "エスニック丼",
-    "レタス包み"
-   ],
-   "toriwake": {
-    "kodomo": "ナンプラー控えめ",
-    "otona": "唐辛子・ライム"
-   },
-   "keep_ok": true
-  },
-  {
    "id": "wa-butahiki-hakusai",
    "name": "豚ひきと白菜のそぼろ煮",
    "genre": "和",
