@@ -330,6 +330,18 @@ details[open]>.workflow-summary::before{transform:rotate(90deg)}
 .fav-heart{position:absolute;top:10px;right:10px;background:none;border:none;font-size:1.2rem;cursor:pointer;opacity:.5;transition:opacity .2s}
 .fav-heart.active{opacity:1}
 .fav-heart:hover{opacity:1}
+/* 料理名のとなりのお気に入りボタン（2026-09-02）。⚠️.fav-heart は position:absolute なので流用できない */
+.cmb-dish-wrap{display:inline-flex;align-items:center;gap:4px;margin:0 6px 6px 0}
+.cmb-dish-wrap .cmb-dish{margin:0}
+.fav-heart-inline{display:inline-flex;align-items:center;gap:3px;min-height:32px;padding:4px 9px;
+  background:var(--surface,#fff);border:1px solid var(--line,#e3d9d4);border-radius:999px;
+  font-size:.72rem;line-height:1;color:var(--text-light,#8a7a74);cursor:pointer;
+  -webkit-tap-highlight-color:transparent;transition:border-color .15s,color .15s}
+.fav-heart-inline .fh-mark{font-size:.95rem}
+.fav-heart-inline.active{border-color:var(--primary,#e8815b);color:var(--primary,#e8815b);font-weight:600}
+.fav-heart-inline:hover{border-color:var(--primary,#e8815b)}
+.fav-hint{font-size:.72rem;color:var(--text-light,#8a7a74);margin:2px 0 8px}
+/* ⚠️スマホで文字を隠さない。🤍だけにすると「何のボタンか分からない」に戻る（今回の原因そのもの） */
 .fav-section{margin-top:24px}
 .fav-item{display:flex;justify-content:space-between;align-items:center;padding:10px 14px;background:var(--surface);border-radius:6px;margin-bottom:6px;font-size:.85rem}
 .fav-item button{background:none;border:none;color:var(--text-light);cursor:pointer;font-size:.8rem}
@@ -845,6 +857,10 @@ function setMainIng(ing){
 function saveFavorites(){
   localStorage.setItem('kondate-fav',JSON.stringify([...st.favorites]));
   updateFavBtn();
+  // 🚨上のツールバーの ❤️ の数も一緒に直す（2026-09-02）。
+  //   updateToolbar は元からあったのに、お気に入りの保存からは呼ばれておらず、
+  //   登録しても上の数字が 0 のままだった（画面を開き直すまで直らない）。
+  if(typeof updateToolbar==='function')updateToolbar();
 }
 
 function updateFavBtn(){
@@ -857,13 +873,43 @@ function updateFavBtn(){
 function toggleFav(id){
   if(st.favorites.has(id))st.favorites.delete(id);else st.favorites.add(id);
   saveFavorites();
-  const btns=document.querySelectorAll(`.fav-heart[data-id="${id}"]`);
-  btns.forEach(b=>{b.classList.toggle('active',st.favorites.has(id));b.textContent=st.favorites.has(id)?'❤️':'🤍';});
+  const on=st.favorites.has(id);
+  // ⚠️料理名の横（.fav-heart-inline）と、折りたたみの中（.fav-heart）の両方を切り替える。
+  //   片方だけにすると、同じ料理のハートが画面内で食い違う（2026-09-02）
+  document.querySelectorAll(`.fav-heart[data-id="${id}"]`).forEach(b=>{
+    b.classList.toggle('active',on);b.textContent=on?'❤️':'🤍';
+  });
+  document.querySelectorAll(`.fav-heart-inline[data-id="${id}"]`).forEach(b=>{
+    b.classList.toggle('active',on);
+    b.innerHTML=`<span class="fh-mark">${on?'❤️':'🤍'}</span><span class="fh-label">${on?'お気に入り':'お気に入り'}</span>`;
+    b.setAttribute('aria-pressed',on?'true':'false');
+  });
+  updateFavHint();
 }
 
 function favBtn(id){
   const active=st.favorites.has(id);
   return `<button class="fav-heart${active?' active':''}" data-id="${id}" onclick="event.stopPropagation();toggleFav('${id}')">${active?'❤️':'🤍'}</button>`;
+}
+
+// 料理名のとなりに置くお気に入りボタン（2026-09-02みかさん「お気に入り登録ボタンがありません」）
+// 🚨これまで favBtn は①1品だけの結果 ②「この品だけの作り方」の折りたたみの中 の2箇所にしか無く、
+//   ②は閉じているので、3日分の献立ではハートが1つも見えていなかった。
+//   ⭐献立を見て「これ気に入った」と思う場所＝料理名のところに置く。
+// ⚠️文字を添える（🤍だけだと何のボタンか分からない＝みかさんが探して見つからなかった原因）
+function favBtnInline(id){
+  if(!id)return ''; // 繰り越し（前日の残り）はidを持たないので出さない
+  const on=st.favorites.has(id);
+  return `<button class="fav-heart-inline${on?' active':''}" data-id="${id}" aria-pressed="${on?'true':'false'}"`
+    +` onclick="event.stopPropagation();toggleFav('${id}')">`
+    +`<span class="fh-mark">${on?'❤️':'🤍'}</span><span class="fh-label">お気に入り</span></button>`;
+}
+
+// まだ1件も登録が無いあいだだけ、押し方を1行だけ出す（登録したら消える）
+function updateFavHint(){
+  document.querySelectorAll('.fav-hint').forEach(el=>{
+    el.style.display=st.favorites.size===0?'block':'none';
+  });
 }
 
 function showFavorites(){
@@ -1383,7 +1429,8 @@ function cmbNormalize(it,i){
   }
   // 事前仕込みがある品は、当日ぶんの工程時間だけを短縮計算に使う（漬け時間で水増ししない）
   const mEff=advance.length?cook.reduce((s,e)=>s+e.min,0)+prep.reduce((s,e)=>s+e.min,0):(r.m||10);
-  return {name:it.name,color:CMB_COLORS[i%3],co:!!it.co,r,prep,cook,advance,advanceWait,m:mEff,maxWait,finish:0,cursor:0,startAfter:0};
+  // id を持たせる（お気に入りボタンを料理名の横に出すため・2026-09-02）
+  return {id:it.id,name:it.name,color:CMB_COLORS[i%3],co:!!it.co,r,prep,cook,advance,advanceWait,m:mEff,maxWait,finish:0,cursor:0,startAfter:0};
 }
 function buildCombinedSchedule(cookItems){
   const dishes=cookItems.map(cmbNormalize);
@@ -1447,7 +1494,12 @@ function combinedHtml(items){
   const sc=buildCombinedSchedule(cookItems);
   const badge=d=>`<span class="cmb-dish" style="background:${d.color}">${d.name}</span>`;
   let body='';
-  body+=`<div class="cmb-dishes">${sc.dishes.map(d=>badge(d)+(d.co?'<span class="cmb-co-mark">🍱 翌日の分も、多めに</span>':'')).join('')}${carryovers.map(c=>`<span class="cmb-dish cmb-dish-co">🍳 ${c.name}（温めるだけ）</span>`).join('')}</div>`;
+  // 料理名の横にお気に入りボタンを出す（2026-09-02みかさん依頼）。繰り越しはidが無いので付かない
+  body+=`<div class="cmb-dishes">${sc.dishes.map(d=>
+      `<span class="cmb-dish-wrap">${badge(d)}${favBtnInline(d.id)}</span>`
+      +(d.co?'<span class="cmb-co-mark">🍱 翌日の分も、多めに</span>':'')
+    ).join('')}${carryovers.map(c=>`<span class="cmb-dish cmb-dish-co">🍳 ${c.name}（温めるだけ）</span>`).join('')}</div>`
+    +`<div class="fav-hint"${st.favorites.size===0?'':' style="display:none"'}>🤍 を押すと、その料理をお気に入りに保存できます（❤️ボタンからいつでも見られます）</div>`;
   // 半日漬ける等がある品は、当日のタイムラインより前に「事前に仕込んでおく」枠を出す
   const advDishes=sc.dishes.filter(d=>d.advance.length);
   if(advDishes.length){
