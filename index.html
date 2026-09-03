@@ -711,9 +711,9 @@ function saveOpts(){
 // ── 履歴（いつもと違う味の判定用）──
 function loadHistory(){try{return JSON.parse(localStorage.getItem('kondate-history')||'[]');}catch(e){return [];}}
 function recordHistory(ids){
-  const genreById={};[...(D.main||[]),...(D.single||[])].forEach(m=>{genreById[m.id]=m.genre;});
+  const byId={};[...(D.main||[]),...(D.single||[])].forEach(m=>{byId[m.id]=m;});
   let h=loadHistory();const ts=Date.now();
-  ids.forEach(id=>{if(id)h.push({id,genre:genreById[id]||'',ts});});
+  ids.forEach(id=>{if(id){const m=byId[id]||{};h.push({id,genre:m.genre||'',protein:m.protein||'',tpl:m.tpl||'',ts});}});
   if(h.length>30)h=h.slice(h.length-30);
   localStorage.setItem('kondate-history',JSON.stringify(h));
 }
@@ -727,6 +727,19 @@ function applyVariety(pool){
   let p=pool.filter(m=>!recentIds.has(m.id)&&m.genre!==dominant);
   if(p.length>0)return p;
   p=pool.filter(m=>!recentIds.has(m.id));
+  return p.length>0?p:pool;
+}
+// 🆕2026-09-03 飽き対策（全モード・みかさん「同じメニューばかりで飽きた」）:
+//   直近14日に出た「同じ料理」と「同じ主材×味の型(tpl)」を候補から外す。外して空になるなら元の候補に戻す（何も出ない事故を作らない）
+function avoidRecent(pool){
+  const h=loadHistory();if(!h.length||!pool||pool.length<2)return pool;
+  const cut=Date.now()-14*24*3600*1000;
+  const recent=h.filter(x=>x.ts&&x.ts>=cut);
+  if(!recent.length)return pool;
+  const ids=new Set(recent.map(x=>x.id));
+  const combos=new Set(recent.filter(x=>x.tpl).map(x=>x.protein+'|'+x.tpl));
+  let p=pool.filter(m=>!ids.has(m.id)&&!(m.tpl&&combos.has(m.protein+'|'+m.tpl)));
+  if(p.length===0)p=pool.filter(m=>!ids.has(m.id));
   return p.length>0?p:pool;
 }
 // 手順(recipes.json)が無い料理向け：データのpointを表示
@@ -1199,7 +1212,7 @@ function generateSingle(opts,bentoIds,forcedDish){
     if(opts.bento)candidates=candidates.filter(s=>bentoIds.has(s.id));
     if(opts.keepOk){const f=candidates.filter(s=>s.keep_ok);if(f.length>0)candidates=f;}
     if(candidates.length===0){showError('この条件に合う1品メニューが見つかりませんでした。食材や調味料を増やしてみてください。');return;}
-    let pool=candidates;
+    let pool=avoidRecent(candidates);
     if(opts.favPriority&&st.favorites.size>0){const fp=pool.filter(s=>st.favorites.has(s.id));if(fp.length>0)pool=fp;}
     if(opts.variety){pool=applyVariety(pool);}
     dish=pick(pool);
@@ -1259,6 +1272,7 @@ function generateThreeDay(opts,bentoIds,forcedMain){
     if(day1Pool.length===0)day1Pool=batchMains;
     // 初日に使いたい食材があれば、1日目のメインはそれを使うものから選ぶ（2日目以降は自由）
     if(st.mainIng){const ip=day1Pool.filter(m=>usesIng(m,st.mainIng));if(ip.length>0)day1Pool=ip;}
+    day1Pool=avoidRecent(day1Pool);
     if(opts.favPriority&&st.favorites.size>0){const favPool=day1Pool.filter(m=>st.favorites.has(m.id));if(favPool.length>0)day1Pool=favPool;}
     if(opts.variety){day1Pool=applyVariety(day1Pool);}
     day1Main=pick(day1Pool);
@@ -1269,6 +1283,7 @@ function generateThreeDay(opts,bentoIds,forcedMain){
   if(day2Pool.length===0)day2Pool=batchMains.filter(m=>m.protein!==day1Main.protein&&m.id!==day1Main.id);
   if(day2Pool.length===0)day2Pool=batchMains.filter(m=>m.id!==day1Main.id);
   if(day2Pool.length===0)day2Pool=batchMains;
+  day2Pool=avoidRecent(day2Pool);
   const day2NewMain=pick(day2Pool);
   recordHistory([day1Main.id,day2NewMain.id]);
   const day3Carryover=pick(day2NewMain.carryover);
@@ -1752,7 +1767,7 @@ function newCandList(step, avoid){
   const {mains,sides,soups,nearMains,opts}=flowPools();
   let pool,fill=[];
   if(step===1){
-    pool=mains;
+    pool=avoidRecent(mains);
     if(opts.variety)pool=applyVariety(pool);
     fill=nearMains;
   }else if(step===2){
