@@ -398,8 +398,7 @@ body.stepui main.container>*:not(#stepui){display:none}
   background:var(--primary,#e08a5b);color:#fff;cursor:pointer}
 .step-next:disabled{background:#ded7cd;color:#fff;cursor:default}
 .step-foot .regen-btn{margin-top:8px}
-.step-exit{display:block;margin:10px auto 0;background:none;border:none;color:var(--text-mid,#7a7268);
-  font-size:.8rem;text-decoration:underline;cursor:pointer}
+
 </style>
 </head>
 <body>
@@ -2201,13 +2200,13 @@ const STEP_NAMES=['食材','メイン','献立'];
 window.__stepUI=false;
 let stepState={n:1,cands:[],pickIdx:-1,extra:[]};
 
+/* 🚨 2026-09-05 みかさん「普通のリリースしてるアプリにはいらない気がします。新しくなった方だけで
+   リリースすればいいかなと思ってます」→ **1画面1ステップを既定にした**。試作のときの切り替えボタンも外した。
+   ⚠️ こちらが困ったとき用に `?ui=classic` で旧画面に行ける道だけ残す（画面には出さない）。 */
 function stepWanted(){
   try{
-    const q=new URLSearchParams(location.search).get('ui');
-    if(q==='step'){localStorage.setItem('kondate-ui','step');return true;}
-    if(q==='classic'){localStorage.removeItem('kondate-ui');return false;}
-    return localStorage.getItem('kondate-ui')==='step';
-  }catch(e){return false;}
+    return new URLSearchParams(location.search).get('ui') !== 'classic';
+  }catch(e){return true;}
 }
 
 function stepInit(){
@@ -2253,7 +2252,6 @@ function stepGo(n){
   if(n===1)stepScreenIng(body,foot);
   else if(n===2)stepScreenMain(body,foot);
   else stepScreenResult(body,foot);
-  foot.appendChild(stepExitLink());
   window.scrollTo({top:0,behavior:'smooth'});
 }
 
@@ -2405,20 +2403,6 @@ function stepBackBtn(){
     stepGo(1);
   };
   return b;
-}
-
-/* ⚠️ ?ui=step は端末に覚える（毎回URLを打たなくていいように）。
-   覚えたままだと戻れなくなるので、どの画面からも1タップで従来の形に戻せるようにしておく。
-   🚨 2026-09-05 みかさん「いままでの画面に戻すってなに？『戻る』ボタンのこと？」
-      → 言葉が足りなかった。**画面の中の移動（← 食材を入力しなおす）と、画面の形そのものを戻すのは別**。
-        文言を「この試作をやめて、いつものアプリに戻す」に変えた。 */
-function stepExitLink(){
-  const a=document.createElement('button');
-  a.className='step-exit';
-  a.title='ステップの中の移動は「← 食材を入力しなおす」。こちらは画面の形そのものを元に戻します';
-  a.textContent='この試作をやめて、いつものアプリに戻す';
-  a.onclick=()=>{try{localStorage.removeItem('kondate-ui');}catch(e){}location.href=location.pathname+'?ui=classic';};
-  return a;
 }
 
 function stepLead(a,b){
