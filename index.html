@@ -2408,11 +2408,15 @@ function stepBackBtn(){
 }
 
 /* ⚠️ ?ui=step は端末に覚える（毎回URLを打たなくていいように）。
-   覚えたままだと戻れなくなるので、どの画面からも1タップで従来の形に戻せるようにしておく。 */
+   覚えたままだと戻れなくなるので、どの画面からも1タップで従来の形に戻せるようにしておく。
+   🚨 2026-09-05 みかさん「いままでの画面に戻すってなに？『戻る』ボタンのこと？」
+      → 言葉が足りなかった。**画面の中の移動（← 食材を入力しなおす）と、画面の形そのものを戻すのは別**。
+        文言を「この試作をやめて、いつものアプリに戻す」に変えた。 */
 function stepExitLink(){
   const a=document.createElement('button');
   a.className='step-exit';
-  a.textContent='いままでの画面に戻す';
+  a.title='ステップの中の移動は「← 食材を入力しなおす」。こちらは画面の形そのものを元に戻します';
+  a.textContent='この試作をやめて、いつものアプリに戻す';
   a.onclick=()=>{try{localStorage.removeItem('kondate-ui');}catch(e){}location.href=location.pathname+'?ui=classic';};
   return a;
 }
