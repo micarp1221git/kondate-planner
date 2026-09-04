@@ -361,45 +361,6 @@ details[open]>.workflow-summary::before{transform:rotate(90deg)}
 .menu-selected .menu-suggest-cat{margin-left:0}
 .menu-selected button{margin-left:auto;background:none;border:none;color:var(--text-mid);cursor:pointer;font-size:.9rem;padding:2px 6px}
 .menu-selected button:hover{color:var(--primary)}
-
-/* ===== 1画面1ステップ（?ui=step）===== */
-body.stepui .hero .features,
-body.stepui .hero .tagline,
-body.stepui .photo-banner,
-body.stepui .toolbar,
-body.stepui #mainpick,
-body.stepui .btn-stack,
-body.stepui .opt-details,
-body.stepui #fav-btn,
-body.stepui .sheet-grip,
-body.stepui .sheet-x,
-body.stepui #sheet-backdrop{display:none!important}
-body.stepui .hero h1{font-size:1.25rem;margin:0}
-body.stepui .hero{padding:14px 0}
-body.stepui main.container>*:not(#stepui){display:none}
-#stepui{display:block}
-.step-head{position:sticky;top:0;z-index:20;background:var(--bg,#fff);padding:10px 0 8px}
-.step-now{font-size:.95rem;font-weight:800;letter-spacing:.04em}
-.step-dots{display:flex;gap:6px;margin-top:6px}
-.step-dots span{height:4px;flex:1;border-radius:99px;background:#e3ded6}
-.step-dots span.cur{background:var(--primary,#e08a5b)}
-.step-dots span.done{background:#b9cfa4}
-.step-lead{font-size:.95rem;font-weight:700;margin:6px 0 12px;line-height:1.6}
-.step-lead span{font-weight:500;color:var(--text-mid,#7a7268);font-size:.86rem}
-.step-body .section.step-open{display:block;position:static;max-height:none;transform:none;
-  box-shadow:none;border-radius:12px;padding:14px;margin-bottom:14px}
-.step-search{margin-bottom:12px;position:relative}
-.step-search label{display:block;font-size:.82rem;font-weight:700;color:var(--text-mid,#7a7268);margin-bottom:4px}
-.step-search input{width:100%;padding:10px 12px;border:1.5px solid #ddd6cc;border-radius:9px;font-size:.95rem}
-.cand-card.cand-on{outline:3px solid var(--primary,#e08a5b);outline-offset:-1px}
-.step-foot{position:sticky;bottom:0;z-index:20;background:var(--bg,#fff);
-  padding:10px 0 14px;border-top:1px solid #eee6dc;margin-top:16px}
-.step-next{width:100%;padding:15px;border:none;border-radius:12px;font-size:1.02rem;font-weight:800;
-  background:var(--primary,#e08a5b);color:#fff;cursor:pointer}
-.step-next:disabled{background:#ded7cd;color:#fff;cursor:default}
-.step-foot .regen-btn{margin-top:8px}
-.step-exit{display:block;margin:10px auto 0;background:none;border:none;color:var(--text-mid,#7a7268);
-  font-size:.8rem;text-decoration:underline;cursor:pointer}
 </style>
 </head>
 <body>
@@ -750,9 +711,9 @@ function saveOpts(){
 // ── 履歴（いつもと違う味の判定用）──
 function loadHistory(){try{return JSON.parse(localStorage.getItem('kondate-history')||'[]');}catch(e){return [];}}
 function recordHistory(ids){
-  const byId={};[...(D.main||[]),...(D.single||[])].forEach(m=>{byId[m.id]=m;});
+  const genreById={};[...(D.main||[]),...(D.single||[])].forEach(m=>{genreById[m.id]=m.genre;});
   let h=loadHistory();const ts=Date.now();
-  ids.forEach(id=>{if(id){const m=byId[id]||{};h.push({id,genre:m.genre||'',protein:m.protein||'',tpl:m.tpl||'',ts});}});
+  ids.forEach(id=>{if(id)h.push({id,genre:genreById[id]||'',ts});});
   if(h.length>30)h=h.slice(h.length-30);
   localStorage.setItem('kondate-history',JSON.stringify(h));
 }
@@ -766,19 +727,6 @@ function applyVariety(pool){
   let p=pool.filter(m=>!recentIds.has(m.id)&&m.genre!==dominant);
   if(p.length>0)return p;
   p=pool.filter(m=>!recentIds.has(m.id));
-  return p.length>0?p:pool;
-}
-// 🆕2026-09-03 飽き対策（全モード・みかさん「同じメニューばかりで飽きた」）:
-//   直近14日に出た「同じ料理」と「同じ主材×味の型(tpl)」を候補から外す。外して空になるなら元の候補に戻す（何も出ない事故を作らない）
-function avoidRecent(pool){
-  const h=loadHistory();if(!h.length||!pool||pool.length<2)return pool;
-  const cut=Date.now()-14*24*3600*1000;
-  const recent=h.filter(x=>x.ts&&x.ts>=cut);
-  if(!recent.length)return pool;
-  const ids=new Set(recent.map(x=>x.id));
-  const combos=new Set(recent.filter(x=>x.tpl).map(x=>x.protein+'|'+x.tpl));
-  let p=pool.filter(m=>!ids.has(m.id)&&!(m.tpl&&combos.has(m.protein+'|'+m.tpl)));
-  if(p.length===0)p=pool.filter(m=>!ids.has(m.id));
   return p.length>0?p:pool;
 }
 // 手順(recipes.json)が無い料理向け：データのpointを表示
@@ -1251,7 +1199,7 @@ function generateSingle(opts,bentoIds,forcedDish){
     if(opts.bento)candidates=candidates.filter(s=>bentoIds.has(s.id));
     if(opts.keepOk){const f=candidates.filter(s=>s.keep_ok);if(f.length>0)candidates=f;}
     if(candidates.length===0){showError('この条件に合う1品メニューが見つかりませんでした。食材や調味料を増やしてみてください。');return;}
-    let pool=avoidRecent(candidates);
+    let pool=candidates;
     if(opts.favPriority&&st.favorites.size>0){const fp=pool.filter(s=>st.favorites.has(s.id));if(fp.length>0)pool=fp;}
     if(opts.variety){pool=applyVariety(pool);}
     dish=pick(pool);
@@ -1311,7 +1259,6 @@ function generateThreeDay(opts,bentoIds,forcedMain){
     if(day1Pool.length===0)day1Pool=batchMains;
     // 初日に使いたい食材があれば、1日目のメインはそれを使うものから選ぶ（2日目以降は自由）
     if(st.mainIng){const ip=day1Pool.filter(m=>usesIng(m,st.mainIng));if(ip.length>0)day1Pool=ip;}
-    day1Pool=avoidRecent(day1Pool);
     if(opts.favPriority&&st.favorites.size>0){const favPool=day1Pool.filter(m=>st.favorites.has(m.id));if(favPool.length>0)day1Pool=favPool;}
     if(opts.variety){day1Pool=applyVariety(day1Pool);}
     day1Main=pick(day1Pool);
@@ -1322,7 +1269,6 @@ function generateThreeDay(opts,bentoIds,forcedMain){
   if(day2Pool.length===0)day2Pool=batchMains.filter(m=>m.protein!==day1Main.protein&&m.id!==day1Main.id);
   if(day2Pool.length===0)day2Pool=batchMains.filter(m=>m.id!==day1Main.id);
   if(day2Pool.length===0)day2Pool=batchMains;
-  day2Pool=avoidRecent(day2Pool);
   const day2NewMain=pick(day2Pool);
   recordHistory([day1Main.id,day2NewMain.id]);
   const day3Carryover=pick(day2NewMain.carryover);
@@ -1806,7 +1752,7 @@ function newCandList(step, avoid){
   const {mains,sides,soups,nearMains,opts}=flowPools();
   let pool,fill=[];
   if(step===1){
-    pool=avoidRecent(mains);
+    pool=mains;
     if(opts.variety)pool=applyVariety(pool);
     fill=nearMains;
   }else if(step===2){
@@ -1831,7 +1777,7 @@ function newCandList(step, avoid){
   }
   // 候補の数。こんだてAI（みかさん作）はメイン候補を20〜25個出している。
   // 6個だと「選んだ気」がしないので、メイン選びだけ多めに出す。
-  return a.slice(0,step===1?(window.__stepUI?22:12):6);
+  return a.slice(0,step===1?12:6);
 }
 
 // こんだてAI（みかさん作）は、どの画面からも「← 食材を入力しなおす」で最初に戻れる。
@@ -1983,9 +1929,6 @@ function setupReturningUser(){
 // 「食材チェック済み」の有無で判定する（kondate_visitedは読み込み時に即セットされるため使えない）
 function setupFirstTimeGuide(){
   if(localStorage.getItem('kondate-i'))return; // 一度でも食材チェックが保存済みなら卒業
-  // ⚠️ 1画面1ステップのときは出さない。ガイドが指している部品（冷蔵庫ボタン等）が画面に無いので、
-  //    案内にならないうえ、上に重なって STEP の見出しを隠す（2026-09-05に実測）
-  if(typeof stepWanted==='function'&&stepWanted())return;
   showFirstTimeGuide();
 }
 
@@ -2112,7 +2055,6 @@ async function loadData(){
       });
     }
     init();
-    if(typeof stepInit==='function')stepInit(); // ⚠️ データが読めたあとで呼ぶ。先に呼ぶと updateCount が D を見て落ちる
   }catch(e){
     console.error('データの読み込みに失敗しました',e);
     document.getElementById('results').classList.remove('hidden');
@@ -2187,243 +2129,6 @@ async function setupBannerAd(){
     document.body.style.paddingBottom = '70px';
   }catch(e){ console.log('banner ad skipped:', e); }
 }
-
-/* ===== 1画面1ステップ（?ui=step で開く・2026-09-05 試作） =====================
-   みかさん「献立アプリを『1画面1ステップ』ってまだやってなかったっけ？」（9/5）
-   元ネタ = みかさん自作の こんだてAI（~/git/kondate-ai）の設計:
-     1画面1ステップ／「STEP 2 / メイン」で現在地を明示／メイン候補20〜25個／
-     どの画面にも「← 食材を入力しなおす」／選ぶ→「✅これで作ってみる」の2段階／
-     おまかせは無い／「🔍 これも候補に入れて出し直す」＋自由入力で候補の外へ行ける
-   🚨 いまのトップ画面は壊していない。`?ui=step` を付けたときだけ、この形になる。
-      （公開中のアプリなので、みかさんが実物を触って決めてから既定にする）
-============================================================================ */
-const STEP_NAMES=['食材','メイン','献立'];
-window.__stepUI=false;
-let stepState={n:1,cands:[],pickIdx:-1,extra:[]};
-
-function stepWanted(){
-  try{
-    const q=new URLSearchParams(location.search).get('ui');
-    if(q==='step'){localStorage.setItem('kondate-ui','step');return true;}
-    if(q==='classic'){localStorage.removeItem('kondate-ui');return false;}
-    return localStorage.getItem('kondate-ui')==='step';
-  }catch(e){return false;}
-}
-
-function stepInit(){
-  if(!stepWanted())return;
-  window.__stepUI=true;
-  document.body.classList.add('stepui');
-  // 🚨 setupFirstTimeGuide() は前のscriptブロックで先に走り終わっている（stepWantedがまだ無い）ので、
-  //    出てしまったガイドはここで消す。2026-09-05に実測で踏んだ順番の問題。
-  const g=document.getElementById('guide-bar'); if(g)g.remove();
-  const main=document.querySelector('main.container');
-  const wrap=document.createElement('div');
-  wrap.id='stepui';
-  wrap.innerHTML='<div class="step-head"><div class="step-now" id="step-now"></div>'
-    +'<div class="step-dots" id="step-dots"></div></div>'
-    +'<div class="step-body" id="step-body"></div>'
-    +'<div class="step-foot" id="step-foot"></div>'
-    +'<div id="step-stash" hidden></div>';
-  main.insertBefore(wrap,main.firstChild);
-  stepGo(1);
-}
-
-/* 画面を描き替える前に、使い回している部品を隠し場所へ戻す。
-   #ingredient-section と #seasoning-section は本体そのもの（作り直すとチェックが消える）。 */
-const STEP_KEEP=['ingredient-section','seasoning-section','results'];
-function stepStash(){
-  const st2=document.getElementById('step-stash');
-  if(!st2)return;
-  STEP_KEEP.forEach(id=>{const el=document.getElementById(id);if(el)st2.appendChild(el);});
-  const sv=document.querySelector('.servings-row'); if(sv)st2.appendChild(sv);
-  const bar=document.querySelector('.status-bar'); if(bar)st2.appendChild(bar);
-}
-
-function stepGo(n){
-  stepState.n=n;
-  const body=document.getElementById('step-body');
-  const foot=document.getElementById('step-foot');
-  document.getElementById('step-now').textContent='STEP '+n+' / '+STEP_NAMES[n-1];
-  document.getElementById('step-dots').innerHTML=STEP_NAMES.map((nm,i)=>
-    '<span class="'+(i+1<n?'done':i+1===n?'cur':'')+'"></span>').join('');
-  stepStash(); // 🚨 innerHTML='' の前に、使い回す部品を退避する。
-               //    しないと冷蔵庫のチェックごと消える（2026-09-05に実測で踏んだ）
-  body.innerHTML=''; foot.innerHTML='';
-  if(n===1)stepScreenIng(body,foot);
-  else if(n===2)stepScreenMain(body,foot);
-  else stepScreenResult(body,foot);
-  foot.appendChild(stepExitLink());
-  window.scrollTo({top:0,behavior:'smooth'});
-}
-
-/* ---- STEP 1 / 食材 ---- */
-function stepScreenIng(body,foot){
-  body.appendChild(stepLead('冷蔵庫にあるものにチェックを入れてください。','ここで入れたものだけで献立を組みます。'));
-  const sv=document.querySelector('.servings-row');
-  if(sv)body.appendChild(sv);
-  ['ingredient-section','seasoning-section'].forEach(id=>{
-    const el=document.getElementById(id);
-    if(!el)return;
-    el.classList.remove('panel','hidden');
-    el.classList.add('step-open');
-    body.appendChild(el);
-  });
-  const bar=document.querySelector('.status-bar');
-  if(bar)foot.appendChild(bar);
-  const next=document.createElement('button');
-  next.className='step-next';
-  next.textContent='次へ：メインを選ぶ →';
-  next.onclick=()=>{
-    const {mains,nearMains}=flowPools();
-    if(mains.length===0&&nearMains.length===0){
-      alert('いまのチェックだと、作れるメインが見つかりませんでした。冷蔵庫か調味料のチェックを増やしてみてください。');
-      return;
-    }
-    stepState.extra=[]; stepState.pickIdx=-1;
-    stepGo(2);
-  };
-  foot.appendChild(next);
-  if(typeof updateCount==='function')updateCount();
-}
-
-/* ---- STEP 2 / メイン ---- */
-function stepScreenMain(body,foot){
-  body.appendChild(stepLead('作りたいメインを1つ選んでください。','これを1日目にして、3日分を組み立てます。'));
-  const search=document.createElement('div');
-  search.className='step-search';
-  search.innerHTML='<label>🔍 これも候補に入れて出し直す</label>'
-    +'<input type="text" id="step-q" placeholder="料理名や食材で探す（例：なす／回鍋肉）" autocomplete="off" oninput="stepSearch(this.value)">'
-    +'<div id="step-sugg" class="menu-suggestions" style="display:none"></div>';
-  body.appendChild(search);
-  const grid=document.createElement('div');
-  grid.className='cand-grid'; grid.id='step-grid';
-  body.appendChild(grid);
-  const again=document.createElement('button');
-  again.className='regen-btn';
-  again.textContent='🔄 別の候補を見る';
-  again.onclick=()=>{stepState.cands=null;stepState.pickIdx=-1;stepRenderCands(true);};
-  body.appendChild(again);
-  stepRenderCands(false);
-  const go=document.createElement('button');
-  go.className='step-next'; go.id='step-confirm'; go.disabled=true;
-  go.textContent='✅ これで作ってみる';
-  go.onclick=()=>{ if(stepState.pickIdx>=0)stepGo(3); };
-  foot.appendChild(go);
-  foot.appendChild(stepBackBtn());
-}
-
-function stepRenderCands(reshuffle){
-  const avoid=reshuffle&&stepState.lastIds?new Set(stepState.lastIds):null;
-  const list=newCandList(1,avoid);
-  const seen=new Set(list.map(x=>x.id));
-  const extra=(stepState.extra||[]).filter(x=>!seen.has(x.id));
-  stepState.cands=[...extra,...list];
-  stepState.lastIds=stepState.cands.map(x=>x.id);
-  const grid=document.getElementById('step-grid');
-  grid.innerHTML=stepState.cands.map((c,i)=>{
-    const miss=missingIngredients(c), sub=substitutions(c);
-    const on=stepState.pickIdx===i?' cand-on':'';
-    return '<button class="cand-card'+(miss.length?' cand-near':'')+on+'" onclick="stepPick('+i+')">'
-      +'<div class="cand-name">'+c.name+'</div>'
-      +'<div class="cand-meta">'+(c.genre||'')+(c.ingredients&&c.ingredients.length?'｜'+c.ingredients.slice(0,3).join('・'):'')+'</div>'
-      +(sub.length?'<div class="cand-sub">🔄 '+sub.map(x=>x.from+'→'+x.to).join('・')+' で代用<small>'+sub[0].why+'</small></div>':'')
-      +(miss.length?'<div class="cand-miss">🛒 '+miss.join('・')+' があれば作れます</div>':'')
-      +'</button>';
-  }).join('');
-}
-
-/* 選ぶ → 確かめる の2段階。タップしただけでは先に進まない */
-function stepPick(i){
-  stepState.pickIdx=i;
-  const grid=document.getElementById('step-grid');
-  [...grid.children].forEach((el,idx)=>el.classList.toggle('cand-on',idx===i));
-  const btn=document.getElementById('step-confirm');
-  btn.disabled=false;
-  btn.textContent='✅ 「'+stepState.cands[i].name+'」で作ってみる';
-}
-
-/* 候補の外へ行く。料理名でも食材名でも受ける（トップの検索欄と同じ探し方） */
-function stepSearch(q){
-  const box=document.getElementById('step-sugg');
-  q=(q||'').trim();
-  if(!q){box.style.display='none';box.innerHTML='';return;}
-  const hits=[];
-  const ings=new Set();
-  (D.main||[]).forEach(m=>(m.ingredients||[]).forEach(i=>{if(i.includes(q))ings.add(i);}));
-  [...ings].slice(0,3).forEach(i=>{
-    const n=(D.main||[]).filter(m=>usesIng(m,i)).length;
-    hits.push({kind:'ing',key:i,name:i,cat:'食材 '+n+'品'});
-  });
-  (D.main||[]).forEach(m=>{if(m.name.includes(q))hits.push({kind:'menu',key:m.id,name:m.name,cat:'主菜'});});
-  box.innerHTML=hits.length===0
-    ? '<div class="menu-suggest-empty">見つかりませんでした（登録されている料理と食材から探します）</div>'
-    : hits.slice(0,8).map(h=>'<div class="menu-suggest-item" onclick="stepAdd(\''+h.kind+'\',\''+h.key+'\')"><span>'+h.name+'</span><span class="menu-suggest-cat">'+h.cat+'</span></div>').join('');
-  box.style.display='block';
-}
-
-function stepAdd(kind,key){
-  if(kind==='ing'){
-    (D.main||[]).filter(m=>usesIng(m,key)).slice(0,8).forEach(m=>{
-      if(!stepState.extra.some(x=>x.id===m.id))stepState.extra.push(m);
-    });
-  }else{
-    const m=(D.main||[]).find(x=>x.id===key);
-    if(m&&!stepState.extra.some(x=>x.id===m.id))stepState.extra.unshift(m);
-  }
-  document.getElementById('step-q').value='';
-  document.getElementById('step-sugg').style.display='none';
-  stepState.pickIdx=-1;
-  const btn=document.getElementById('step-confirm');
-  btn.disabled=true; btn.textContent='✅ これで作ってみる';
-  stepRenderCands(false);
-}
-
-/* ---- STEP 3 / 献立 ---- */
-function stepScreenResult(body,foot){
-  const item=stepState.cands[stepState.pickIdx];
-  const res=document.getElementById('results');
-  body.appendChild(res);
-  const opts=getOpts();
-  const bentoIds=new Set((D._meta&&D._meta.bento_ids)||[]);
-  generateThreeDay(opts,bentoIds,item);
-  const again=document.createElement('button');
-  again.className='regen-btn';
-  again.textContent='← メインを選び直す';
-  again.onclick=()=>stepGo(2);
-  foot.appendChild(again);
-  foot.appendChild(stepBackBtn());
-}
-
-function stepBackBtn(){
-  const b=document.createElement('button');
-  b.className='regen-btn';
-  b.textContent='← 食材を入力しなおす';
-  b.onclick=()=>{
-    const res=document.getElementById('results');
-    if(res){res.classList.add('hidden');res.innerHTML='';}
-    stepGo(1);
-  };
-  return b;
-}
-
-/* ⚠️ ?ui=step は端末に覚える（毎回URLを打たなくていいように）。
-   覚えたままだと戻れなくなるので、どの画面からも1タップで従来の形に戻せるようにしておく。 */
-function stepExitLink(){
-  const a=document.createElement('button');
-  a.className='step-exit';
-  a.textContent='いままでの画面に戻す';
-  a.onclick=()=>{try{localStorage.removeItem('kondate-ui');}catch(e){}location.href=location.pathname+'?ui=classic';};
-  return a;
-}
-
-function stepLead(a,b){
-  const d=document.createElement('p');
-  d.className='step-lead';
-  d.innerHTML=a+(b?'<br><span>'+b+'</span>':'');
-  return d;
-}
-
 setTimeout(setupBannerAd, 1500);
 </script>
 </body>
