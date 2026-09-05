@@ -108,7 +108,11 @@ details[open]>.group-summary::before{transform:rotate(90deg)}
 .day-card:nth-child(3){animation-delay:.2s}
 @keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
 .day-label{padding:14px 18px;font-family:var(--serif);font-weight:700;font-size:.88rem;color:#fff;letter-spacing:.05em;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
-.reroll-btn{margin-left:auto;background:rgba(255,255,255,.22);border:1px solid rgba(255,255,255,.5);color:#fff;font-size:.72rem;font-weight:600;padding:5px 10px;border-radius:999px;cursor:pointer;font-family:var(--sans)}
+/* 🆕2026-09-05 みかさん「ボタンを3つにして横並びにする」
+   ⚠️ 前は .reroll-btn に margin-left:auto が付いていて、1つずつ右へ押し出されて縦に積まれていた。 */
+.reroll-lead{width:100%;margin-top:9px;font-family:var(--sans);font-weight:400;font-size:.7rem;opacity:.85;letter-spacing:.02em}
+.reroll-row{display:flex;gap:6px;width:100%;margin-top:5px}
+.reroll-btn{flex:1;min-width:0;background:rgba(255,255,255,.22);border:1px solid rgba(255,255,255,.5);color:#fff;font-size:.7rem;font-weight:600;padding:6px 4px;border-radius:999px;cursor:pointer;font-family:var(--sans);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .reroll-btn:active{background:rgba(255,255,255,.35)}
 .day1 .day-label{background:#C85A35}
 .day2 .day-label{background:#4A8C6F}
@@ -122,13 +126,24 @@ details[open]>.group-summary::before{transform:rotate(90deg)}
 .menu-note{font-size:.76rem;color:var(--text-light);margin-top:2px}
 .nutri-badge{font-size:.8rem;color:#5c5148;background:#f6f2ea;border-radius:8px;padding:7px 10px;margin-top:10px}
 .nutri-note{display:block;font-size:.68rem;color:#a39a8f;margin-top:3px}
-.micro-row{display:flex;gap:6px;flex-wrap:wrap;justify-content:center;margin-top:10px}
-.micro{font-size:.76rem;padding:5px 10px;border-radius:12px;background:#f6f2ea;color:#5c5148;font-weight:600}
-.micro small{display:block;font-size:.64rem;font-weight:400;color:#a39a8f;margin-top:1px}
+/* 🆕2026-09-05 みかさん「栄養バランスの説明の場所が大きすぎかな。使いやすいUIUXが最優先です」
+   → 3つを1行に畳んだ（実測 159px → 26px）。中身（何から取れているか・注記・補える食材）は
+     「詳しく」を開いたときだけ。⚠️消していない。献立の主役ではなく、確認したい人が確認するもの、という置き方。 */
+.micro-row{display:flex;gap:5px;justify-content:center;align-items:stretch;margin-top:8px}
+.micro{flex:1;min-width:0;font-size:.72rem;padding:5px 4px;border-radius:9px;background:#f6f2ea;color:#5c5148;
+  font-weight:600;text-align:center;line-height:1.3}
+.micro small{display:none}
 .micro.good{background:#eef5e8;color:#4a6b3a}
 .micro.none{background:#fff3e6;color:#a8590f}
-.micro-note{flex-basis:100%;text-align:center;font-size:.66rem;color:#a39a8f;margin-top:2px}
-.micro-hint{margin-top:8px;font-size:.74rem;color:#a8590f;background:#fff3e6;border-radius:10px;padding:6px 12px;display:inline-block}
+.micro-more{margin-top:6px;text-align:center}
+.micro-more summary{display:inline-block;list-style:none;font-size:.72rem;color:var(--text-light);
+  cursor:pointer;padding:3px 8px}
+.micro-more summary::-webkit-details-marker{display:none}
+.micro-more[open] summary{color:var(--text-mid)}
+.micro-detail{font-size:.7rem;color:#a39a8f;text-align:left;padding:6px 2px 0;line-height:1.6}
+.micro-detail b{color:#5c5148;font-weight:600}
+.micro-hint{margin-top:6px;font-size:.72rem;color:#a8590f;background:#fff3e6;border-radius:9px;padding:6px 10px;
+  display:block;text-align:left;line-height:1.6}
 .toriwake{font-size:.76rem;color:var(--green);margin-top:3px}
 .carryover-row{border-left:2px solid var(--green);padding-left:12px;margin-left:0}
 .new-dish-row{border-left:2px solid var(--primary);padding-left:12px;margin-left:0}
@@ -1610,32 +1625,54 @@ let curPlan=null,planCtx=null;
 // 🆕2026-08-23みかさん「メインは固定して副菜以降を別メニュー探したいときある」
 //   rerollDay() は**メインごと**替えてしまうので、メインが気に入ったときに使えなかった。
 //   こちらは**メインと繰り越しには一切触らず**、副菜と汁物だけ振り直す。
-function rerollSides(n){
+// 🆕2026-09-05 みかさん「副菜と汁ものを分けて、汁物だけ別メニュー探せるようにしよう」
+//   → 「副菜・汁物だけ替える」を、副菜だけ／汁物だけ の2本に割った。
+//   ⚠️ 汁物には「1日目に多めに作って2日目に続ける」型がある。片方だけ替えると
+//     Day1とDay2で違う汁物になって“続き”の表示と食い違うので、続きのときは一緒に動かす。
+const _excl=(pool,id)=>{const f=pool.filter(x=>x.id!==id);return f.length>0?f:pool;};
+
+function rerollSide(n){
   if(!curPlan||!planCtx)return;
-  const p=curPlan,{sides,soups}=planCtx;
-  const excl=(pool,id)=>{const f=pool.filter(x=>x.id!==id);return f.length>0?f:pool;};
-  if(sides.length<2&&soups.length<2){showError('他に出せる副菜・汁物が今の条件にありません。チェックを増やすと候補が増えます。');return;}
+  const p=curPlan,{sides}=planCtx;
+  if(sides.length<2){showError('他に出せる副菜が今の条件にありません。チェックを増やすと候補が増えます。');return;}
   if(n===1){
     const ms=sides.filter(x=>x.makeahead);
-    p.day1.side=pick(excl(ms.length>0?ms:sides,p.day1.side.id));
-    const bs=soups.filter(x=>x.batch);
-    const wasCont=p.day2.soupNote&&p.day2.soupNote.includes('続き');
-    p.day1.soup=pick(excl(bs.length>0?bs:soups,p.day1.soup.id));
-    if(wasCont)p.day2.soup=p.day1.soup;   // 2日目に持ち越している汁物は、ずれないように合わせる
+    p.day1.side=pick(_excl(ms.length>0?ms:sides,p.day1.side.id));
   }else if(n===2){
-    p.day2.side=pick(excl(sides,p.day2.side.id));
-    if(!(p.day2.soupNote&&p.day2.soupNote.includes('続き'))){p.day2.soup=pick(excl(soups,p.day2.soup.id));}
+    p.day2.side=pick(_excl(sides,p.day2.side.id));
   }else{
-    p.day3.side=pick(excl(sides,p.day3.side.id));
-    p.day3.soup=pick(excl(soups,p.day3.soup.id));
+    p.day3.side=pick(_excl(sides,p.day3.side.id));
   }
   renderThreeDayResults(p);   // ⚠️メインを触っていないので genreLabel は作り直さない
+}
+
+function rerollSoup(n){
+  if(!curPlan||!planCtx)return;
+  const p=curPlan,{soups}=planCtx;
+  if(soups.length<2){showError('他に出せる汁物が今の条件にありません。チェックを増やすと候補が増えます。');return;}
+  const cont=!!(p.day2.soupNote&&p.day2.soupNote.includes('続き'));
+  if(n===1){
+    const bs=soups.filter(x=>x.batch);
+    p.day1.soup=pick(_excl(bs.length>0?bs:soups,p.day1.soup.id));
+    if(cont)p.day2.soup=p.day1.soup;   // 2日目に続く汁物は、ずれないように合わせる
+  }else if(n===2){
+    if(cont){
+      const bs=soups.filter(x=>x.batch);
+      p.day1.soup=pick(_excl(bs.length>0?bs:soups,p.day1.soup.id));
+      p.day2.soup=p.day1.soup;   // Day2は「Day1の続き」なので、2日ぶん一緒に動かす
+    }else{
+      p.day2.soup=pick(_excl(soups,p.day2.soup.id));
+    }
+  }else{
+    p.day3.soup=pick(_excl(soups,p.day3.soup.id));
+  }
+  renderThreeDayResults(p);
 }
 
 function rerollDay(n){
   if(!curPlan||!planCtx)return;
   const p=curPlan,{batchMains,sides,soups}=planCtx;
-  const excl=(pool,id)=>{const f=pool.filter(x=>x.id!==id);return f.length>0?f:pool;};
+  const excl=_excl;
   if(n===1){
     if(batchMains.length<2){showError('他に出せるメインが今の条件にありません。チェックを増やすと候補が増えます。');return;}
     p.day1.main=pick(excl(batchMains.filter(m=>m.id!==p.day2.newMain.id),p.day1.main.id));
@@ -1705,15 +1742,27 @@ function renderThreeDayResults(plan){
       ${buyMiss.length?`<p class="buy-note">🛒 買い足し：${buyMiss.join('・')}</p>`:''}
       ${subAll.length?`<p class="sub-note">🔄 ${subAll.map(x=>x.from+'→'+x.to).join('・')} で代用します<small>${[...new Set(subAll.map(x=>x.why))].join(' / ')}</small></p>`:''}
       <div class="micro-row">${[micro.ca,micro.fe,micro.zn].map(m=>
-        `<span class="micro ${m.days>=2?'good':m.days===1?'some':'none'}">${m.label} ${m.days>=2?'◎':m.days===1?'○':'△'}${m.src.length?`<small>${m.src.join('・')}</small>`:''}</span>`).join('')}
-        <span class="micro-note">3日ぶんの目安（材料名から自動判定）。△の日は、下の「補える食材」からどうぞ</span>
+        `<span class="micro ${m.days>=2?'good':m.days===1?'some':'none'}">${m.label} ${m.days>=2?'◎':m.days===1?'○':'△'}</span>`).join('')}
       </div>
-      ${[micro.ca,micro.fe,micro.zn].some(m=>m.days===0)?`<p class="micro-hint">🥛 ${[micro.ca,micro.fe,micro.zn].filter(m=>m.days===0).map(m=>
-        m.label+'を補うなら'+(m.label==='カルシウム'?'：牛乳・チーズ・豆腐・小松菜・しらす':m.label==='鉄'?'：ほうれん草・小松菜・納豆・あさり・牛こま':'：たまご・納豆・チーズ・牛こま・えび')).join(' / ')}</p>`:''}
+      <details class="micro-more">
+        <summary>▾ 栄養バランスの中身を見る</summary>
+        <div class="micro-detail">
+          ${[micro.ca,micro.fe,micro.zn].map(m=>`<div><b>${m.label} ${m.days>=2?'◎':m.days===1?'○':'△'}</b>${m.src.length?'　'+m.src.join('・'):'　（3日ぶんで見当たりませんでした）'}</div>`).join('')}
+          <div style="margin-top:5px">3日ぶんの目安です（材料名から自動で見ています）。</div>
+          ${[micro.ca,micro.fe,micro.zn].some(m=>m.days===0)?`<p class="micro-hint">🥛 ${[micro.ca,micro.fe,micro.zn].filter(m=>m.days===0).map(m=>
+            m.label+'を補うなら'+(m.label==='カルシウム'?'：牛乳・チーズ・豆腐・小松菜・しらす':m.label==='鉄'?'：ほうれん草・小松菜・納豆・あさり・牛こま':'：たまご・納豆・チーズ・牛こま・えび')).join(' / ')}</p>`:''}
+        </div>
+      </details>
     </div>
     <div class="day-cards">
       <div class="day-card day1">
-        <div class="day-label">🔪 Day1<small>仕込み・多めに作る</small><button class="reroll-btn" onclick="rerollDay(1)">🎲 別メニューを提案し直す</button><button class="reroll-btn" onclick="rerollSides(1)">🥗 副菜・汁物だけ替える</button></div>
+        <div class="day-label">🔪 Day1<small>仕込み・多めに作る</small>
+          <div class="reroll-lead">🔁 別のものに替える</div>
+          <div class="reroll-row">
+            <button class="reroll-btn" onclick="rerollDay(1)">🎲 メイン</button>
+            <button class="reroll-btn" onclick="rerollSide(1)">🥗 副菜</button>
+            <button class="reroll-btn" onclick="rerollSoup(1)">🍲 汁物</button>
+          </div></div>
         <div class="day-body">
           ${combinedHtml(wf1Items)}
           <div class="dish-extras">
@@ -1726,7 +1775,13 @@ function renderThreeDayResults(plan){
       </div>
       <div class="carryover-flow">${plan.day1.main.name} → ${plan.day2.carryover.n}</div>
       <div class="day-card day2">
-        <div class="day-label">🍳 Day2<small>繰り越し＋もうひと品</small><button class="reroll-btn" onclick="rerollDay(2)">🎲 別メニューを提案し直す</button><button class="reroll-btn" onclick="rerollSides(2)">🥗 副菜・汁物だけ替える</button></div>
+        <div class="day-label">🍳 Day2<small>繰り越し＋もうひと品</small>
+          <div class="reroll-lead">🔁 別のものに替える</div>
+          <div class="reroll-row">
+            <button class="reroll-btn" onclick="rerollDay(2)">🎲 メイン</button>
+            <button class="reroll-btn" onclick="rerollSide(2)">🥗 副菜</button>
+            <button class="reroll-btn" onclick="rerollSoup(2)">🍲 汁物</button>
+          </div></div>
         <div class="day-body">
           ${combinedHtml(wf2Items)}
           <div class="dish-extras">
@@ -1740,7 +1795,14 @@ function renderThreeDayResults(plan){
       </div>
       <div class="carryover-flow">${plan.day2.newMain.name} → ${plan.day3.carryover.n}</div>
       <div class="day-card day3">
-        <div class="day-label">✨ Day3<small>繰り越し・ラクする日</small><button class="reroll-btn" onclick="rerollDay(3)">🎲 別メニューを提案し直す</button><button class="reroll-btn" onclick="rerollSides(3)">🥗 副菜・汁物だけ替える</button></div>
+        <div class="day-label">✨ Day3<small>繰り越し・ラクする日</small>
+          <!-- ⚠️Day3は前日からの繰り越しの日で、この日だけの主菜が無い。
+               替えられるのは副菜と汁物だけなので、ここは2つにしてある（3つ目を出しても押せる中身が無い）。 -->
+          <div class="reroll-lead">🔁 別のものに替える</div>
+          <div class="reroll-row">
+            <button class="reroll-btn" onclick="rerollSide(3)">🥗 副菜</button>
+            <button class="reroll-btn" onclick="rerollSoup(3)">🍲 汁物</button>
+          </div></div>
         <div class="day-body">
           ${combinedHtml(wf3Items)}
           <div class="dish-extras">
