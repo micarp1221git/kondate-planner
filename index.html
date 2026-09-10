@@ -653,6 +653,33 @@ function findMenuById(id){
   if(s)return {item:s,kind:'single'};
   return null;
 }
+
+// 🔎 ひらがなで打っても当たる検索（2026-09-10 みかさん「とりもも持ってひらがなで打つと検索出てこなかった」）
+//   ①カタカナ→ひらがな・全角→半角・「ー」と空白は無視して、打った字と登録名を同じ形に揃える
+//   ②漢字は読み方の表で、ひらがなに置き換えたものも候補にする（鶏もも肉 → とりももにく）
+//   ⭐ 元の名前でも読みでも当たるように「足す」だけ。当たりが増えるだけで、減ることはない
+const YOMI={'カレイ切り身(骨なし)':'かれいきりみほねなし','豚ロースブロック':'ぶたろーすぶろっく','いわし蒲焼き缶':'いわしかばやきかん','豚バラブロック':'ぶたばらぶろっく','豚ロース薄切り':'ぶたろーすうすぎり','さば味噌煮缶':'さばみそにかん','カレイ切り身':'かれいきりみ','サワラ切り身':'さわらきりみ','豚バラ薄切り':'ぶたばらうすぎり','さば水煮缶':'さばみずにかん','ちんげん菜':'ちんげんさい','ほうれん草':'ほうれんそう','タラ切り身':'たらきりみ','ブリ切り身':'ぶりきりみ','合いびき肉':'あいびきにく','大根おろし':'だいこんおろし','大豆水煮缶':'だいずみずにかん','骨取りサバ':'ほねとりさば','鮭切り身':'さけきりみ','鯛切り身':'たいきりみ','焼き鳥缶':'やきとりかん','粉チーズ':'こなちーず','豚ロース':'ぶたろーす','豚ひき肉':'ぶたひきにく','餃子の皮':'ぎょうざのかわ','鶏もも肉':'とりももにく','鶏むね肉':'とりむねにく','鶏ひき肉':'とりひきにく','から揚げ':'からあげ','照り焼き':'てりやき','生姜焼き':'しょうがやき','肉じゃが':'にくじゃが','青椒肉絲':'ちんじゃおろーす','厚揚げ':'あつあげ','油揚げ':'あぶらあげ','太刀魚':'たちうお','小松菜':'こまつな','小麦粉':'こむぎこ','手羽元':'てばもと','手羽先':'てばさき','片栗粉':'かたくりこ','牛こま':'ぎゅうこま','玉ねぎ':'たまねぎ','米少々':'こめしょうしょう','豚バラ':'ぶたばら','豚こま':'ぶたこま','豚ヒレ':'ぶたひれ','長ねぎ':'ながねぎ','唐揚げ':'からあげ','回鍋肉':'ほいこーろー','春巻き':'はるまき','手作り':'てづくり','塩麹':'しおこうじ','大根':'だいこん','春雨':'はるさめ','生姜':'しょうが','白菜':'はくさい','豆腐':'とうふ','里芋':'さといも','玉子':'たまご','野菜':'やさい','味噌':'みそ','醤油':'しょうゆ','人参':'にんじん','茄子':'なす','南瓜':'かぼちゃ','麻婆':'まーぼー','酢豚':'すぶた','餃子':'ぎょうざ','南蛮':'なんばん','甘辛':'あまから','炒め':'いため','焼き':'やき','揚げ':'あげ','蒸し':'むし','漬け':'づけ','和え':'あえ','巻き':'まき','大葉':'おおば','鶏':'とり','豚':'ぶた','牛':'ぎゅう','肉':'にく','魚':'さかな','卵':'たまご','煮':'に','丼':'どん','鍋':'なべ','汁':'しる','飯':'めし','粥':'かゆ','塩':'しお','油':'あぶら','風':'ふう','梅':'うめ',};
+const YOMI_KEYS=Object.keys(YOMI);
+function kanaNorm(s){
+  return String(s||'')
+    .replace(/[\u30a1-\u30f6]/g,c=>String.fromCharCode(c.charCodeAt(0)-0x60))
+    .replace(/[\uff01-\uff5e]/g,c=>String.fromCharCode(c.charCodeAt(0)-0xfee0))
+    .replace(/[ー・\s\u3000]/g,'').toLowerCase();
+}
+function kanaKeys(name){
+  const out=[kanaNorm(name)];
+  if(YOMI[name])out.push(kanaNorm(YOMI[name]));
+  let t=String(name||'');
+  YOMI_KEYS.forEach(k=>{if(t.includes(k))t=t.split(k).join(YOMI[k]);});
+  const y=kanaNorm(t);
+  if(!out.includes(y))out.push(y);
+  return out;
+}
+function kanaHit(name,q){
+  const nq=kanaNorm(q);
+  if(!nq)return false;
+  return kanaKeys(name).some(k=>k.includes(nq));
+}
 // 料理名でも食材名でも受ける。チップに出ない食材（なす・れんこん等）はここから指定できる
 function onMenuSearch(q){
   const box=document.getElementById('menu-suggestions');
@@ -661,13 +688,13 @@ function onMenuSearch(q){
   const hits=[];
   // 食材を先に出す（「なす」と打った人が欲しいのは、なすの料理ぜんぶ）
   const ings=new Set();
-  (D.main||[]).forEach(m=>(m.ingredients||[]).forEach(i=>{if(i.includes(q))ings.add(i);}));
+  (D.main||[]).forEach(m=>(m.ingredients||[]).forEach(i=>{if(kanaHit(i,q))ings.add(i);}));
   [...ings].slice(0,4).forEach(i=>{
     const n=(D.main||[]).filter(m=>usesIng(m,i)).length;
     hits.push({kind:'ing',key:i,name:i,cat:`食材 ${n}品`});
   });
-  (D.main||[]).forEach(m=>{if(m.name.includes(q))hits.push({kind:'menu',key:m.id,name:m.name,cat:'主菜'});});
-  (D.single||[]).forEach(s=>{if(s.name.includes(q))hits.push({kind:'menu',key:s.id,name:s.name,cat:'1品'});});
+  (D.main||[]).forEach(m=>{if(kanaHit(m.name,q))hits.push({kind:'menu',key:m.id,name:m.name,cat:'主菜'});});
+  (D.single||[]).forEach(s=>{if(kanaHit(s.name,q))hits.push({kind:'menu',key:s.id,name:s.name,cat:'1品'});});
   if(hits.length===0){
     box.innerHTML='<div class="menu-suggest-empty">見つかりませんでした（登録されている料理と食材から探します）</div>';
   }else{
@@ -2410,12 +2437,12 @@ function stepSearch(q){
   if(!q){box.style.display='none';box.innerHTML='';return;}
   const hits=[];
   const ings=new Set();
-  (D.main||[]).forEach(m=>(m.ingredients||[]).forEach(i=>{if(i.includes(q))ings.add(i);}));
+  (D.main||[]).forEach(m=>(m.ingredients||[]).forEach(i=>{if(kanaHit(i,q))ings.add(i);}));
   [...ings].slice(0,3).forEach(i=>{
     const n=(D.main||[]).filter(m=>usesIng(m,i)).length;
     hits.push({kind:'ing',key:i,name:i,cat:'食材 '+n+'品'});
   });
-  (D.main||[]).forEach(m=>{if(m.name.includes(q))hits.push({kind:'menu',key:m.id,name:m.name,cat:'主菜'});});
+  (D.main||[]).forEach(m=>{if(kanaHit(m.name,q))hits.push({kind:'menu',key:m.id,name:m.name,cat:'主菜'});});
   box.innerHTML=hits.length===0
     ? '<div class="menu-suggest-empty">見つかりませんでした（登録されている料理と食材から探します）</div>'
     : hits.slice(0,8).map(h=>'<div class="menu-suggest-item" onclick="stepAdd(\''+h.kind+'\',\''+h.key+'\')"><span>'+h.name+'</span><span class="menu-suggest-cat">'+h.cat+'</span></div>').join('');
