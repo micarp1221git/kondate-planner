@@ -1367,6 +1367,46 @@ function generateThreeDay(opts,bentoIds,forcedMain){
   const day2NewMain=pick(day2Pool);
   recordHistory([day1Main.id,day2NewMain.id]);
   const day3Carryover=pick(day2NewMain.carryover);
+
+// 🍳 味のかぶりを避ける（2026-09-10 みかさん「オイスターソースなど味が同じになってしまう調味料レシピは、被らないようにだして」）
+//   ⭐ 塩・こしょう・醤油・酒・みりん・だし・にんにくのような土台の調味料は、かぶって当たり前なので数えない。
+//      数えるのは「食べたときに同じ味だと分かるもの」だけ。
+//   ⚠️ かぶらない候補が1つも無いときは、絞らずに元のまま出す（献立が組めなくなるほうが困る）。
+const TASTE_GROUP={
+  'オイスター':'オイスター','味噌':'味噌','ケチャップ':'トマト','ソース':'ソース','ウスターソース':'ソース',
+  'カレー粉':'カレー','カレールー':'カレー','ターメリック':'カレー','クミン':'カレー',
+  'ポン酢':'ポン酢','酢':'酢','レモン':'レモン','ナンプラー':'エスニック',
+  'コチュジャン':'韓国','キムチ':'韓国','マヨネーズ':'マヨ',
+  'ごまだれ':'ごまだれ','ごまだれ or マヨ':'ごまだれ','塩昆布':'塩昆布',
+  'バター':'バター','チーズ':'チーズ','粉チーズ':'チーズ','牛乳':'クリーム','わさび':'わさび','めんつゆ':'めんつゆ'
+};
+function tasteSet(x){
+  const out=new Set();
+  ((x&&x.seasonings)||[]).forEach(s=>{const g=TASTE_GROUP[s];if(g)out.add(g);});
+  // 調味料が書かれていない料理のために、名前からも拾う
+  const n=(x&&x.name)||'';
+  if(/オイスター/.test(n))out.add('オイスター');
+  if(/味噌|みそ/.test(n))out.add('味噌');
+  if(/カレー/.test(n))out.add('カレー');
+  if(/ポン酢/.test(n))out.add('ポン酢');
+  if(/甘酢|酢の物|マリネ|南蛮|酢豚/.test(n))out.add('酢');
+  if(/塩昆布/.test(n))out.add('塩昆布');
+  if(/キムチ/.test(n))out.add('韓国');
+  if(/チーズ/.test(n))out.add('チーズ');
+  else if(/クリーム|グラタン|シチュー/.test(n))out.add('クリーム');
+  return out;
+}
+function tasteClash(a,b){
+  if(!a||!b)return false;
+  const A=tasteSet(a); if(A.size===0)return false;
+  for(const t of tasteSet(b)) if(A.has(t)) return true;
+  return false;
+}
+function avoidTaste(pool,...others){
+  if(!pool||pool.length===0)return pool;
+  const ok=pool.filter(x=>!others.some(o=>tasteClash(x,o)));
+  return ok.length>0?ok:pool;
+}
   const makeaheadSides=shuffle(sides.filter(s=>s.makeahead));
   const freshSides=shuffle(sides.filter(s=>!s.makeahead));
   const allSidesShuffled=shuffle(sides);
@@ -1374,10 +1414,10 @@ function generateThreeDay(opts,bentoIds,forcedMain){
   function pickSide(pool){const av=pool.filter(s=>!usedSideIds.has(s.id));if(av.length===0)return pick(pool.length>0?pool:sides);const s=av[0];usedSideIds.add(s.id);return s;}
   let d1SidePool=makeaheadSides.filter(s=>genreMatch(s,day1Main.genre));
   if(nutriCount(day1Main,'green')===0){const gp=d1SidePool.filter(s=>nutriCount(s,'green')>0);if(gp.length>0)d1SidePool=gp;}
-  const day1Side=pickSide(d1SidePool.length>0?d1SidePool:makeaheadSides.length>0?makeaheadSides:allSidesShuffled);
+  const day1Side=pickSide(avoidTaste(d1SidePool.length>0?d1SidePool:makeaheadSides.length>0?makeaheadSides:allSidesShuffled,day1Main));
   let d2SidePool=freshSides.length>0?freshSides:allSidesShuffled;
   if(nutriCount(day2NewMain,'green')===0){const gp=d2SidePool.filter(s=>nutriCount(s,'green')>0);if(gp.length>0)d2SidePool=gp;}
-  const day2Side=pickSide(d2SidePool);
+  const day2Side=pickSide(avoidTaste(d2SidePool,day2NewMain));
   let d3SidePool=allSidesShuffled.filter(s=>genreMatch(s,day2NewMain.genre)&&!usedSideIds.has(s.id));
   if(nutriCount(day2NewMain,'green')===0){const gp=d3SidePool.filter(s=>nutriCount(s,'green')>0);if(gp.length>0)d3SidePool=gp;}
   // 2026-08-19 みかさん「カルシウム・鉄・亜鉛を普通の食事から」
@@ -1391,17 +1431,17 @@ function generateThreeDay(opts,bentoIds,forcedMain){
       if(fix.length>0)d3SidePool=fix;
     }
   }
-  const day3Side=pickSide(d3SidePool.length>0?d3SidePool:allSidesShuffled);
+  const day3Side=pickSide(avoidTaste(d3SidePool.length>0?d3SidePool:allSidesShuffled,day2NewMain));
   const usedSoupIds=new Set();
   function pickSoup(pool){const av=pool.filter(s=>!usedSoupIds.has(s.id));if(av.length===0)return pick(pool.length>0?pool:soups);const s=pick(av);usedSoupIds.add(s.id);return s;}
   let batchSoups=soups.filter(s=>s.batch);
   let d1SoupPool=batchSoups.filter(s=>genreMatch(s,day1Main.genre));
-  const day1Soup=pickSoup(d1SoupPool.length>0?d1SoupPool:batchSoups.length>0?batchSoups:soups);
+  const day1Soup=pickSoup(avoidTaste(d1SoupPool.length>0?d1SoupPool:batchSoups.length>0?batchSoups:soups,day1Main,day1Side));
   let day2Soup,day2SoupNote='';
   if(day1Soup.batch&&Math.random()<0.5){day2Soup=day1Soup;day2SoupNote='（昨日の続き・温めるだけ）';}
-  else{let d2SoupPool=soups.filter(s=>genreMatch(s,day2NewMain.genre));day2Soup=pickSoup(d2SoupPool.length>0?d2SoupPool:soups);if(day2Soup.id===day1Soup.id)day2SoupNote='（昨日の続き）';}
+  else{let d2SoupPool=soups.filter(s=>genreMatch(s,day2NewMain.genre));day2Soup=pickSoup(avoidTaste(d2SoupPool.length>0?d2SoupPool:soups,day2NewMain,day2Side));if(day2Soup.id===day1Soup.id)day2SoupNote='（昨日の続き）';}
   let d3SoupPool=soups.filter(s=>genreMatch(s,day2NewMain.genre));
-  const day3Soup=pickSoup(d3SoupPool.length>0?d3SoupPool:soups);
+  const day3Soup=pickSoup(avoidTaste(d3SoupPool.length>0?d3SoupPool:soups,day2NewMain,day3Side));
   const g1=day1Main.genre,g2=day2NewMain.genre;
   const genreLabel=g1===g2?g1:`${g1} → ${g2}`;
   curPlan={genreLabel,
