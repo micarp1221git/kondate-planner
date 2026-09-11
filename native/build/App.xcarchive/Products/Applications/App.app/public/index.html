@@ -95,8 +95,6 @@ details[open]>.group-summary::before{transform:rotate(90deg)}
 .cand-near{border-style:dashed}
 .cand-miss{margin-top:6px;font-size:.72rem;color:#a8590f;background:#fff3e6;border-radius:10px;padding:3px 8px;line-height:1.4}
 .cand-sub{margin-top:6px;font-size:.72rem;color:#4a6b3a;background:#eef5e8;border-radius:10px;padding:3px 8px;line-height:1.4}
-.cand-sub small{display:block;font-size:.66rem;color:#6b8a5a;font-weight:400;margin-top:1px}
-.sub-note small{display:block;font-size:.68rem;font-weight:400;color:#6b8a5a;margin-top:2px}
 .sub-note{display:inline-block;margin-top:8px;padding:5px 12px;border-radius:14px;background:#eef5e8;color:#4a6b3a;font-weight:700;font-size:.78rem}
 .status-bar small{display:block;font-size:.72rem;color:var(--text-light);margin-top:2px;font-weight:400}
 
@@ -108,11 +106,7 @@ details[open]>.group-summary::before{transform:rotate(90deg)}
 .day-card:nth-child(3){animation-delay:.2s}
 @keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
 .day-label{padding:14px 18px;font-family:var(--serif);font-weight:700;font-size:.88rem;color:#fff;letter-spacing:.05em;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
-/* 🆕2026-09-05 みかさん「ボタンを3つにして横並びにする」
-   ⚠️ 前は .reroll-btn に margin-left:auto が付いていて、1つずつ右へ押し出されて縦に積まれていた。 */
-.reroll-lead{width:100%;margin-top:9px;font-family:var(--sans);font-weight:400;font-size:.7rem;opacity:.85;letter-spacing:.02em}
-.reroll-row{display:flex;gap:6px;width:100%;margin-top:5px}
-.reroll-btn{flex:1;min-width:0;background:rgba(255,255,255,.22);border:1px solid rgba(255,255,255,.5);color:#fff;font-size:.7rem;font-weight:600;padding:6px 4px;border-radius:999px;cursor:pointer;font-family:var(--sans);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.reroll-btn{margin-left:auto;background:rgba(255,255,255,.22);border:1px solid rgba(255,255,255,.5);color:#fff;font-size:.72rem;font-weight:600;padding:5px 10px;border-radius:999px;cursor:pointer;font-family:var(--sans)}
 .reroll-btn:active{background:rgba(255,255,255,.35)}
 .day1 .day-label{background:#C85A35}
 .day2 .day-label{background:#4A8C6F}
@@ -126,24 +120,6 @@ details[open]>.group-summary::before{transform:rotate(90deg)}
 .menu-note{font-size:.76rem;color:var(--text-light);margin-top:2px}
 .nutri-badge{font-size:.8rem;color:#5c5148;background:#f6f2ea;border-radius:8px;padding:7px 10px;margin-top:10px}
 .nutri-note{display:block;font-size:.68rem;color:#a39a8f;margin-top:3px}
-/* 🆕2026-09-05 みかさん「栄養バランスの説明の場所が大きすぎかな。使いやすいUIUXが最優先です」
-   → 3つを1行に畳んだ（実測 159px → 26px）。中身（何から取れているか・注記・補える食材）は
-     「詳しく」を開いたときだけ。⚠️消していない。献立の主役ではなく、確認したい人が確認するもの、という置き方。 */
-.micro-row{display:flex;gap:5px;justify-content:center;align-items:stretch;margin-top:8px}
-.micro{flex:1;min-width:0;font-size:.72rem;padding:5px 4px;border-radius:9px;background:#f6f2ea;color:#5c5148;
-  font-weight:600;text-align:center;line-height:1.3}
-.micro small{display:none}
-.micro.good{background:#eef5e8;color:#4a6b3a}
-.micro.none{background:#fff3e6;color:#a8590f}
-.micro-more{margin-top:6px;text-align:center}
-.micro-more summary{display:inline-block;list-style:none;font-size:.72rem;color:var(--text-light);
-  cursor:pointer;padding:3px 8px}
-.micro-more summary::-webkit-details-marker{display:none}
-.micro-more[open] summary{color:var(--text-mid)}
-.micro-detail{font-size:.7rem;color:#a39a8f;text-align:left;padding:6px 2px 0;line-height:1.6}
-.micro-detail b{color:#5c5148;font-weight:600}
-.micro-hint{margin-top:6px;font-size:.72rem;color:#a8590f;background:#fff3e6;border-radius:9px;padding:6px 10px;
-  display:block;text-align:left;line-height:1.6}
 .toriwake{font-size:.76rem;color:var(--green);margin-top:3px}
 .carryover-row{border-left:2px solid var(--green);padding-left:12px;margin-left:0}
 .new-dish-row{border-left:2px solid var(--primary);padding-left:12px;margin-left:0}
@@ -181,21 +157,8 @@ details[open]>.group-summary::before{transform:rotate(90deg)}
 .ing-chip.on{background:var(--primary);border-color:var(--primary);color:#fff;font-weight:700}
 .ing-chip.omakase{border-style:dashed}
 .mainpick-empty{font-size:.8rem;color:var(--text-light);line-height:1.6}
+.panel{margin-top:14px}
 .panel.hidden{display:none}
-/* ボトムシート: 下から出る。背景の位置は変わらない */
-.panel{position:fixed;left:0;right:0;bottom:0;z-index:60;margin:0;border-radius:16px 16px 0 0;
-  min-height:46vh;max-height:82vh;overflow-y:auto;-webkit-overflow-scrolling:touch;
-  box-shadow:0 -6px 24px rgba(0,0,0,.18);padding-top:8px;
-  animation:sheetUp .22s ease-out}
-@keyframes sheetUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
-.sheet-grip{width:40px;height:4px;border-radius:2px;background:var(--border);margin:4px auto 10px;cursor:pointer}
-.sheet-x{position:absolute;top:10px;right:14px;width:32px;height:32px;border:none;border-radius:50%;
-  background:var(--surface);color:var(--text-mid);font-size:1rem;cursor:pointer;line-height:1}
-.sheet-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.32);z-index:59;opacity:0;pointer-events:none;transition:opacity .2s}
-.sheet-backdrop.show{opacity:1;pointer-events:auto}
-body.sheet-open{overflow:hidden}
-/* ⚠️2026-08-20: body に position:fixed を使ったら、中のシートが幅0になった（実測）。
-   背景固定は overflow:hidden で足りる。 */
 .panel-close{display:block;width:100%;max-width:240px;margin:16px auto 0;padding:11px;background:var(--primary-light);color:var(--primary);border:1.5px solid var(--primary);border-radius:8px;font-size:.88rem;font-weight:700;cursor:pointer}
 .opt-details{margin:20px 0 0;border:1.5px solid var(--border);border-radius:10px;background:var(--card);overflow:hidden}
 .opt-details>summary{padding:13px 16px;font-size:.88rem;font-weight:600;color:var(--text-mid);cursor:pointer;list-style:none}
@@ -345,18 +308,6 @@ details[open]>.workflow-summary::before{transform:rotate(90deg)}
 .fav-heart{position:absolute;top:10px;right:10px;background:none;border:none;font-size:1.2rem;cursor:pointer;opacity:.5;transition:opacity .2s}
 .fav-heart.active{opacity:1}
 .fav-heart:hover{opacity:1}
-/* 料理名のとなりのお気に入りボタン（2026-09-02）。⚠️.fav-heart は position:absolute なので流用できない */
-.cmb-dish-wrap{display:inline-flex;align-items:center;gap:4px;margin:0 6px 6px 0}
-.cmb-dish-wrap .cmb-dish{margin:0}
-.fav-heart-inline{display:inline-flex;align-items:center;gap:3px;min-height:32px;padding:4px 9px;
-  background:var(--surface,#fff);border:1px solid var(--line,#e3d9d4);border-radius:999px;
-  font-size:.72rem;line-height:1;color:var(--text-light,#8a7a74);cursor:pointer;
-  -webkit-tap-highlight-color:transparent;transition:border-color .15s,color .15s}
-.fav-heart-inline .fh-mark{font-size:.95rem}
-.fav-heart-inline.active{border-color:var(--primary,#e8815b);color:var(--primary,#e8815b);font-weight:600}
-.fav-heart-inline:hover{border-color:var(--primary,#e8815b)}
-.fav-hint{font-size:.72rem;color:var(--text-light,#8a7a74);margin:2px 0 8px}
-/* ⚠️スマホで文字を隠さない。🤍だけにすると「何のボタンか分からない」に戻る（今回の原因そのもの） */
 .fav-section{margin-top:24px}
 .fav-item{display:flex;justify-content:space-between;align-items:center;padding:10px 14px;background:var(--surface);border-radius:6px;margin-bottom:6px;font-size:.85rem}
 .fav-item button{background:none;border:none;color:var(--text-light);cursor:pointer;font-size:.8rem}
@@ -376,44 +327,6 @@ details[open]>.workflow-summary::before{transform:rotate(90deg)}
 .menu-selected .menu-suggest-cat{margin-left:0}
 .menu-selected button{margin-left:auto;background:none;border:none;color:var(--text-mid);cursor:pointer;font-size:.9rem;padding:2px 6px}
 .menu-selected button:hover{color:var(--primary)}
-
-/* ===== 1画面1ステップ（?ui=step）===== */
-body.stepui .hero .features,
-body.stepui .hero .tagline,
-body.stepui .photo-banner,
-body.stepui .toolbar,
-body.stepui #mainpick,
-body.stepui .btn-stack,
-body.stepui .opt-details,
-body.stepui #fav-btn,
-body.stepui .sheet-grip,
-body.stepui .sheet-x,
-body.stepui #sheet-backdrop{display:none!important}
-body.stepui .hero h1{font-size:1.25rem;margin:0}
-body.stepui .hero{padding:14px 0}
-body.stepui main.container>*:not(#stepui){display:none}
-#stepui{display:block}
-.step-head{position:sticky;top:0;z-index:20;background:var(--bg,#fff);padding:10px 0 8px}
-.step-now{font-size:.95rem;font-weight:800;letter-spacing:.04em}
-.step-dots{display:flex;gap:6px;margin-top:6px}
-.step-dots span{height:4px;flex:1;border-radius:99px;background:#e3ded6}
-.step-dots span.cur{background:var(--primary,#e08a5b)}
-.step-dots span.done{background:#b9cfa4}
-.step-lead{font-size:.95rem;font-weight:700;margin:6px 0 12px;line-height:1.6}
-.step-lead span{font-weight:500;color:var(--text-mid,#7a7268);font-size:.86rem}
-.step-body .section.step-open{display:block;position:static;max-height:none;transform:none;
-  box-shadow:none;border-radius:12px;padding:14px;margin-bottom:14px}
-.step-search{margin-bottom:12px;position:relative}
-.step-search label{display:block;font-size:.82rem;font-weight:700;color:var(--text-mid,#7a7268);margin-bottom:4px}
-.step-search input{width:100%;padding:10px 12px;border:1.5px solid #ddd6cc;border-radius:9px;font-size:.95rem}
-.cand-card.cand-on{outline:3px solid var(--primary,#e08a5b);outline-offset:-1px}
-.step-foot{position:sticky;bottom:0;z-index:20;background:var(--bg,#fff);
-  padding:10px 0 14px;border-top:1px solid #eee6dc;margin-top:16px}
-.step-next{width:100%;padding:15px;border:none;border-radius:12px;font-size:1.02rem;font-weight:800;
-  background:var(--primary,#e08a5b);color:#fff;cursor:pointer}
-.step-next:disabled{background:#ded7cd;color:#fff;cursor:default}
-.step-foot .regen-btn{margin-top:8px}
-
 </style>
 </head>
 <body>
@@ -474,22 +387,17 @@ body.stepui main.container>*:not(#stepui){display:none}
   <div id="results" class="results hidden"></div>
 
   <!-- 引き出し: ふだんは閉じている -->
-  <div id="sheet-backdrop" class="sheet-backdrop"></div>
   <section class="section panel hidden" id="ingredient-section">
-    <div class="sheet-grip" onclick="closeSheet()"></div>
-    <button class="sheet-x" onclick="closeSheet()" aria-label="閉じる">✕</button>
     <h2>🧊 冷蔵庫の中身</h2>
     <p class="section-desc">今あるものにチェック。この食材だけで献立を組みます。</p>
     <div id="ingredient-groups"></div>
-    <button class="panel-close" onclick="closeSheet()">✅ 決定して閉じる</button>
+    <button class="panel-close" onclick="togglePanel('ingredient')">✅ 閉じる</button>
   </section>
   <section class="section panel hidden" id="seasoning-section">
-    <div class="sheet-grip" onclick="closeSheet()"></div>
-    <button class="sheet-x" onclick="closeSheet()" aria-label="閉じる">✕</button>
     <h2>🧂 手持ちの調味料</h2>
     <p class="section-desc">あるものにチェック。ここで作れる料理が決まります。</p>
     <div id="seasoning-groups"></div>
-    <button class="panel-close" onclick="closeSheet()">✅ 決定して閉じる</button>
+    <button class="panel-close" onclick="togglePanel('seasoning')">✅ 閉じる</button>
   </section>
   <p class="save-hint">💡 チェック内容はブラウザに自動保存。次に開いてもそのまま使えます。</p>
 
@@ -568,14 +476,14 @@ const SEASONING_GROUPS = [
     {id:"マヨネーズ",on:true},{id:"ケチャップ",on:true},{id:"ソース",on:true}
   ]},
   {name:"洋風", items:[
-    {id:"コンソメ",on:true},{id:"バター",on:true},{id:"オリーブ油",on:true}
+    {id:"コンソメ",on:false},{id:"バター",on:true},{id:"オリーブ油",on:false}
   ]},
   {name:"中華・アジアン", items:[
-    {id:"ごま油",on:true},{id:"鶏ガラ",on:true},{id:"オイスター",on:true},
-    {id:"コチュジャン",on:false},{id:"ナンプラー",on:false},{id:"カレー粉",on:true},{id:"カレールー",on:true}
+    {id:"ごま油",on:true},{id:"鶏ガラ",on:true},{id:"オイスター",on:false},
+    {id:"コチュジャン",on:false},{id:"ナンプラー",on:false},{id:"カレー粉",on:false},{id:"カレールー",on:false}
   ]},
   {name:"和風プラス", items:[
-    {id:"すりごま",on:true},{id:"かつお節",on:true},{id:"塩昆布",on:false},{id:"ポン酢",on:true}
+    {id:"すりごま",on:false},{id:"かつお節",on:false},{id:"塩昆布",on:false},{id:"ポン酢",on:false}
   ]},
   {name:"そのほか", items:[
     {id:"牛乳",on:true},{id:"チーズ",on:true},{id:"粉チーズ",on:true},{id:"めんつゆ",on:true},
@@ -586,13 +494,10 @@ const SEASONING_GROUPS = [
 
 const ING_GROUPS = [
   {name:"お肉", items:["鶏もも肉","鶏むね肉","ささみ","鶏ひき肉","手羽元","手羽先","豚ロース(とんかつ用)","豚ロース(薄切り)","豚バラ","豚ヒレ","豚こま","牛こま","合いびき肉","豚ひき肉"]},
-  {name:"魚介", items:["ブリ切り身","メカジキ","太刀魚","鮭切り身","タラ切り身","サワラ切り身","カレイ切り身(骨なし)","骨取りサバ","鯛切り身","むきえび","ホタテ","イカ","しらす","あさり","たらこ","刺身(サーモン/マグロ等)"]},
+  {name:"魚介", items:["ブリ切り身","メカジキ","太刀魚","鮭切り身","タラ切り身","サワラ切り身","カレイ切り身(骨なし)","骨取りサバ","鯛切り身","むきえび","ホタテ","イカ","しらす"]},
   {name:"たまご・大豆", items:["たまご","豆腐","厚揚げ","油揚げ"]},
-  {name:"野菜", items:["じゃがいも","にんじん","玉ねぎ","大根","かぶ","キャベツ","白菜","レタス","水菜","ほうれん草","小松菜","ちんげん菜","ブロッコリー","もやし","にら","きのこ","長ねぎ","ピーマン","トマト","きゅうり","オクラ","ズッキーニ","パプリカ","アスパラ","ゴーヤ","セロリ","アボカド","枝豆","とうもろこし","里芋","長芋","こんにゃく","生姜","なす","れんこん","かぼちゃ","さつまいも","ごぼう","たけのこ"]},
-  // 2026-08-19 みかさん「ハンバーグないのなんで？」→ パン粉が冷蔵庫扱いで止めていた。
-  //   買い置きが当たり前のもの（棚にあるもの）は PANTRY へ移し、チェック不要にした。
-  //   ⚠️ここに残すのは「無ければ本当に作れない」もの。
-  {name:"ストック", items:["トマト缶","ツナ缶","コーン缶","サバ缶","さば水煮缶","さば味噌煮缶","いわし蒲焼き缶","焼き鳥缶","大豆水煮缶","ミックスビーンズ","ウィンナー","ハム","ベーコン","餃子の皮","ワンタン","はんぺん","ちくわ","かに風味かまぼこ","納豆","キムチ","大葉","ヨーグルト","焼きそば麺","中華麺","マカロニ"]}
+  {name:"野菜", items:["じゃがいも","にんじん","玉ねぎ","大根","かぶ","キャベツ","白菜","レタス","水菜","ほうれん草","小松菜","ちんげん菜","ブロッコリー","もやし","にら","きのこ","長ねぎ","ピーマン","トマト","きゅうり","オクラ","ズッキーニ","パプリカ","アスパラ","ゴーヤ","セロリ","アボカド","枝豆","とうもろこし","里芋","長芋","こんにゃく","生姜"]},
+  {name:"ストック", items:["トマト缶","ツナ缶","コーン缶","サバ缶","春雨","そうめん","ウィンナー","パン粉","餃子の皮","切り干し大根","高野豆腐","はんぺん","わかめ","ひじき","大豆","大葉","ヨーグルト","うどん","パスタ","焼きそば麺"]}
 ];
 
 const st = {
@@ -718,21 +623,6 @@ function shuffle(arr) { const a=[...arr]; for(let i=a.length-1;i>0;i--){const j=
 const NUTRI_RED=['鶏','豚','牛','ひき','ミンチ','ベーコン','ハム','ソーセージ','ウインナー','たまご','卵','豆腐','厚揚げ','油揚げ','大豆','ビーンズ','鮭','さば','鯖','ぶり','たら','えび','海老','いか','ツナ','しらす','ちくわ','かにかま','はんぺん','納豆','チーズ','牛乳','ヨーグルト','あさり','肉'];
 const NUTRI_GREEN=['ほうれん草','小松菜','キャベツ','レタス','白菜','ブロッコリー','トマト','きゅうり','なす','ピーマン','パプリカ','にんじん','人参','玉ねぎ','ねぎ','大根','かぶ','ごぼう','れんこん','もやし','オクラ','アスパラ','ズッキーニ','セロリ','水菜','チンゲン菜','ニラ','にら','しめじ','えのき','まいたけ','しいたけ','エリンギ','きのこ','わかめ','ひじき','海藻','豆苗','枝豆','いんげん','スナップ','とうもろこし','コーン','春菊','三つ葉','大葉','青梗菜','野菜'];
 const NUTRI_YELLOW=['ごはん','ご飯','米','麺','うどん','そば','パスタ','スパゲ','パン','じゃがいも','さつまいも','里芋','いも','餅','春雨','皮','小麦粉'];
-// 2026-08-19 みかさん「タンパク質・カルシウム・鉄・亜鉛などを普通の食事から摂る」
-//   ⚠️数値（mg等）は出さない。3色判定と同じ「その食材が入っているか」の目安のみ。
-//   ⚠️リストはdata.jsonに実在する食材だけで作った（実在しない名前は判定に効かず、嘘の安心になる）
-const NUTRI_CA=['牛乳','チーズ','粉チーズ','モッツァレラ','ヨーグルト','しらす','ちりめんじゃこ','豆腐','厚揚げ','油揚げ','小松菜','ちんげん菜','チンゲン菜','水菜','ひじき','わかめ','高野豆腐','大豆','ブロッコリー','さば水煮缶','サバ缶','骨取りサバ','はんぺん','切り干し大根'];
-const NUTRI_FE=['牛こま','合いびき肉','あさり','ひじき','小松菜','ほうれん草','大豆','納豆','厚揚げ','豆腐','高野豆腐','ブリ切り身','ブリ','かつお節','たまご','水菜','切り干し大根','大豆水煮缶','ミックスビーンズ'];
-const NUTRI_ZN=['牛こま','豚こま','豚バラ','豚ロース','鶏もも肉','鶏むね肉','合いびき肉','豚ひき肉','鶏ひき肉','たまご','チーズ','納豆','高野豆腐','大豆','ホタテ','むきえび','たらこ','切り干し大根','あさり'];
-// その料理に、その栄養の食材が入っているか（入っている食材名を返す）
-function microHits(dish,key){
-  const list = key==='ca'?NUTRI_CA : key==='fe'?NUTRI_FE : NUTRI_ZN;
-  const ings=(dish&&dish.ingredients)||[];
-  const hits=new Set();
-  ings.forEach(i=>list.forEach(k=>{if(String(i).includes(k))hits.add(i);}));
-  return [...hits];
-}
-
 function nutriCount(dish,color){const list=color==='red'?NUTRI_RED:color==='green'?NUTRI_GREEN:NUTRI_YELLOW;const ings=(dish&&dish.ingredients)||[];const hits=new Set();ings.forEach(i=>{list.forEach(k=>{if(String(i).includes(k))hits.add(i);});});return hits.size;}
 function nutriBadge(dishes,riceIncluded){
   let red=0,green=0,yellow=0;
@@ -764,9 +654,9 @@ function saveOpts(){
 // ── 履歴（いつもと違う味の判定用）──
 function loadHistory(){try{return JSON.parse(localStorage.getItem('kondate-history')||'[]');}catch(e){return [];}}
 function recordHistory(ids){
-  const byId={};[...(D.main||[]),...(D.single||[])].forEach(m=>{byId[m.id]=m;});
+  const genreById={};[...(D.main||[]),...(D.single||[])].forEach(m=>{genreById[m.id]=m.genre;});
   let h=loadHistory();const ts=Date.now();
-  ids.forEach(id=>{if(id){const m=byId[id]||{};h.push({id,genre:m.genre||'',protein:m.protein||'',tpl:m.tpl||'',ts});}});
+  ids.forEach(id=>{if(id)h.push({id,genre:genreById[id]||'',ts});});
   if(h.length>30)h=h.slice(h.length-30);
   localStorage.setItem('kondate-history',JSON.stringify(h));
 }
@@ -780,19 +670,6 @@ function applyVariety(pool){
   let p=pool.filter(m=>!recentIds.has(m.id)&&m.genre!==dominant);
   if(p.length>0)return p;
   p=pool.filter(m=>!recentIds.has(m.id));
-  return p.length>0?p:pool;
-}
-// 🆕2026-09-03 飽き対策（全モード・みかさん「同じメニューばかりで飽きた」）:
-//   直近14日に出た「同じ料理」と「同じ主材×味の型(tpl)」を候補から外す。外して空になるなら元の候補に戻す（何も出ない事故を作らない）
-function avoidRecent(pool){
-  const h=loadHistory();if(!h.length||!pool||pool.length<2)return pool;
-  const cut=Date.now()-14*24*3600*1000;
-  const recent=h.filter(x=>x.ts&&x.ts>=cut);
-  if(!recent.length)return pool;
-  const ids=new Set(recent.map(x=>x.id));
-  const combos=new Set(recent.filter(x=>x.tpl).map(x=>x.protein+'|'+x.tpl));
-  let p=pool.filter(m=>!ids.has(m.id)&&!(m.tpl&&combos.has(m.protein+'|'+m.tpl)));
-  if(p.length===0)p=pool.filter(m=>!ids.has(m.id));
   return p.length>0?p:pool;
 }
 // 手順(recipes.json)が無い料理向け：データのpointを表示
@@ -831,55 +708,16 @@ function saveState(){
 // ── トップページの道具立て（2026-08-16 みかさん「毎日使うページを快適にしたい」）──
 
 // 調味料・冷蔵庫は毎日いじるものではないので引き出しに片付け、アイコンから開く
-// 2026-08-20 みかさん「冷蔵庫押して下までスクロールされるのいやだな」
-//   → ボトムシートに変更。押した場所と開く場所が離れているのが原因だった。
-//   ⭐ボトムシートの肝は「背景のページ位置を保つ」こと（LogRocket）。閉じると元の場所に戻る。
-//   ⚠️背景タップでは閉じない（誤操作でチェックが消えたように見えるため）。閉じるのは ✕ と下スワイプ。
-let sheetScrollY = 0;
 function togglePanel(which){
   const sec=document.getElementById(which+'-section');
   const btn=document.getElementById(which==='ingredient'?'tool-fridge':'tool-seasoning');
   const other=document.getElementById((which==='ingredient'?'seasoning':'ingredient')+'-section');
   const otherBtn=document.getElementById(which==='ingredient'?'tool-seasoning':'tool-fridge');
-  const backdrop=document.getElementById('sheet-backdrop');
   const opening=sec.classList.contains('hidden');
   other.classList.add('hidden'); otherBtn.classList.remove('open'); // 引き出しは一度に1つ
   sec.classList.toggle('hidden',!opening);
   btn.classList.toggle('open',opening);
-  backdrop.classList.toggle('show',opening);
-  if(opening){
-    sheetScrollY = window.scrollY;          // いまの位置を覚える
-    document.body.classList.add('sheet-open'); // 背景が動かないよう固定
-    sec.classList.remove('collapsed');   // 旧仕様の名残が付いていても中身を出す
-    sec.scrollTop = 0;
-    // ⚠️中のグループが全部閉じていると、シートが空に見える（145pxしかなかった）
-    const groups=[...sec.querySelectorAll('.group-details')];
-    if(groups.length && !groups.some(g=>g.open)) groups[0].open = true;
-  }else{
-    closeSheetChrome();
-  }
-}
-function closeSheetChrome(){
-  document.body.classList.remove('sheet-open');
-  window.scrollTo(0, sheetScrollY);        // 元の位置へ戻す
-  document.getElementById('sheet-backdrop').classList.remove('show');
-  document.querySelectorAll('.tool-btn.open').forEach(b=>b.classList.remove('open'));
-}
-// 下スワイプで閉じる。⚠️シートを上までスクロールしている時だけ効かせる（中のスクロールと喧嘩しないため）
-function initSheetSwipe(){
-  document.querySelectorAll('.panel').forEach(sec=>{
-    let y0=null;
-    sec.addEventListener('touchstart',e=>{ y0 = sec.scrollTop<=0 ? e.touches[0].clientY : null; },{passive:true});
-    sec.addEventListener('touchmove',e=>{
-      if(y0===null)return;
-      if(e.touches[0].clientY - y0 > 70){ y0=null; closeSheet(); }
-    },{passive:true});
-  });
-}
-
-function closeSheet(){
-  document.querySelectorAll('.panel:not(.hidden)').forEach(x=>x.classList.add('hidden'));
-  closeSheetChrome();
+  if(opening)sec.scrollIntoView({behavior:'smooth',block:'start'});
 }
 
 function updateToolbar(){
@@ -923,10 +761,6 @@ function setMainIng(ing){
 function saveFavorites(){
   localStorage.setItem('kondate-fav',JSON.stringify([...st.favorites]));
   updateFavBtn();
-  // 🚨上のツールバーの ❤️ の数も一緒に直す（2026-09-02）。
-  //   updateToolbar は元からあったのに、お気に入りの保存からは呼ばれておらず、
-  //   登録しても上の数字が 0 のままだった（画面を開き直すまで直らない）。
-  if(typeof updateToolbar==='function')updateToolbar();
 }
 
 function updateFavBtn(){
@@ -939,43 +773,13 @@ function updateFavBtn(){
 function toggleFav(id){
   if(st.favorites.has(id))st.favorites.delete(id);else st.favorites.add(id);
   saveFavorites();
-  const on=st.favorites.has(id);
-  // ⚠️料理名の横（.fav-heart-inline）と、折りたたみの中（.fav-heart）の両方を切り替える。
-  //   片方だけにすると、同じ料理のハートが画面内で食い違う（2026-09-02）
-  document.querySelectorAll(`.fav-heart[data-id="${id}"]`).forEach(b=>{
-    b.classList.toggle('active',on);b.textContent=on?'❤️':'🤍';
-  });
-  document.querySelectorAll(`.fav-heart-inline[data-id="${id}"]`).forEach(b=>{
-    b.classList.toggle('active',on);
-    b.innerHTML=`<span class="fh-mark">${on?'❤️':'🤍'}</span><span class="fh-label">${on?'お気に入り':'お気に入り'}</span>`;
-    b.setAttribute('aria-pressed',on?'true':'false');
-  });
-  updateFavHint();
+  const btns=document.querySelectorAll(`.fav-heart[data-id="${id}"]`);
+  btns.forEach(b=>{b.classList.toggle('active',st.favorites.has(id));b.textContent=st.favorites.has(id)?'❤️':'🤍';});
 }
 
 function favBtn(id){
   const active=st.favorites.has(id);
   return `<button class="fav-heart${active?' active':''}" data-id="${id}" onclick="event.stopPropagation();toggleFav('${id}')">${active?'❤️':'🤍'}</button>`;
-}
-
-// 料理名のとなりに置くお気に入りボタン（2026-09-02みかさん「お気に入り登録ボタンがありません」）
-// 🚨これまで favBtn は①1品だけの結果 ②「この品だけの作り方」の折りたたみの中 の2箇所にしか無く、
-//   ②は閉じているので、3日分の献立ではハートが1つも見えていなかった。
-//   ⭐献立を見て「これ気に入った」と思う場所＝料理名のところに置く。
-// ⚠️文字を添える（🤍だけだと何のボタンか分からない＝みかさんが探して見つからなかった原因）
-function favBtnInline(id){
-  if(!id)return ''; // 繰り越し（前日の残り）はidを持たないので出さない
-  const on=st.favorites.has(id);
-  return `<button class="fav-heart-inline${on?' active':''}" data-id="${id}" aria-pressed="${on?'true':'false'}"`
-    +` onclick="event.stopPropagation();toggleFav('${id}')">`
-    +`<span class="fh-mark">${on?'❤️':'🤍'}</span><span class="fh-label">お気に入り</span></button>`;
-}
-
-// まだ1件も登録が無いあいだだけ、押し方を1行だけ出す（登録したら消える）
-function updateFavHint(){
-  document.querySelectorAll('.fav-hint').forEach(el=>{
-    el.style.display=st.favorites.size===0?'block':'none';
-  });
 }
 
 function showFavorites(){
@@ -1069,17 +873,6 @@ function updateBadges(){
 }
 
 // 食材チェックリスト（ING_GROUPSに載っている＝ユーザーが申告できる食材）
-// 買い置きが当たり前で、いちいちチェックしないもの（2026-08-19みかさん「ある程度のものは別の何かで代用したりする」）
-// ⚠️ここに入れた食材は「いつも持っている」扱いになる。無いと本当に困るものは入れない。
-const PANTRY = new Set([
-  // 乾物・粉もの（棚にある）
-  "パン粉","春雨","そうめん","うどん","パスタ","切り干し大根","高野豆腐","わかめ","ひじき","大豆","小麦粉","片栗粉",
-  // 主食・調味に近いもの
-  "ごはん","米少々","牛乳","チーズ","粉チーズ","モッツァレラ","にんにく","レモン","黒ごま","刻み海苔","かつお節",
-  "ちりめんじゃこ","塩麹","わさび","三つ葉","みょうが","かいわれ",
-  // 別の食材から作るもの（元の食材を持っていれば作れる）
-  "大根おろし","目玉焼き","うずら卵","とんかつ","焼き豚orハム",
-]);
 const KNOWN_ING = new Set(ING_GROUPS.flatMap(g => g.items));
 // データの食材名 → チェックリストの食材名（名前ゆれ吸収）
 const ING_ALIAS = {
@@ -1093,46 +886,31 @@ const ING_ALIAS = {
   'しめじ':['きのこ'],'なめこ':['きのこ'],
   'チンゲン菜':['ちんげん菜'],
   '鮭':['鮭切り身'],'ブリ':['ブリ切り身'],
-  'カレイ切り身':['カレイ切り身(骨なし)'],
-  // 2026-08-19 追加。⚠️生鮮は PANTRY（常に持っている扱い）に入れず、必ずここで名前を寄せる
-  'いんげん':['アスパラ','ブロッコリー']
+  'カレイ切り身':['カレイ切り身(骨なし)']
 };
 // データ側の食材名 i が、いま指定中の「初日のメイン食材」と同じものを指すか
 // 2026-08-18 みかさん「例えば青梗菜と小松菜とか、似てるやつはどっちでもいいようにしよう」
 //   入れ替えても料理として成立するものだけをグループにする。
 //   ⚠️ 代用したことは画面に出す（レシピ本文には元の食材名が書いてあるので、黙って置き換えると嘘になる）
 //   ⚠️ 玉ねぎ/長ねぎ・じゃがいも/さつまいも は「似ているが別物」なので入れない。
-// 2026-08-20 みかさん「置き換えればいいんだって頭にならない人もいるかもしれない」
-//   → 調べたら、海外でも「代用機能はあるのに使われない」が未解決の課題だった（Plant Jammerが
-//     UXコンテストの題材にしている）。⭐うちは「提案」せず最初から候補に混ぜる方式なので、
-//     残る仕事は「置き換えても大丈夫な理由」を1行そえること（海外の作法③）。
 const SUBSTITUTE_GROUPS = [
-  { items:['小松菜','ほうれん草','ちんげん菜','水菜'],
-    why:'同じ葉物。ゆで時間だけ少し変わります' },
-  { items:['豚こま','豚バラ','豚ロース(薄切り)'],
-    why:'同じ薄切りの豚。脂の多さが少し違うだけです' },
-  { items:['鶏ひき肉','豚ひき肉','合いびき肉'],
-    why:'同じひき肉。味の濃さが少し変わります' },
-  { items:['タラ切り身','カレイ切り身(骨なし)','サワラ切り身','鯛切り身'],
-    why:'同じ白身魚。焼き時間はそのままで大丈夫です' }
+  ['小松菜','ほうれん草','ちんげん菜','水菜'],                 // 葉物（おひたし・炒め物）
+  ['豚こま','豚バラ','豚ロース(薄切り)'],                      // 薄切りの豚（炒め物・煮物）
+  ['鶏ひき肉','豚ひき肉','合いびき肉'],                        // ひき肉
+  ['タラ切り身','カレイ切り身(骨なし)','サワラ切り身','鯛切り身'] // 白身魚の切り身
 ];
 // 食材 i の代わりになるもののうち、いま持っているものを1つ返す（無ければ null）
 function subFor(i){
-  const g = SUBSTITUTE_GROUPS.find(g => g.items.includes(i));
+  const g = SUBSTITUTE_GROUPS.find(g => g.includes(i));
   if(!g) return null;
-  return g.items.find(x => x !== i && (st.ingredients.has(x) || x === st.mainIng)) || null;
-}
-// その食材の代用が「なぜ大丈夫か」（同じグループの理由）
-function subWhy(i){
-  const g = SUBSTITUTE_GROUPS.find(g => g.items.includes(i));
-  return g ? g.why : '';
+  return g.find(x => x !== i && (st.ingredients.has(x) || x === st.mainIng)) || null;
 }
 // この料理で「何を何で代用するか」の一覧
 function substitutions(item){
   if(!item.ingredients) return [];
   return item.ingredients
     .filter(i => !st.ingredients.has(i) && !isMainIng(i) && !(ING_ALIAS[i]||[]).some(x=>st.ingredients.has(x)))
-    .map(i => { const s = subFor(i); return s ? {from:i, to:s, why:subWhy(i)} : null; })
+    .map(i => { const s = subFor(i); return s ? {from:i, to:s} : null; })
     .filter(Boolean);
 }
 
@@ -1141,7 +919,6 @@ function isMainIng(i){
 }
 function ingredientOK(i){
   if(st.ingredients.has(i))return true;
-  if(PANTRY.has(i))return true; // 買い置きが当たり前のもの（棚にある）
   if(isMainIng(i))return true; // 検索欄で指定した食材は「持っている」扱い（自分で打った＝あるから打った）
   if(subFor(i))return true;    // 似たもので代用できる（画面に「◯◯で代用」と出す）
   const al=ING_ALIAS[i];
@@ -1265,7 +1042,7 @@ function generateSingle(opts,bentoIds,forcedDish){
     if(opts.bento)candidates=candidates.filter(s=>bentoIds.has(s.id));
     if(opts.keepOk){const f=candidates.filter(s=>s.keep_ok);if(f.length>0)candidates=f;}
     if(candidates.length===0){showError('この条件に合う1品メニューが見つかりませんでした。食材や調味料を増やしてみてください。');return;}
-    let pool=avoidRecent(candidates);
+    let pool=candidates;
     if(opts.favPriority&&st.favorites.size>0){const fp=pool.filter(s=>st.favorites.has(s.id));if(fp.length>0)pool=fp;}
     if(opts.variety){pool=applyVariety(pool);}
     dish=pick(pool);
@@ -1325,7 +1102,6 @@ function generateThreeDay(opts,bentoIds,forcedMain){
     if(day1Pool.length===0)day1Pool=batchMains;
     // 初日に使いたい食材があれば、1日目のメインはそれを使うものから選ぶ（2日目以降は自由）
     if(st.mainIng){const ip=day1Pool.filter(m=>usesIng(m,st.mainIng));if(ip.length>0)day1Pool=ip;}
-    day1Pool=avoidRecent(day1Pool);
     if(opts.favPriority&&st.favorites.size>0){const favPool=day1Pool.filter(m=>st.favorites.has(m.id));if(favPool.length>0)day1Pool=favPool;}
     if(opts.variety){day1Pool=applyVariety(day1Pool);}
     day1Main=pick(day1Pool);
@@ -1336,7 +1112,6 @@ function generateThreeDay(opts,bentoIds,forcedMain){
   if(day2Pool.length===0)day2Pool=batchMains.filter(m=>m.protein!==day1Main.protein&&m.id!==day1Main.id);
   if(day2Pool.length===0)day2Pool=batchMains.filter(m=>m.id!==day1Main.id);
   if(day2Pool.length===0)day2Pool=batchMains;
-  day2Pool=avoidRecent(day2Pool);
   const day2NewMain=pick(day2Pool);
   recordHistory([day1Main.id,day2NewMain.id]);
   const day3Carryover=pick(day2NewMain.carryover);
@@ -1353,17 +1128,6 @@ function generateThreeDay(opts,bentoIds,forcedMain){
   const day2Side=pickSide(d2SidePool);
   let d3SidePool=allSidesShuffled.filter(s=>genreMatch(s,day2NewMain.genre)&&!usedSideIds.has(s.id));
   if(nutriCount(day2NewMain,'green')===0){const gp=d3SidePool.filter(s=>nutriCount(s,'green')>0);if(gp.length>0)d3SidePool=gp;}
-  // 2026-08-19 みかさん「カルシウム・鉄・亜鉛を普通の食事から」
-  //   ここまでで一度も出ていない栄養があれば、3日目の副菜でそれを補えるものを優先する
-  //   ⚠️候補が無ければ元のプールのまま（無理に入れて変な献立にしない）
-  {
-    const so_far=[day1Main,day1Side,day2NewMain,day2Side].filter(Boolean);
-    const lacking=['ca','fe','zn'].filter(k=>so_far.every(x=>microHits(x,k).length===0));
-    if(lacking.length){
-      const fix=d3SidePool.filter(s=>lacking.some(k=>microHits(s,k).length>0));
-      if(fix.length>0)d3SidePool=fix;
-    }
-  }
   const day3Side=pickSide(d3SidePool.length>0?d3SidePool:allSidesShuffled);
   const usedSoupIds=new Set();
   function pickSoup(pool){const av=pool.filter(s=>!usedSoupIds.has(s.id));if(av.length===0)return pick(pool.length>0?pool:soups);const s=pick(av);usedSoupIds.add(s.id);return s;}
@@ -1497,8 +1261,7 @@ function cmbNormalize(it,i){
   }
   // 事前仕込みがある品は、当日ぶんの工程時間だけを短縮計算に使う（漬け時間で水増ししない）
   const mEff=advance.length?cook.reduce((s,e)=>s+e.min,0)+prep.reduce((s,e)=>s+e.min,0):(r.m||10);
-  // id を持たせる（お気に入りボタンを料理名の横に出すため・2026-09-02）
-  return {id:it.id,name:it.name,color:CMB_COLORS[i%3],co:!!it.co,r,prep,cook,advance,advanceWait,m:mEff,maxWait,finish:0,cursor:0,startAfter:0};
+  return {name:it.name,color:CMB_COLORS[i%3],co:!!it.co,r,prep,cook,advance,advanceWait,m:mEff,maxWait,finish:0,cursor:0,startAfter:0};
 }
 function buildCombinedSchedule(cookItems){
   const dishes=cookItems.map(cmbNormalize);
@@ -1562,12 +1325,7 @@ function combinedHtml(items){
   const sc=buildCombinedSchedule(cookItems);
   const badge=d=>`<span class="cmb-dish" style="background:${d.color}">${d.name}</span>`;
   let body='';
-  // 料理名の横にお気に入りボタンを出す（2026-09-02みかさん依頼）。繰り越しはidが無いので付かない
-  body+=`<div class="cmb-dishes">${sc.dishes.map(d=>
-      `<span class="cmb-dish-wrap">${badge(d)}${favBtnInline(d.id)}</span>`
-      +(d.co?'<span class="cmb-co-mark">🍱 翌日の分も、多めに</span>':'')
-    ).join('')}${carryovers.map(c=>`<span class="cmb-dish cmb-dish-co">🍳 ${c.name}（温めるだけ）</span>`).join('')}</div>`
-    +`<div class="fav-hint"${st.favorites.size===0?'':' style="display:none"'}>🤍 を押すと、その料理をお気に入りに保存できます（❤️ボタンからいつでも見られます）</div>`;
+  body+=`<div class="cmb-dishes">${sc.dishes.map(d=>badge(d)+(d.co?'<span class="cmb-co-mark">🍱 翌日の分も、多めに</span>':'')).join('')}${carryovers.map(c=>`<span class="cmb-dish cmb-dish-co">🍳 ${c.name}（温めるだけ）</span>`).join('')}</div>`;
   // 半日漬ける等がある品は、当日のタイムラインより前に「事前に仕込んでおく」枠を出す
   const advDishes=sc.dishes.filter(d=>d.advance.length);
   if(advDishes.length){
@@ -1622,57 +1380,10 @@ function carryoverExtraHtml(co,from){
 
 let curPlan=null,planCtx=null;
 
-// 🆕2026-08-23みかさん「メインは固定して副菜以降を別メニュー探したいときある」
-//   rerollDay() は**メインごと**替えてしまうので、メインが気に入ったときに使えなかった。
-//   こちらは**メインと繰り越しには一切触らず**、副菜と汁物だけ振り直す。
-// 🆕2026-09-05 みかさん「副菜と汁ものを分けて、汁物だけ別メニュー探せるようにしよう」
-//   → 「副菜・汁物だけ替える」を、副菜だけ／汁物だけ の2本に割った。
-//   ⚠️ 汁物には「1日目に多めに作って2日目に続ける」型がある。片方だけ替えると
-//     Day1とDay2で違う汁物になって“続き”の表示と食い違うので、続きのときは一緒に動かす。
-const _excl=(pool,id)=>{const f=pool.filter(x=>x.id!==id);return f.length>0?f:pool;};
-
-function rerollSide(n){
-  if(!curPlan||!planCtx)return;
-  const p=curPlan,{sides}=planCtx;
-  if(sides.length<2){showError('他に出せる副菜が今の条件にありません。チェックを増やすと候補が増えます。');return;}
-  if(n===1){
-    const ms=sides.filter(x=>x.makeahead);
-    p.day1.side=pick(_excl(ms.length>0?ms:sides,p.day1.side.id));
-  }else if(n===2){
-    p.day2.side=pick(_excl(sides,p.day2.side.id));
-  }else{
-    p.day3.side=pick(_excl(sides,p.day3.side.id));
-  }
-  renderThreeDayResults(p);   // ⚠️メインを触っていないので genreLabel は作り直さない
-}
-
-function rerollSoup(n){
-  if(!curPlan||!planCtx)return;
-  const p=curPlan,{soups}=planCtx;
-  if(soups.length<2){showError('他に出せる汁物が今の条件にありません。チェックを増やすと候補が増えます。');return;}
-  const cont=!!(p.day2.soupNote&&p.day2.soupNote.includes('続き'));
-  if(n===1){
-    const bs=soups.filter(x=>x.batch);
-    p.day1.soup=pick(_excl(bs.length>0?bs:soups,p.day1.soup.id));
-    if(cont)p.day2.soup=p.day1.soup;   // 2日目に続く汁物は、ずれないように合わせる
-  }else if(n===2){
-    if(cont){
-      const bs=soups.filter(x=>x.batch);
-      p.day1.soup=pick(_excl(bs.length>0?bs:soups,p.day1.soup.id));
-      p.day2.soup=p.day1.soup;   // Day2は「Day1の続き」なので、2日ぶん一緒に動かす
-    }else{
-      p.day2.soup=pick(_excl(soups,p.day2.soup.id));
-    }
-  }else{
-    p.day3.soup=pick(_excl(soups,p.day3.soup.id));
-  }
-  renderThreeDayResults(p);
-}
-
 function rerollDay(n){
   if(!curPlan||!planCtx)return;
   const p=curPlan,{batchMains,sides,soups}=planCtx;
-  const excl=_excl;
+  const excl=(pool,id)=>{const f=pool.filter(x=>x.id!==id);return f.length>0?f:pool;};
   if(n===1){
     if(batchMains.length<2){showError('他に出せるメインが今の条件にありません。チェックを増やすと候補が増えます。');return;}
     p.day1.main=pick(excl(batchMains.filter(m=>m.id!==p.day2.newMain.id),p.day1.main.id));
@@ -1716,19 +1427,6 @@ function renderThreeDayResults(plan){
 
   // 「あと1つ足りない」メインを選んで3日分にした場合、買い足すものを最初に出す
   const buyMiss=missingIngredients(plan.day1.main);
-  // 3日ぶんまとめて、カルシウム・鉄・亜鉛が何日ぶん入っているかを見る（みかさん2026-08-19）
-  const days3=[[plan.day1.main,plan.day1.side,plan.day1.soup],
-               [plan.day2.newMain,plan.day2.side,plan.day2.soup],
-               [plan.day3.side,plan.day3.soup]];
-  const micro={};
-  [['ca','カルシウム'],['fe','鉄'],['zn','亜鉛']].forEach(([k,label])=>{
-    const src=new Set(); let days=0;
-    days3.forEach(d=>{
-      const h=d.filter(Boolean).flatMap(x=>microHits(x,k));
-      if(h.length){days++; h.forEach(x=>src.add(x));}
-    });
-    micro[k]={label,days,src:[...src].slice(0,3)};
-  });
   // 代用しているものは3日ぶんまとめて出す（レシピ本文は元の食材名のままなので必ず知らせる）
   const subAll=[];
   [plan.day1.main,plan.day1.side,plan.day1.soup,plan.day2.newMain,plan.day2.side,plan.day2.soup,plan.day3.side,plan.day3.soup]
@@ -1740,29 +1438,11 @@ function renderThreeDayResults(plan){
       <h2>🍽️ 3日分の献立｜${plan.genreLabel}</h2>
       <p>メインを繰り越して明日の1品へ。3品あるのにラクできる。</p>
       ${buyMiss.length?`<p class="buy-note">🛒 買い足し：${buyMiss.join('・')}</p>`:''}
-      ${subAll.length?`<p class="sub-note">🔄 ${subAll.map(x=>x.from+'→'+x.to).join('・')} で代用します<small>${[...new Set(subAll.map(x=>x.why))].join(' / ')}</small></p>`:''}
-      <div class="micro-row">${[micro.ca,micro.fe,micro.zn].map(m=>
-        `<span class="micro ${m.days>=2?'good':m.days===1?'some':'none'}">${m.label} ${m.days>=2?'◎':m.days===1?'○':'△'}</span>`).join('')}
-      </div>
-      <details class="micro-more">
-        <summary>▾ 栄養バランスの中身を見る</summary>
-        <div class="micro-detail">
-          ${[micro.ca,micro.fe,micro.zn].map(m=>`<div><b>${m.label} ${m.days>=2?'◎':m.days===1?'○':'△'}</b>${m.src.length?'　'+m.src.join('・'):'　（3日ぶんで見当たりませんでした）'}</div>`).join('')}
-          <div style="margin-top:5px">3日ぶんの目安です（材料名から自動で見ています）。</div>
-          ${[micro.ca,micro.fe,micro.zn].some(m=>m.days===0)?`<p class="micro-hint">🥛 ${[micro.ca,micro.fe,micro.zn].filter(m=>m.days===0).map(m=>
-            m.label+'を補うなら'+(m.label==='カルシウム'?'：牛乳・チーズ・豆腐・小松菜・しらす':m.label==='鉄'?'：ほうれん草・小松菜・納豆・あさり・牛こま':'：たまご・納豆・チーズ・牛こま・えび')).join(' / ')}</p>`:''}
-        </div>
-      </details>
+      ${subAll.length?`<p class="sub-note">🔄 ${subAll.map(x=>x.from+'→'+x.to).join('・')} で代用します</p>`:''}
     </div>
     <div class="day-cards">
       <div class="day-card day1">
-        <div class="day-label">🔪 Day1<small>仕込み・多めに作る</small>
-          <div class="reroll-lead">🔁 別のものに替える</div>
-          <div class="reroll-row">
-            <button class="reroll-btn" onclick="rerollDay(1)">🎲 メイン</button>
-            <button class="reroll-btn" onclick="rerollSide(1)">🥗 副菜</button>
-            <button class="reroll-btn" onclick="rerollSoup(1)">🍲 汁物</button>
-          </div></div>
+        <div class="day-label">🔪 Day1<small>仕込み・多めに作る</small><button class="reroll-btn" onclick="rerollDay(1)">🎲 別メニューを提案し直す</button></div>
         <div class="day-body">
           ${combinedHtml(wf1Items)}
           <div class="dish-extras">
@@ -1775,13 +1455,7 @@ function renderThreeDayResults(plan){
       </div>
       <div class="carryover-flow">${plan.day1.main.name} → ${plan.day2.carryover.n}</div>
       <div class="day-card day2">
-        <div class="day-label">🍳 Day2<small>繰り越し＋もうひと品</small>
-          <div class="reroll-lead">🔁 別のものに替える</div>
-          <div class="reroll-row">
-            <button class="reroll-btn" onclick="rerollDay(2)">🎲 メイン</button>
-            <button class="reroll-btn" onclick="rerollSide(2)">🥗 副菜</button>
-            <button class="reroll-btn" onclick="rerollSoup(2)">🍲 汁物</button>
-          </div></div>
+        <div class="day-label">🍳 Day2<small>繰り越し＋もうひと品</small><button class="reroll-btn" onclick="rerollDay(2)">🎲 別メニューを提案し直す</button></div>
         <div class="day-body">
           ${combinedHtml(wf2Items)}
           <div class="dish-extras">
@@ -1795,14 +1469,7 @@ function renderThreeDayResults(plan){
       </div>
       <div class="carryover-flow">${plan.day2.newMain.name} → ${plan.day3.carryover.n}</div>
       <div class="day-card day3">
-        <div class="day-label">✨ Day3<small>繰り越し・ラクする日</small>
-          <!-- ⚠️Day3は前日からの繰り越しの日で、この日だけの主菜が無い。
-               替えられるのは副菜と汁物だけなので、ここは2つにしてある（3つ目を出しても押せる中身が無い）。 -->
-          <div class="reroll-lead">🔁 別のものに替える</div>
-          <div class="reroll-row">
-            <button class="reroll-btn" onclick="rerollSide(3)">🥗 副菜</button>
-            <button class="reroll-btn" onclick="rerollSoup(3)">🍲 汁物</button>
-          </div></div>
+        <div class="day-label">✨ Day3<small>繰り越し・ラクする日</small><button class="reroll-btn" onclick="rerollDay(3)">🎲 別メニューを提案し直す</button></div>
         <div class="day-body">
           ${combinedHtml(wf3Items)}
           <div class="dish-extras">
@@ -1867,7 +1534,7 @@ function newCandList(step, avoid){
   const {mains,sides,soups,nearMains,opts}=flowPools();
   let pool,fill=[];
   if(step===1){
-    pool=avoidRecent(mains);
+    pool=mains;
     if(opts.variety)pool=applyVariety(pool);
     fill=nearMains;
   }else if(step===2){
@@ -1892,7 +1559,7 @@ function newCandList(step, avoid){
   }
   // 候補の数。こんだてAI（みかさん作）はメイン候補を20〜25個出している。
   // 6個だと「選んだ気」がしないので、メイン選びだけ多めに出す。
-  return a.slice(0,step===1?(window.__stepUI?22:12):6);
+  return a.slice(0,step===1?12:6);
 }
 
 // こんだてAI（みかさん作）は、どの画面からも「← 食材を入力しなおす」で最初に戻れる。
@@ -1983,7 +1650,7 @@ function renderFlowStep(){
         <button class="cand-card${miss.length?' cand-near':''}" onclick="selectCand(${i})">
           <div class="cand-name">${c.name}</div>
           <div class="cand-meta">${c.genre||''}${c.ingredients&&c.ingredients.length?'｜'+c.ingredients.slice(0,3).join('・'):''}</div>
-          ${sub.length?`<div class="cand-sub">🔄 ${sub.map(x=>x.from+'→'+x.to).join('・')} で代用<small>${sub[0].why}</small></div>`:''}
+          ${sub.length?`<div class="cand-sub">🔄 ${sub.map(x=>x.from+'→'+x.to).join('・')} で代用</div>`:''}
           ${miss.length?`<div class="cand-miss">🛒 ${miss.join('・')} があれば作れます</div>`:''}
         </button>`;}).join('')}
     </div>
@@ -2035,18 +1702,24 @@ function setupReturningUser(){
     const hint=document.querySelector('.save-hint');
     if(hint)hint.textContent='💡 チェック内容はこの端末に自動保存。次に開いてもそのまま使えます。';
   }
-  // ⚠️2026-08-20: 旧「collapsed」（ページ内で折りたたむ仕組み）は廃止。
-  //   ボトムシート化で役目を終えたのに残っていて、シートの中身を display:none で隠していた。
+  // 2回目以降は調味料・冷蔵庫を折りたたみ、すぐ「献立をつくる」へ
+  const visited=localStorage.getItem('kondate_visited');
+  if(visited){
+    ['seasoning-section','ingredient-section'].forEach(id=>{
+      const sec=document.getElementById(id);
+      if(sec)sec.classList.add('collapsed');
+    });
+  }
   localStorage.setItem('kondate_visited','1');
+  document.querySelectorAll('#seasoning-section h2,#ingredient-section h2').forEach(h=>{
+    h.addEventListener('click',()=>h.closest('.section').classList.toggle('collapsed'));
+  });
 }
 
 // 初見ユーザー向けガイド（①調味料確認→②冷蔵庫3つ以上→③つくる、を連れて行く）
 // 「食材チェック済み」の有無で判定する（kondate_visitedは読み込み時に即セットされるため使えない）
 function setupFirstTimeGuide(){
   if(localStorage.getItem('kondate-i'))return; // 一度でも食材チェックが保存済みなら卒業
-  // ⚠️ 1画面1ステップのときは出さない。ガイドが指している部品（冷蔵庫ボタン等）が画面に無いので、
-  //    案内にならないうえ、上に重なって STEP の見出しを隠す（2026-09-05に実測）
-  if(typeof stepWanted==='function'&&stepWanted())return;
   showFirstTimeGuide();
 }
 
@@ -2149,10 +1822,9 @@ function init(){
   renderMainPick();
   updateCount();
   updateFavBtn();
-  initSheetSwipe();
   // はじめて開いた人は、まず冷蔵庫にチェックを入れないと何も始まらないので開けておく。
   // すでに登録済みの人（＝毎日使う人）は、紹介文を畳んでボタンをすぐ押せる位置に上げる。
-  if(st.ingredients.size===0)setTimeout(()=>togglePanel('ingredient'),400);
+  if(st.ingredients.size===0)togglePanel('ingredient');
   else document.body.classList.add('returning');
 }
 
@@ -2173,7 +1845,6 @@ async function loadData(){
       });
     }
     init();
-    if(typeof stepInit==='function')stepInit(); // ⚠️ データが読めたあとで呼ぶ。先に呼ぶと updateCount が D を見て落ちる
   }catch(e){
     console.error('データの読み込みに失敗しました',e);
     document.getElementById('results').classList.remove('hidden');
@@ -2209,7 +1880,7 @@ async function setupDailyReminder(){
     if(has(2)) return;
     await LN.schedule({ notifications: [{
       id: 2,
-      title: '今日の夕飯、まだ決まってない？ 🍚',
+      title: '今日の夕飯、まだ白紙？ 🍚',
       body: '押すだけで3日分。買い物に行く前に、まるっと決めちゃおう',
       schedule: { on: { hour: 16, minute: 0 }, allowWhileIdle: true }
     }] });
@@ -2248,232 +1919,6 @@ async function setupBannerAd(){
     document.body.style.paddingBottom = '70px';
   }catch(e){ console.log('banner ad skipped:', e); }
 }
-
-/* ===== 1画面1ステップ（?ui=step で開く・2026-09-05 試作） =====================
-   みかさん「献立アプリを『1画面1ステップ』ってまだやってなかったっけ？」（9/5）
-   元ネタ = みかさん自作の こんだてAI（~/git/kondate-ai）の設計:
-     1画面1ステップ／「STEP 2 / メイン」で現在地を明示／メイン候補20〜25個／
-     どの画面にも「← 食材を入力しなおす」／選ぶ→「✅これで作ってみる」の2段階／
-     おまかせは無い／「🔍 これも候補に入れて出し直す」＋自由入力で候補の外へ行ける
-   🚨 いまのトップ画面は壊していない。`?ui=step` を付けたときだけ、この形になる。
-      （公開中のアプリなので、みかさんが実物を触って決めてから既定にする）
-============================================================================ */
-const STEP_NAMES=['食材','メイン','献立'];
-window.__stepUI=false;
-let stepState={n:1,cands:[],pickIdx:-1,extra:[]};
-
-/* 🚨 2026-09-05 みかさん「普通のリリースしてるアプリにはいらない気がします。新しくなった方だけで
-   リリースすればいいかなと思ってます」→ **1画面1ステップを既定にした**。試作のときの切り替えボタンも外した。
-   ⚠️ こちらが困ったとき用に `?ui=classic` で旧画面に行ける道だけ残す（画面には出さない）。 */
-function stepWanted(){
-  try{
-    return new URLSearchParams(location.search).get('ui') !== 'classic';
-  }catch(e){return true;}
-}
-
-function stepInit(){
-  if(!stepWanted())return;
-  window.__stepUI=true;
-  document.body.classList.add('stepui');
-  // 🚨 setupFirstTimeGuide() は前のscriptブロックで先に走り終わっている（stepWantedがまだ無い）ので、
-  //    出てしまったガイドはここで消す。2026-09-05に実測で踏んだ順番の問題。
-  const g=document.getElementById('guide-bar'); if(g)g.remove();
-  const main=document.querySelector('main.container');
-  const wrap=document.createElement('div');
-  wrap.id='stepui';
-  wrap.innerHTML='<div class="step-head"><div class="step-now" id="step-now"></div>'
-    +'<div class="step-dots" id="step-dots"></div></div>'
-    +'<div class="step-body" id="step-body"></div>'
-    +'<div class="step-foot" id="step-foot"></div>'
-    +'<div id="step-stash" hidden></div>';
-  main.insertBefore(wrap,main.firstChild);
-  stepGo(1);
-}
-
-/* 画面を描き替える前に、使い回している部品を隠し場所へ戻す。
-   #ingredient-section と #seasoning-section は本体そのもの（作り直すとチェックが消える）。 */
-const STEP_KEEP=['ingredient-section','seasoning-section','results'];
-function stepStash(){
-  const st2=document.getElementById('step-stash');
-  if(!st2)return;
-  STEP_KEEP.forEach(id=>{const el=document.getElementById(id);if(el)st2.appendChild(el);});
-  const sv=document.querySelector('.servings-row'); if(sv)st2.appendChild(sv);
-  const bar=document.querySelector('.status-bar'); if(bar)st2.appendChild(bar);
-}
-
-function stepGo(n){
-  stepState.n=n;
-  const body=document.getElementById('step-body');
-  const foot=document.getElementById('step-foot');
-  document.getElementById('step-now').textContent='STEP '+n+' / '+STEP_NAMES[n-1];
-  document.getElementById('step-dots').innerHTML=STEP_NAMES.map((nm,i)=>
-    '<span class="'+(i+1<n?'done':i+1===n?'cur':'')+'"></span>').join('');
-  stepStash(); // 🚨 innerHTML='' の前に、使い回す部品を退避する。
-               //    しないと冷蔵庫のチェックごと消える（2026-09-05に実測で踏んだ）
-  body.innerHTML=''; foot.innerHTML='';
-  if(n===1)stepScreenIng(body,foot);
-  else if(n===2)stepScreenMain(body,foot);
-  else stepScreenResult(body,foot);
-  window.scrollTo({top:0,behavior:'smooth'});
-}
-
-/* ---- STEP 1 / 食材 ---- */
-function stepScreenIng(body,foot){
-  body.appendChild(stepLead('冷蔵庫にあるものにチェックを入れてください。','ここで入れたものだけで献立を組みます。'));
-  const sv=document.querySelector('.servings-row');
-  if(sv)body.appendChild(sv);
-  ['ingredient-section','seasoning-section'].forEach(id=>{
-    const el=document.getElementById(id);
-    if(!el)return;
-    el.classList.remove('panel','hidden');
-    el.classList.add('step-open');
-    body.appendChild(el);
-  });
-  const bar=document.querySelector('.status-bar');
-  if(bar)foot.appendChild(bar);
-  const next=document.createElement('button');
-  next.className='step-next';
-  next.textContent='次へ：メインを選ぶ →';
-  next.onclick=()=>{
-    const {mains,nearMains}=flowPools();
-    if(mains.length===0&&nearMains.length===0){
-      alert('いまのチェックだと、作れるメインが見つかりませんでした。冷蔵庫か調味料のチェックを増やしてみてください。');
-      return;
-    }
-    stepState.extra=[]; stepState.pickIdx=-1;
-    stepGo(2);
-  };
-  foot.appendChild(next);
-  if(typeof updateCount==='function')updateCount();
-}
-
-/* ---- STEP 2 / メイン ---- */
-function stepScreenMain(body,foot){
-  body.appendChild(stepLead('作りたいメインを1つ選んでください。','これを1日目にして、3日分を組み立てます。'));
-  const search=document.createElement('div');
-  search.className='step-search';
-  search.innerHTML='<label>🔍 これも候補に入れて出し直す</label>'
-    +'<input type="text" id="step-q" placeholder="料理名や食材で探す（例：なす／回鍋肉）" autocomplete="off" oninput="stepSearch(this.value)">'
-    +'<div id="step-sugg" class="menu-suggestions" style="display:none"></div>';
-  body.appendChild(search);
-  const grid=document.createElement('div');
-  grid.className='cand-grid'; grid.id='step-grid';
-  body.appendChild(grid);
-  const again=document.createElement('button');
-  again.className='regen-btn';
-  again.textContent='🔄 別の候補を見る';
-  again.onclick=()=>{stepState.cands=null;stepState.pickIdx=-1;stepRenderCands(true);};
-  body.appendChild(again);
-  stepRenderCands(false);
-  const go=document.createElement('button');
-  go.className='step-next'; go.id='step-confirm'; go.disabled=true;
-  go.textContent='✅ これで作ってみる';
-  go.onclick=()=>{ if(stepState.pickIdx>=0)stepGo(3); };
-  foot.appendChild(go);
-  foot.appendChild(stepBackBtn());
-}
-
-function stepRenderCands(reshuffle){
-  const avoid=reshuffle&&stepState.lastIds?new Set(stepState.lastIds):null;
-  const list=newCandList(1,avoid);
-  const seen=new Set(list.map(x=>x.id));
-  const extra=(stepState.extra||[]).filter(x=>!seen.has(x.id));
-  stepState.cands=[...extra,...list];
-  stepState.lastIds=stepState.cands.map(x=>x.id);
-  const grid=document.getElementById('step-grid');
-  grid.innerHTML=stepState.cands.map((c,i)=>{
-    const miss=missingIngredients(c), sub=substitutions(c);
-    const on=stepState.pickIdx===i?' cand-on':'';
-    return '<button class="cand-card'+(miss.length?' cand-near':'')+on+'" onclick="stepPick('+i+')">'
-      +'<div class="cand-name">'+c.name+'</div>'
-      +'<div class="cand-meta">'+(c.genre||'')+(c.ingredients&&c.ingredients.length?'｜'+c.ingredients.slice(0,3).join('・'):'')+'</div>'
-      +(sub.length?'<div class="cand-sub">🔄 '+sub.map(x=>x.from+'→'+x.to).join('・')+' で代用<small>'+sub[0].why+'</small></div>':'')
-      +(miss.length?'<div class="cand-miss">🛒 '+miss.join('・')+' があれば作れます</div>':'')
-      +'</button>';
-  }).join('');
-}
-
-/* 選ぶ → 確かめる の2段階。タップしただけでは先に進まない */
-function stepPick(i){
-  stepState.pickIdx=i;
-  const grid=document.getElementById('step-grid');
-  [...grid.children].forEach((el,idx)=>el.classList.toggle('cand-on',idx===i));
-  const btn=document.getElementById('step-confirm');
-  btn.disabled=false;
-  btn.textContent='✅ 「'+stepState.cands[i].name+'」で作ってみる';
-}
-
-/* 候補の外へ行く。料理名でも食材名でも受ける（トップの検索欄と同じ探し方） */
-function stepSearch(q){
-  const box=document.getElementById('step-sugg');
-  q=(q||'').trim();
-  if(!q){box.style.display='none';box.innerHTML='';return;}
-  const hits=[];
-  const ings=new Set();
-  (D.main||[]).forEach(m=>(m.ingredients||[]).forEach(i=>{if(i.includes(q))ings.add(i);}));
-  [...ings].slice(0,3).forEach(i=>{
-    const n=(D.main||[]).filter(m=>usesIng(m,i)).length;
-    hits.push({kind:'ing',key:i,name:i,cat:'食材 '+n+'品'});
-  });
-  (D.main||[]).forEach(m=>{if(m.name.includes(q))hits.push({kind:'menu',key:m.id,name:m.name,cat:'主菜'});});
-  box.innerHTML=hits.length===0
-    ? '<div class="menu-suggest-empty">見つかりませんでした（登録されている料理と食材から探します）</div>'
-    : hits.slice(0,8).map(h=>'<div class="menu-suggest-item" onclick="stepAdd(\''+h.kind+'\',\''+h.key+'\')"><span>'+h.name+'</span><span class="menu-suggest-cat">'+h.cat+'</span></div>').join('');
-  box.style.display='block';
-}
-
-function stepAdd(kind,key){
-  if(kind==='ing'){
-    (D.main||[]).filter(m=>usesIng(m,key)).slice(0,8).forEach(m=>{
-      if(!stepState.extra.some(x=>x.id===m.id))stepState.extra.push(m);
-    });
-  }else{
-    const m=(D.main||[]).find(x=>x.id===key);
-    if(m&&!stepState.extra.some(x=>x.id===m.id))stepState.extra.unshift(m);
-  }
-  document.getElementById('step-q').value='';
-  document.getElementById('step-sugg').style.display='none';
-  stepState.pickIdx=-1;
-  const btn=document.getElementById('step-confirm');
-  btn.disabled=true; btn.textContent='✅ これで作ってみる';
-  stepRenderCands(false);
-}
-
-/* ---- STEP 3 / 献立 ---- */
-function stepScreenResult(body,foot){
-  const item=stepState.cands[stepState.pickIdx];
-  const res=document.getElementById('results');
-  body.appendChild(res);
-  const opts=getOpts();
-  const bentoIds=new Set((D._meta&&D._meta.bento_ids)||[]);
-  generateThreeDay(opts,bentoIds,item);
-  const again=document.createElement('button');
-  again.className='regen-btn';
-  again.textContent='← メインを選び直す';
-  again.onclick=()=>stepGo(2);
-  foot.appendChild(again);
-  foot.appendChild(stepBackBtn());
-}
-
-function stepBackBtn(){
-  const b=document.createElement('button');
-  b.className='regen-btn';
-  b.textContent='← 食材を入力しなおす';
-  b.onclick=()=>{
-    const res=document.getElementById('results');
-    if(res){res.classList.add('hidden');res.innerHTML='';}
-    stepGo(1);
-  };
-  return b;
-}
-
-function stepLead(a,b){
-  const d=document.createElement('p');
-  d.className='step-lead';
-  d.innerHTML=a+(b?'<br><span>'+b+'</span>':'');
-  return d;
-}
-
 setTimeout(setupBannerAd, 1500);
 </script>
 </body>

@@ -38,7 +38,7 @@
 		</data>
 		<key>Frameworks/Capacitor.framework/Capacitor</key>
 		<data>
-		FyWJGQWBCmGSHCzfMfsnu5563SE=
+		ILc7olTkfRNQixYbcWk6S+UesA0=
 		</data>
 		<key>Frameworks/Capacitor.framework/Info.plist</key>
 		<data>
@@ -58,7 +58,7 @@
 		</data>
 		<key>Frameworks/Cordova.framework/Cordova</key>
 		<data>
-		itOkT0HRNWhNw20o1g3x8Uf64Gs=
+		7p3oDjiH7XnGQitOqaq3kVMxQO8=
 		</data>
 		<key>Frameworks/Cordova.framework/Info.plist</key>
 		<data>
@@ -74,7 +74,7 @@
 		</data>
 		<key>Info.plist</key>
 		<data>
-		a3H33E3cWdJrHlpajcJ+ezJU7Us=
+		RjHuE35+B3YduYwXLjeJOwOaB7k=
 		</data>
 		<key>PkgInfo</key>
 		<data>
@@ -102,7 +102,7 @@
 		</data>
 		<key>public/data.json</key>
 		<data>
-		fj/TySVBAQBg6g6AI+YwU695mok=
+		GQW000rFWZSyB59qSAVxqiWaz7I=
 		</data>
 		<key>public/icon-192-maskable.png</key>
 		<data>
@@ -130,7 +130,7 @@
 		</data>
 		<key>public/index.html</key>
 		<data>
-		le1UOKafW1jH5Go8A5AhN+SwVGc=
+		8BYxeDj4GLiS8ncnE/29EaTcKBw=
 		</data>
 		<key>public/manifest.json</key>
 		<data>
@@ -146,7 +146,7 @@
 		</data>
 		<key>public/recipes.json</key>
 		<data>
-		ELen3hobo0Di+74XYoL0E/exP1s=
+		HggkbpvR2R0S7k3Iujw5Kvmq8wI=
 		</data>
 		<key>public/service-worker.js</key>
 		<data>
@@ -215,7 +215,7 @@
 		<dict>
 			<key>hash2</key>
 			<data>
-			KQlXQQg9EaFKA0KZa0JEY8bTJ1MXFBlm7dQ161WD2QM=
+			sTtVNAthNQ32aOAOMu83hqBMxq+Vvii/+iaIwX+i304=
 			</data>
 		</dict>
 		<key>Frameworks/Capacitor.framework/Info.plist</key>
@@ -250,7 +250,7 @@
 		<dict>
 			<key>hash2</key>
 			<data>
-			juVCIeL5QGYHXbLXPKcgJR0PV9yR6w9GDJzUivjnXn8=
+			YhA09+ktctl0kUNlqsVEdawwiz/Xj9qFDzIG9WINSpA=
 			</data>
 		</dict>
 		<key>Frameworks/Cordova.framework/Info.plist</key>
@@ -313,7 +313,7 @@
 		<dict>
 			<key>hash2</key>
 			<data>
-			LBpc56AuNeQ7QZAAqKTp0rkqF2EwcDAdfNAwqH4ncGQ=
+			GpC5E7HD7s7FtY9vZUsIT1taANoLRcb2+S+nHNWIrmI=
 			</data>
 		</dict>
 		<key>public/icon-192-maskable.png</key>
@@ -362,7 +362,7 @@
 		<dict>
 			<key>hash2</key>
 			<data>
-			a7voy2utV73Evci76soZOUGXRnrezksTW4MeiolZjmM=
+			Yn1S5xqw5YNoHDaM657E7yPJhTCmQ494ZVWvKvqJljo=
 			</data>
 		</dict>
 		<key>public/manifest.json</key>
@@ -390,7 +390,7 @@
 		<dict>
 			<key>hash2</key>
 			<data>
-			qLZLs6E83T6AmfbvA8Tdag0goxmDQUVL0OoBfFkRL6Q=
+			FMRa78YmYJEwZFEqfyNBt8otMAQXB0JWo9WI6uumjiA=
 			</data>
 		</dict>
 		<key>public/service-worker.js</key>
