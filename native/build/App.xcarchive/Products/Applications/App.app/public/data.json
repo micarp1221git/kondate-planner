@@ -1,7 +1,7 @@
 {
  "_meta": {
   "purpose": "献立サイトのデータ基盤。料理の型マトリクス×3日分ロジックから生成。サイトはこのデータをロジックで組み合わせて表示する（毎回AIを使わない=運用コスト$0）。",
-  "version": "3.3 (2026-07-27) 缶詰レシピ27品を追加（さば水煮/さば味噌煮/いわし蒲焼き/ツナ/焼き鳥/大豆水煮/ミックスビーンズ/コーン）",
+  "version": "3.7 (2026-09-03) 味の型エンジンv1.1: 野菜の対(色・食感・火の通り)×根菜の切り方＋型4つ追加(甘酢あん/塩レモン/カレー炒め/生姜醤油)で34品追加",
   "genre": [
    "和",
    "洋",
@@ -87,7 +87,32 @@
    "single": "単品/丼/麺/ワンプレート。3品作る元気がない日の『これ1つでOK』メニュー"
   },
   "note_zubora": "ペルソナ=ズボラさん。レンジ/ワンパン/放置/和えるだけ中心。揚げ物は全て『揚げ焼き（少量油・両面）』方式。pointフィールドに手間軽減のコツ",
-  "keep_ok説明": "keep_ok=true は『置いといても（冷めても/温め直しても）美味しい・作り置き向き』。アプリの『置いといても美味しい』チェックでこのフラグの料理だけ表示する想定"
+  "keep_ok説明": "keep_ok=true は『置いといても（冷めても/温め直しても）美味しい・作り置き向き』。アプリの『置いといても美味しい』チェックでこのフラグの料理だけ表示する想定",
+  "templates": {
+   "説明": "tpl=味の型のid。同じ型×同じ主材が直近2週間に出ていたら選ばない（index.html avoidRecent）。新しい型を足すときは scratch/kondate_tpl.py の T に1つ足して再生成",
+   "型": [
+    "negishio=ねぎ塩炒め",
+    "oyster=オイスター炒め",
+    "umashio=中華うま塩炒め",
+    "toromi=とろみ中華煮",
+    "miso=味噌炒め",
+    "oroshiponzu=カリカリ焼き・おろしポン酢",
+    "ninnikushoyu=にんにく醤油炒め",
+    "umani=和風うま煮",
+    "amazu=甘酢あん炒め",
+    "shiolemon=塩レモン炒め",
+    "curry=カレー炒め",
+    "shoga=生姜醤油炒め"
+   ],
+   "野菜の対": [
+    "小松菜とにんじん（緑×橙・葉物と薄切り根菜で火の通りをそろえる）",
+    "ちんげん菜と大根（葉物×いちょう切りの根菜で食感に差）",
+    "キャベツとピーマン（甘みと苦みの対・緑2色）",
+    "もやしとにら（シャキ×香り・安い早い）",
+    "白菜とにんじん（煮ても炒めても崩れにくい対）",
+    "きのこと小松菜（うま味×葉物・食物繊維）"
+   ]
+  }
  },
  "main": [
   {
@@ -109,7 +134,7 @@
    "carryover": [
     "照り焼き丼",
     "照り焼きサンド",
-    "サラダのせ"
+    "のせサラダ"
    ],
    "toriwake": {
     "kodomo": "そのまま",
@@ -139,7 +164,7 @@
    "batch": true,
    "carryover": [
     "卵とじ",
-    "炊き込みご飯の具"
+    "炊き込みご飯"
    ],
    "toriwake": {
     "kodomo": "そのまま",
@@ -167,7 +192,7 @@
    "batch": false,
    "carryover": [
     "親子丼",
-    "うどんの具"
+    "うどん"
    ],
    "toriwake": {
     "kodomo": "そのまま",
@@ -192,7 +217,7 @@
    ],
    "batch": true,
    "carryover": [
-    "サラダのせ",
+    "のせサラダ",
     "トマト煮込み",
     "サンド"
    ],
@@ -221,8 +246,7 @@
    ],
    "batch": true,
    "carryover": [
-    "甘酢丼",
-    "お弁当おかず"
+    "甘酢丼"
    ],
    "toriwake": {
     "kodomo": "そのまま",
@@ -513,16 +537,19 @@
    "genre": "和",
    "protein": "豚ロース",
    "method": "焼く",
-   "ratio": "醤油1:みりん1+おろし生姜",
+   "ratio": "醤油3:みりん2:酒1+砂糖+おろし生姜",
    "seasonings": [
     "醤油",
     "みりん",
-    "酒"
+    "酒",
+    "砂糖",
+    "生姜"
    ],
    "ingredients": [
     "豚ロース薄切り",
     "玉ねぎ",
-    "生姜"
+    "生姜",
+    "小麦粉"
    ],
    "batch": true,
    "carryover": [
@@ -557,7 +584,7 @@
    "batch": true,
    "carryover": [
     "チャーシュー丼",
-    "ラーメンの具",
+    "のせラーメン",
     "炒飯"
    ],
    "toriwake": {
@@ -642,7 +669,7 @@
    "batch": true,
    "carryover": [
     "回鍋肉丼",
-    "焼きそばの具"
+    "焼きそば"
    ],
    "toriwake": {
     "kodomo": "そのまま",
@@ -1051,7 +1078,7 @@
    "batch": true,
    "carryover": [
     "卵とじ",
-    "うどんの具"
+    "うどん"
    ],
    "toriwake": {
     "kodomo": "そのまま",
@@ -1228,7 +1255,7 @@
    ],
    "batch": false,
    "carryover": [
-    "お弁当"
+    "炒めそうめん"
    ],
    "toriwake": {
     "kodomo": "そのまま",
@@ -1385,8 +1412,7 @@
    ],
    "batch": true,
    "carryover": [
-    "甘酢丼",
-    "お弁当"
+    "甘酢丼"
    ],
    "toriwake": {
     "kodomo": "そのまま",
@@ -1465,8 +1491,7 @@
    ],
    "batch": true,
    "carryover": [
-    "ほぐして混ぜご飯",
-    "お弁当"
+    "ほぐして混ぜご飯"
    ],
    "toriwake": {
     "kodomo": "そのまま",
@@ -1690,8 +1715,7 @@
    ],
    "batch": true,
    "carryover": [
-    "丼",
-    "お弁当"
+    "丼"
    ],
    "toriwake": {
     "kodomo": "そのまま",
@@ -1943,7 +1967,7 @@
    "batch": true,
    "carryover": [
     "丼",
-    "おにぎりの具"
+    "おにぎり"
    ],
    "toriwake": {
     "kodomo": "そのまま",
@@ -1973,7 +1997,7 @@
    "batch": true,
    "carryover": [
     "角煮丼",
-    "ラーメンの具",
+    "のせラーメン",
     "卵と煮る"
    ],
    "toriwake": {
@@ -2027,7 +2051,7 @@
    "batch": false,
    "carryover": [
     "サラダ",
-    "そうめんのせ"
+    "のせそうめん"
    ],
    "toriwake": {
     "kodomo": "ごまだれ",
@@ -2084,8 +2108,7 @@
    ],
    "batch": true,
    "carryover": [
-    "甘酢丼",
-    "お弁当"
+    "甘酢丼"
    ],
    "toriwake": {
     "kodomo": "そのまま",
@@ -2342,7 +2365,7 @@
    "batch": true,
    "carryover": [
     "丼",
-    "春雨追加"
+    "春雨スープ"
    ],
    "toriwake": {
     "kodomo": "そのまま(辛味なし)",
@@ -2424,7 +2447,6 @@
    ],
    "batch": true,
    "carryover": [
-    "お弁当",
     "丼"
    ],
    "toriwake": {
@@ -2782,8 +2804,7 @@
    ],
    "batch": true,
    "carryover": [
-    "甘酢丼",
-    "お弁当"
+    "甘酢丼"
    ],
    "toriwake": {
     "kodomo": "そのまま",
@@ -2866,7 +2887,7 @@
    "carryover": [
     "サラダ",
     "サンド",
-    "おにぎりの具"
+    "おにぎり"
    ],
    "toriwake": {
     "kodomo": "そのまま",
@@ -2894,8 +2915,7 @@
    "batch": true,
    "carryover": [
     "肉巻き丼",
-    "お弁当おかず",
-    "サラダのせ"
+    "のせサラダ"
    ],
    "toriwake": {
     "kodomo": "そのまま",
@@ -2922,8 +2942,8 @@
    ],
    "batch": true,
    "carryover": [
-    "パスタの具",
-    "オムレツの具"
+    "パスタ",
+    "オムレツ"
    ],
    "toriwake": {
     "kodomo": "そのまま",
@@ -3012,8 +3032,7 @@
    ],
    "batch": false,
    "carryover": [
-    "サンドの具",
-    "お弁当おかず"
+    "サンドイッチ"
    ],
    "toriwake": {
     "kodomo": "そのまま",
@@ -3041,7 +3060,7 @@
    "batch": true,
    "carryover": [
     "棒々鶏サラダ",
-    "春雨サラダの具"
+    "春雨サラダ"
    ],
    "toriwake": {
     "kodomo": "たれ少なめ",
@@ -3069,7 +3088,7 @@
    "batch": true,
    "carryover": [
     "ほぐして混ぜごはん",
-    "うどんにかける"
+    "かけうどん"
    ],
    "toriwake": {
     "kodomo": "そのまま",
@@ -3154,8 +3173,8 @@
    ],
    "batch": true,
    "carryover": [
-    "骨を外してチャーハンの具",
-    "スープの具"
+    "チャーハン",
+    "具だくさんスープ"
    ],
    "toriwake": {
     "kodomo": "甘め",
@@ -3184,7 +3203,7 @@
    "batch": true,
    "carryover": [
     "ごはんにかけてあんかけ丼",
-    "うどんにかける"
+    "かけうどん"
    ],
    "toriwake": {
     "kodomo": "そのまま",
@@ -3373,7 +3392,7 @@
    ],
    "batch": false,
    "carryover": [
-    "パンにのせる"
+    "のせトースト"
    ],
    "toriwake": {
     "kodomo": "そのまま",
@@ -3483,7 +3502,7 @@
    "batch": true,
    "carryover": [
     "あんかけ丼",
-    "焼きそばの具"
+    "焼きそば"
    ],
    "toriwake": {
     "kodomo": "野菜を小さめに",
@@ -3512,7 +3531,7 @@
    "batch": true,
    "carryover": [
     "油淋鶏丼",
-    "そうめんのせ"
+    "のせそうめん"
    ],
    "toriwake": {
     "kodomo": "タレ少なめ",
@@ -3540,8 +3559,8 @@
    ],
    "batch": true,
    "carryover": [
-    "中華丼の具",
-    "焼きそばの具"
+    "中華丼",
+    "焼きそば"
    ],
    "toriwake": {
     "kodomo": "そのまま",
@@ -3687,7 +3706,7 @@
    "batch": true,
    "carryover": [
     "あんかけ丼",
-    "うどんにかける"
+    "かけうどん"
    ],
    "toriwake": {
     "kodomo": "辛みなし",
@@ -3717,7 +3736,7 @@
    "carryover": [
     "そぼろ丼",
     "レタス包み",
-    "炒飯の具"
+    "炒飯"
    ],
    "toriwake": {
     "kodomo": "そのまま",
@@ -3746,7 +3765,7 @@
    "batch": true,
    "carryover": [
     "なす丼",
-    "そうめんのせ"
+    "のせそうめん"
    ],
    "toriwake": {
     "kodomo": "そのまま",
@@ -3773,8 +3792,7 @@
    ],
    "batch": true,
    "carryover": [
-    "照り煮丼",
-    "お弁当のおかず"
+    "照り煮丼"
    ],
    "toriwake": {
     "kodomo": "骨をはずして",
@@ -3801,8 +3819,8 @@
    ],
    "batch": true,
    "carryover": [
-    "サンドの具",
-    "サラダのせ"
+    "サンドイッチ",
+    "のせサラダ"
    ],
    "toriwake": {
     "kodomo": "骨をはずして",
@@ -3858,8 +3876,8 @@
    ],
    "batch": true,
    "carryover": [
-    "サラダのせ",
-    "サンドの具"
+    "のせサラダ",
+    "サンドイッチ"
    ],
    "toriwake": {
     "kodomo": "骨をはずして",
@@ -3888,7 +3906,7 @@
    "batch": true,
    "carryover": [
     "煮込み丼",
-    "ラーメンの具"
+    "のせラーメン"
    ],
    "toriwake": {
     "kodomo": "骨をはずして",
@@ -3945,8 +3963,7 @@
    ],
    "batch": true,
    "carryover": [
-    "オイスター丼",
-    "お弁当のおかず"
+    "オイスター丼"
    ],
    "toriwake": {
     "kodomo": "骨をはずして",
@@ -3975,7 +3992,7 @@
    "batch": true,
    "carryover": [
     "味噌炒め丼",
-    "焼きそばの具"
+    "焼きそば"
    ],
    "toriwake": {
     "kodomo": "甘めに",
@@ -4004,7 +4021,7 @@
    ],
    "batch": false,
    "carryover": [
-    "焼きそばの具",
+    "焼きそば",
     "ラーメンにのせる"
    ],
    "toriwake": {
@@ -4061,7 +4078,7 @@
    "batch": false,
    "carryover": [
     "パスタにあえる",
-    "サンドの具"
+    "サンドイッチ"
    ],
    "toriwake": {
     "kodomo": "にんにく少なめ",
@@ -4116,8 +4133,8 @@
    ],
    "batch": false,
    "carryover": [
-    "パンにのせる",
-    "オムレツの具"
+    "のせトースト",
+    "オムレツ"
    ],
    "toriwake": {
     "kodomo": "そのまま",
@@ -4173,8 +4190,7 @@
    "batch": true,
    "carryover": [
     "しぐれ煮丼",
-    "おにぎりの具",
-    "お弁当のおかず"
+    "おにぎり"
    ],
    "toriwake": {
     "kodomo": "生姜少なめ",
@@ -4232,7 +4248,7 @@
    "batch": true,
    "carryover": [
     "カレーピラフ",
-    "サンドの具"
+    "サンドイッチ"
    ],
    "toriwake": {
     "kodomo": "カレー粉少なめ",
@@ -4319,7 +4335,7 @@
    "batch": false,
    "carryover": [
     "パスタにあえる",
-    "サラダのせ"
+    "のせサラダ"
    ],
    "toriwake": {
     "kodomo": "にんにく少なめ",
@@ -4347,7 +4363,7 @@
    ],
    "batch": true,
    "carryover": [
-    "ごはんにかける",
+    "かけごはん",
     "パスタソース"
    ],
    "toriwake": {
@@ -4376,7 +4392,7 @@
    ],
    "batch": false,
    "carryover": [
-    "焼きそばの具",
+    "焼きそば",
     "ビビンバ風丼"
    ],
    "toriwake": {
@@ -4404,41 +4420,12 @@
    ],
    "batch": true,
    "carryover": [
-    "中華丼の具",
-    "うどんにかける"
+    "中華丼",
+    "かけうどん"
    ],
    "toriwake": {
     "kodomo": "そのまま",
     "otona": "ラー油・粗びき胡椒"
-   },
-   "keep_ok": true
-  },
-  {
-   "id": "asia-gyu-ethnic",
-   "name": "牛こまのエスニック炒め",
-   "genre": "アジアン",
-   "protein": "牛こま",
-   "method": "炒める",
-   "ratio": "ナンプラー1:醤油1:砂糖1",
-   "seasonings": [
-    "ナンプラー",
-    "醤油",
-    "砂糖",
-    "にんにく"
-   ],
-   "ingredients": [
-    "牛こま",
-    "玉ねぎ",
-    "パプリカ"
-   ],
-   "batch": true,
-   "carryover": [
-    "エスニック丼",
-    "レタス包み"
-   ],
-   "toriwake": {
-    "kodomo": "ナンプラー控えめ",
-    "otona": "唐辛子・ライム"
    },
    "keep_ok": true
   },
@@ -4463,7 +4450,7 @@
    "batch": true,
    "carryover": [
     "そぼろ煮丼",
-    "うどんにかける"
+    "かけうどん"
    ],
    "toriwake": {
     "kodomo": "そのまま",
@@ -4492,7 +4479,7 @@
    "batch": true,
    "carryover": [
     "ハンバーグ丼",
-    "サンドの具"
+    "サンドイッチ"
    ],
    "toriwake": {
     "kodomo": "おろし少なめ",
@@ -4521,7 +4508,7 @@
    ],
    "batch": false,
    "carryover": [
-    "焼きそばの具",
+    "焼きそば",
     "ラーメンにのせる"
    ],
    "toriwake": {
@@ -4549,7 +4536,7 @@
    ],
    "batch": false,
    "carryover": [
-    "パンにのせる",
+    "のせトースト",
     "パスタソース"
    ],
    "toriwake": {
@@ -4633,8 +4620,8 @@
    ],
    "batch": true,
    "carryover": [
-    "中華丼の具",
-    "うどんにかける"
+    "中華丼",
+    "かけうどん"
    ],
    "toriwake": {
     "kodomo": "そのまま",
@@ -4664,7 +4651,7 @@
    "batch": false,
    "carryover": [
     "丼にする",
-    "チャーハンの具"
+    "チャーハン"
    ],
    "toriwake": {
     "kodomo": "そのまま",
@@ -4719,8 +4706,7 @@
    ],
    "batch": true,
    "carryover": [
-    "お弁当のおかず",
-    "のり巻きの具"
+    "のり巻き"
    ],
    "toriwake": {
     "kodomo": "そのまま",
@@ -4776,8 +4762,7 @@
    ],
    "batch": true,
    "carryover": [
-    "サンドの具",
-    "お弁当のおかず"
+    "サンドイッチ"
    ],
    "toriwake": {
     "kodomo": "そのまま",
@@ -4806,8 +4791,7 @@
    ],
    "batch": true,
    "carryover": [
-    "サンドの具",
-    "お弁当のおかず"
+    "サンドイッチ"
    ],
    "toriwake": {
     "kodomo": "そのまま",
@@ -4837,7 +4821,7 @@
    "batch": false,
    "carryover": [
     "丼にする",
-    "チャーハンの具"
+    "チャーハン"
    ],
    "toriwake": {
     "kodomo": "そのまま",
@@ -4864,7 +4848,7 @@
    ],
    "batch": false,
    "carryover": [
-    "焼きそばの具",
+    "焼きそば",
     "丼にする"
    ],
    "toriwake": {
@@ -4890,8 +4874,8 @@
    ],
    "batch": false,
    "carryover": [
-    "ごはんにのせる",
-    "サンドの具"
+    "のせごはん",
+    "サンドイッチ"
    ],
    "toriwake": {
     "kodomo": "ナンプラー控えめ",
@@ -4926,6 +4910,3638 @@
     "otona": "からし・黒こしょう"
    },
    "point": "とんかつ用の厚切りロースで。筋を切ってから衣をつけると反らない。低めの温度でじっくり"
+  },
+  {
+   "id": "asia-tamori-curry",
+   "name": "タモリカレー(鶏のスパイスカレー・週末じっくり)",
+   "genre": "アジアン",
+   "protein": "鶏もも",
+   "method": "煮る",
+   "ratio": "カレー粉+チャツネ+赤ワイン+ヨーグルト+チーズ",
+   "seasonings": [
+    "カレー粉",
+    "ターメリック",
+    "クミン",
+    "醤油",
+    "砂糖",
+    "塩"
+   ],
+   "ingredients": [
+    "鶏もも肉",
+    "玉ねぎ",
+    "ホールトマト",
+    "ヨーグルト",
+    "とろけるチーズ",
+    "にんにく",
+    "生姜"
+   ],
+   "batch": true,
+   "carryover": [
+    "カレーうどん",
+    "カレードリア"
+   ],
+   "toriwake": {
+    "kodomo": "甘口に(ヨーグルトを足す)",
+    "otona": "そのまま"
+   },
+   "keep_ok": true
+  },
+  {
+   "id": "tpl-negishio-0-0",
+   "name": "鶏ももとキャベツのねぎ塩炒め",
+   "genre": "中",
+   "protein": "鶏もも",
+   "method": "炒める",
+   "ratio": "鶏ガラ小2:塩小1/3:ごま油大1:レモン小2",
+   "seasonings": [
+    "ごま油",
+    "鶏ガラ",
+    "塩",
+    "レモン"
+   ],
+   "ingredients": [
+    "鶏もも肉",
+    "キャベツ",
+    "長ねぎ"
+   ],
+   "batch": true,
+   "carryover": [
+    "丼にのせる",
+    "翌日は卵とじ"
+   ],
+   "toriwake": {
+    "kodomo": "そのまま",
+    "otona": "黒こしょう・レモン追加"
+   },
+   "keep_ok": true,
+   "tpl": "negishio",
+   "point": "味の型「ねぎ塩炒め」。主材と野菜は差し替えOK"
+  },
+  {
+   "id": "tpl-negishio-0-1",
+   "name": "鶏ももと小松菜のねぎ塩炒め",
+   "genre": "中",
+   "protein": "鶏もも",
+   "method": "炒める",
+   "ratio": "鶏ガラ小2:塩小1/3:ごま油大1:レモン小2",
+   "seasonings": [
+    "ごま油",
+    "鶏ガラ",
+    "塩",
+    "レモン"
+   ],
+   "ingredients": [
+    "鶏もも肉",
+    "小松菜",
+    "長ねぎ"
+   ],
+   "batch": true,
+   "carryover": [
+    "丼にのせる",
+    "翌日は卵とじ"
+   ],
+   "toriwake": {
+    "kodomo": "そのまま",
+    "otona": "黒こしょう・レモン追加"
+   },
+   "keep_ok": true,
+   "tpl": "negishio",
+   "point": "味の型「ねぎ塩炒め」。主材と野菜は差し替えOK"
+  },
+  {
+   "id": "tpl-negishio-0-2",
+   "name": "鶏ももともやしのねぎ塩炒め",
+   "genre": "中",
+   "protein": "鶏もも",
+   "method": "炒める",
+   "ratio": "鶏ガラ小2:塩小1/3:ごま油大1:レモン小2",
+   "seasonings": [
+    "ごま油",
+    "鶏ガラ",
+    "塩",
+    "レモン"
+   ],
+   "ingredients": [
+    "鶏もも肉",
+    "もやし",
+    "長ねぎ"
+   ],
+   "batch": true,
+   "carryover": [
+    "丼にのせる",
+    "翌日は卵とじ"
+   ],
+   "toriwake": {
+    "kodomo": "そのまま",
+    "otona": "黒こしょう・レモン追加"
+   },
+   "keep_ok": true,
+   "tpl": "negishio",
+   "point": "味の型「ねぎ塩炒め」。主材と野菜は差し替えOK"
+  },
+  {
+   "id": "tpl-negishio-1-0",
+   "name": "鶏むねとキャベツのねぎ塩炒め",
+   "genre": "中",
+   "protein": "鶏むね",
+   "method": "炒める",
+   "ratio": "鶏ガラ小2:塩小1/3:ごま油大1:レモン小2",
+   "seasonings": [
+    "ごま油",
+    "鶏ガラ",
+    "塩",
+    "レモン"
+   ],
+   "ingredients": [
+    "鶏むね肉",
+    "キャベツ",
+    "長ねぎ"
+   ],
+   "batch": true,
+   "carryover": [
+    "丼にのせる",
+    "翌日は卵とじ"
+   ],
+   "toriwake": {
+    "kodomo": "そのまま",
+    "otona": "黒こしょう・レモン追加"
+   },
+   "keep_ok": true,
+   "tpl": "negishio",
+   "point": "味の型「ねぎ塩炒め」。主材と野菜は差し替えOK"
+  },
+  {
+   "id": "tpl-negishio-1-1",
+   "name": "鶏むねと小松菜のねぎ塩炒め",
+   "genre": "中",
+   "protein": "鶏むね",
+   "method": "炒める",
+   "ratio": "鶏ガラ小2:塩小1/3:ごま油大1:レモン小2",
+   "seasonings": [
+    "ごま油",
+    "鶏ガラ",
+    "塩",
+    "レモン"
+   ],
+   "ingredients": [
+    "鶏むね肉",
+    "小松菜",
+    "長ねぎ"
+   ],
+   "batch": true,
+   "carryover": [
+    "丼にのせる",
+    "翌日は卵とじ"
+   ],
+   "toriwake": {
+    "kodomo": "そのまま",
+    "otona": "黒こしょう・レモン追加"
+   },
+   "keep_ok": true,
+   "tpl": "negishio",
+   "point": "味の型「ねぎ塩炒め」。主材と野菜は差し替えOK"
+  },
+  {
+   "id": "tpl-negishio-1-2",
+   "name": "鶏むねともやしのねぎ塩炒め",
+   "genre": "中",
+   "protein": "鶏むね",
+   "method": "炒める",
+   "ratio": "鶏ガラ小2:塩小1/3:ごま油大1:レモン小2",
+   "seasonings": [
+    "ごま油",
+    "鶏ガラ",
+    "塩",
+    "レモン"
+   ],
+   "ingredients": [
+    "鶏むね肉",
+    "もやし",
+    "長ねぎ"
+   ],
+   "batch": true,
+   "carryover": [
+    "丼にのせる",
+    "翌日は卵とじ"
+   ],
+   "toriwake": {
+    "kodomo": "そのまま",
+    "otona": "黒こしょう・レモン追加"
+   },
+   "keep_ok": true,
+   "tpl": "negishio",
+   "point": "味の型「ねぎ塩炒め」。主材と野菜は差し替えOK"
+  },
+  {
+   "id": "tpl-negishio-2-0",
+   "name": "豚こまとキャベツのねぎ塩炒め",
+   "genre": "中",
+   "protein": "豚こま",
+   "method": "炒める",
+   "ratio": "鶏ガラ小2:塩小1/3:ごま油大1:レモン小2",
+   "seasonings": [
+    "ごま油",
+    "鶏ガラ",
+    "塩",
+    "レモン"
+   ],
+   "ingredients": [
+    "豚こま",
+    "キャベツ",
+    "長ねぎ"
+   ],
+   "batch": true,
+   "carryover": [
+    "丼にのせる",
+    "翌日は卵とじ"
+   ],
+   "toriwake": {
+    "kodomo": "そのまま",
+    "otona": "黒こしょう・レモン追加"
+   },
+   "keep_ok": true,
+   "tpl": "negishio",
+   "point": "味の型「ねぎ塩炒め」。主材と野菜は差し替えOK"
+  },
+  {
+   "id": "tpl-negishio-2-1",
+   "name": "豚こまと小松菜のねぎ塩炒め",
+   "genre": "中",
+   "protein": "豚こま",
+   "method": "炒める",
+   "ratio": "鶏ガラ小2:塩小1/3:ごま油大1:レモン小2",
+   "seasonings": [
+    "ごま油",
+    "鶏ガラ",
+    "塩",
+    "レモン"
+   ],
+   "ingredients": [
+    "豚こま",
+    "小松菜",
+    "長ねぎ"
+   ],
+   "batch": true,
+   "carryover": [
+    "丼にのせる",
+    "翌日は卵とじ"
+   ],
+   "toriwake": {
+    "kodomo": "そのまま",
+    "otona": "黒こしょう・レモン追加"
+   },
+   "keep_ok": true,
+   "tpl": "negishio",
+   "point": "味の型「ねぎ塩炒め」。主材と野菜は差し替えOK"
+  },
+  {
+   "id": "tpl-negishio-2-2",
+   "name": "豚こまともやしのねぎ塩炒め",
+   "genre": "中",
+   "protein": "豚こま",
+   "method": "炒める",
+   "ratio": "鶏ガラ小2:塩小1/3:ごま油大1:レモン小2",
+   "seasonings": [
+    "ごま油",
+    "鶏ガラ",
+    "塩",
+    "レモン"
+   ],
+   "ingredients": [
+    "豚こま",
+    "もやし",
+    "長ねぎ"
+   ],
+   "batch": true,
+   "carryover": [
+    "丼にのせる",
+    "翌日は卵とじ"
+   ],
+   "toriwake": {
+    "kodomo": "そのまま",
+    "otona": "黒こしょう・レモン追加"
+   },
+   "keep_ok": true,
+   "tpl": "negishio",
+   "point": "味の型「ねぎ塩炒め」。主材と野菜は差し替えOK"
+  },
+  {
+   "id": "tpl-negishio-3-0",
+   "name": "豚バラとキャベツのねぎ塩炒め",
+   "genre": "中",
+   "protein": "豚バラ",
+   "method": "炒める",
+   "ratio": "鶏ガラ小2:塩小1/3:ごま油大1:レモン小2",
+   "seasonings": [
+    "ごま油",
+    "鶏ガラ",
+    "塩",
+    "レモン"
+   ],
+   "ingredients": [
+    "豚バラ薄切り",
+    "キャベツ",
+    "長ねぎ"
+   ],
+   "batch": true,
+   "carryover": [
+    "丼にのせる",
+    "翌日は卵とじ"
+   ],
+   "toriwake": {
+    "kodomo": "そのまま",
+    "otona": "黒こしょう・レモン追加"
+   },
+   "keep_ok": true,
+   "tpl": "negishio",
+   "point": "味の型「ねぎ塩炒め」。主材と野菜は差し替えOK"
+  },
+  {
+   "id": "tpl-negishio-3-1",
+   "name": "豚バラと小松菜のねぎ塩炒め",
+   "genre": "中",
+   "protein": "豚バラ",
+   "method": "炒める",
+   "ratio": "鶏ガラ小2:塩小1/3:ごま油大1:レモン小2",
+   "seasonings": [
+    "ごま油",
+    "鶏ガラ",
+    "塩",
+    "レモン"
+   ],
+   "ingredients": [
+    "豚バラ薄切り",
+    "小松菜",
+    "長ねぎ"
+   ],
+   "batch": true,
+   "carryover": [
+    "丼にのせる",
+    "翌日は卵とじ"
+   ],
+   "toriwake": {
+    "kodomo": "そのまま",
+    "otona": "黒こしょう・レモン追加"
+   },
+   "keep_ok": true,
+   "tpl": "negishio",
+   "point": "味の型「ねぎ塩炒め」。主材と野菜は差し替えOK"
+  },
+  {
+   "id": "tpl-negishio-3-2",
+   "name": "豚バラともやしのねぎ塩炒め",
+   "genre": "中",
+   "protein": "豚バラ",
+   "method": "炒める",
+   "ratio": "鶏ガラ小2:塩小1/3:ごま油大1:レモン小2",
+   "seasonings": [
+    "ごま油",
+    "鶏ガラ",
+    "塩",
+    "レモン"
+   ],
+   "ingredients": [
+    "豚バラ薄切り",
+    "もやし",
+    "長ねぎ"
+   ],
+   "batch": true,
+   "carryover": [
+    "丼にのせる",
+    "翌日は卵とじ"
+   ],
+   "toriwake": {
+    "kodomo": "そのまま",
+    "otona": "黒こしょう・レモン追加"
+   },
+   "keep_ok": true,
+   "tpl": "negishio",
+   "point": "味の型「ねぎ塩炒め」。主材と野菜は差し替えOK"
+  },
+  {
+   "id": "tpl-oyster-0-3",
+   "name": "鶏ももとピーマンのオイスター炒め",
+   "genre": "中",
+   "protein": "鶏もも",
+   "method": "炒める",
+   "ratio": "オイスター大2:酒大1:醤油小1:砂糖小1",
+   "seasonings": [
+    "オイスター",
+    "酒",
+    "醤油",
+    "砂糖"
+   ],
+   "ingredients": [
+    "鶏もも肉",
+    "ピーマン",
+    "玉ねぎ"
+   ],
+   "batch": true,
+   "carryover": [
+    "丼にのせる",
+    "翌日は卵とじ"
+   ],
+   "toriwake": {
+    "kodomo": "そのまま",
+    "otona": "黒こしょう"
+   },
+   "keep_ok": true,
+   "tpl": "oyster",
+   "point": "味の型「オイスター炒め」。主材と野菜は差し替えOK"
+  },
+  {
+   "id": "tpl-oyster-0-4",
+   "name": "鶏ももときのこのオイスター炒め",
+   "genre": "中",
+   "protein": "鶏もも",
+   "method": "炒める",
+   "ratio": "オイスター大2:酒大1:醤油小1:砂糖小1",
+   "seasonings": [
+    "オイスター",
+    "酒",
+    "醤油",
+    "砂糖"
+   ],
+   "ingredients": [
+    "鶏もも肉",
+    "きのこ",
+    "玉ねぎ"
+   ],
+   "batch": true,
+   "carryover": [
+    "丼にのせる",
+    "翌日は卵とじ"
+   ],
+   "toriwake": {
+    "kodomo": "そのまま",
+    "otona": "黒こしょう"
+   },
+   "keep_ok": true,
+   "tpl": "oyster",
+   "point": "味の型「オイスター炒め」。主材と野菜は差し替えOK"
+  },
+  {
+   "id": "tpl-oyster-1-3",
+   "name": "鶏むねとピーマンのオイスター炒め",
+   "genre": "中",
+   "protein": "鶏むね",
+   "method": "炒める",
+   "ratio": "オイスター大2:酒大1:醤油小1:砂糖小1",
+   "seasonings": [
+    "オイスター",
+    "酒",
+    "醤油",
+    "砂糖"
+   ],
+   "ingredients": [
+    "鶏むね肉",
+    "ピーマン",
+    "玉ねぎ"
+   ],
+   "batch": true,
+   "carryover": [
+    "丼にのせる",
+    "翌日は卵とじ"
+   ],
+   "toriwake": {
+    "kodomo": "そのまま",
+    "otona": "黒こしょう"
+   },
+   "keep_ok": true,
+   "tpl": "oyster",
+   "point": "味の型「オイスター炒め」。主材と野菜は差し替えOK"
+  },
+  {
+   "id": "tpl-oyster-1-0",
+   "name": "鶏むねとキャベツのオイスター炒め",
+   "genre": "中",
+   "protein": "鶏むね",
+   "method": "炒める",
+   "ratio": "オイスター大2:酒大1:醤油小1:砂糖小1",
+   "seasonings": [
+    "オイスター",
+    "酒",
+    "醤油",
+    "砂糖"
+   ],
+   "ingredients": [
+    "鶏むね肉",
+    "キャベツ",
+    "玉ねぎ"
+   ],
+   "batch": true,
+   "carryover": [
+    "丼にのせる",
+    "翌日は卵とじ"
+   ],
+   "toriwake": {
+    "kodomo": "そのまま",
+    "otona": "黒こしょう"
+   },
+   "keep_ok": true,
+   "tpl": "oyster",
+   "point": "味の型「オイスター炒め」。主材と野菜は差し替えOK"
+  },
+  {
+   "id": "tpl-oyster-1-4",
+   "name": "鶏むねときのこのオイスター炒め",
+   "genre": "中",
+   "protein": "鶏むね",
+   "method": "炒める",
+   "ratio": "オイスター大2:酒大1:醤油小1:砂糖小1",
+   "seasonings": [
+    "オイスター",
+    "酒",
+    "醤油",
+    "砂糖"
+   ],
+   "ingredients": [
+    "鶏むね肉",
+    "きのこ",
+    "玉ねぎ"
+   ],
+   "batch": true,
+   "carryover": [
+    "丼にのせる",
+    "翌日は卵とじ"
+   ],
+   "toriwake": {
+    "kodomo": "そのまま",
+    "otona": "黒こしょう"
+   },
+   "keep_ok": true,
+   "tpl": "oyster",
+   "point": "味の型「オイスター炒め」。主材と野菜は差し替えOK"
+  },
+  {
+   "id": "tpl-oyster-2-3",
+   "name": "豚こまとピーマンのオイスター炒め",
+   "genre": "中",
+   "protein": "豚こま",
+   "method": "炒める",
+   "ratio": "オイスター大2:酒大1:醤油小1:砂糖小1",
+   "seasonings": [
+    "オイスター",
+    "酒",
+    "醤油",
+    "砂糖"
+   ],
+   "ingredients": [
+    "豚こま",
+    "ピーマン",
+    "玉ねぎ"
+   ],
+   "batch": true,
+   "carryover": [
+    "丼にのせる",
+    "翌日は卵とじ"
+   ],
+   "toriwake": {
+    "kodomo": "そのまま",
+    "otona": "黒こしょう"
+   },
+   "keep_ok": true,
+   "tpl": "oyster",
+   "point": "味の型「オイスター炒め」。主材と野菜は差し替えOK"
+  },
+  {
+   "id": "tpl-oyster-2-0",
+   "name": "豚こまとキャベツのオイスター炒め",
+   "genre": "中",
+   "protein": "豚こま",
+   "method": "炒める",
+   "ratio": "オイスター大2:酒大1:醤油小1:砂糖小1",
+   "seasonings": [
+    "オイスター",
+    "酒",
+    "醤油",
+    "砂糖"
+   ],
+   "ingredients": [
+    "豚こま",
+    "キャベツ",
+    "玉ねぎ"
+   ],
+   "batch": true,
+   "carryover": [
+    "丼にのせる",
+    "翌日は卵とじ"
+   ],
+   "toriwake": {
+    "kodomo": "そのまま",
+    "otona": "黒こしょう"
+   },
+   "keep_ok": true,
+   "tpl": "oyster",
+   "point": "味の型「オイスター炒め」。主材と野菜は差し替えOK"
+  },
+  {
+   "id": "tpl-oyster-2-4",
+   "name": "豚こまときのこのオイスター炒め",
+   "genre": "中",
+   "protein": "豚こま",
+   "method": "炒める",
+   "ratio": "オイスター大2:酒大1:醤油小1:砂糖小1",
+   "seasonings": [
+    "オイスター",
+    "酒",
+    "醤油",
+    "砂糖"
+   ],
+   "ingredients": [
+    "豚こま",
+    "きのこ",
+    "玉ねぎ"
+   ],
+   "batch": true,
+   "carryover": [
+    "丼にのせる",
+    "翌日は卵とじ"
+   ],
+   "toriwake": {
+    "kodomo": "そのまま",
+    "otona": "黒こしょう"
+   },
+   "keep_ok": true,
+   "tpl": "oyster",
+   "point": "味の型「オイスター炒め」。主材と野菜は差し替えOK"
+  },
+  {
+   "id": "tpl-oyster-3-3",
+   "name": "豚バラとピーマンのオイスター炒め",
+   "genre": "中",
+   "protein": "豚バラ",
+   "method": "炒める",
+   "ratio": "オイスター大2:酒大1:醤油小1:砂糖小1",
+   "seasonings": [
+    "オイスター",
+    "酒",
+    "醤油",
+    "砂糖"
+   ],
+   "ingredients": [
+    "豚バラ薄切り",
+    "ピーマン",
+    "玉ねぎ"
+   ],
+   "batch": true,
+   "carryover": [
+    "丼にのせる",
+    "翌日は卵とじ"
+   ],
+   "toriwake": {
+    "kodomo": "そのまま",
+    "otona": "黒こしょう"
+   },
+   "keep_ok": true,
+   "tpl": "oyster",
+   "point": "味の型「オイスター炒め」。主材と野菜は差し替えOK"
+  },
+  {
+   "id": "tpl-oyster-3-0",
+   "name": "豚バラとキャベツのオイスター炒め",
+   "genre": "中",
+   "protein": "豚バラ",
+   "method": "炒める",
+   "ratio": "オイスター大2:酒大1:醤油小1:砂糖小1",
+   "seasonings": [
+    "オイスター",
+    "酒",
+    "醤油",
+    "砂糖"
+   ],
+   "ingredients": [
+    "豚バラ薄切り",
+    "キャベツ",
+    "玉ねぎ"
+   ],
+   "batch": true,
+   "carryover": [
+    "丼にのせる",
+    "翌日は卵とじ"
+   ],
+   "toriwake": {
+    "kodomo": "そのまま",
+    "otona": "黒こしょう"
+   },
+   "keep_ok": true,
+   "tpl": "oyster",
+   "point": "味の型「オイスター炒め」。主材と野菜は差し替えOK"
+  },
+  {
+   "id": "tpl-oyster-3-4",
+   "name": "豚バラときのこのオイスター炒め",
+   "genre": "中",
+   "protein": "豚バラ",
+   "method": "炒める",
+   "ratio": "オイスター大2:酒大1:醤油小1:砂糖小1",
+   "seasonings": [
+    "オイスター",
+    "酒",
+    "醤油",
+    "砂糖"
+   ],
+   "ingredients": [
+    "豚バラ薄切り",
+    "きのこ",
+    "玉ねぎ"
+   ],
+   "batch": true,
+   "carryover": [
+    "丼にのせる",
+    "翌日は卵とじ"
+   ],
+   "toriwake": {
+    "kodomo": "そのまま",
+    "otona": "黒こしょう"
+   },
+   "keep_ok": true,
+   "tpl": "oyster",
+   "point": "味の型「オイスター炒め」。主材と野菜は差し替えOK"
+  },
+  {
+   "id": "tpl-umashio-0-8",
+   "name": "鶏ももと厚揚げの中華うま塩炒め",
+   "genre": "中",
+   "protein": "鶏もも",
+   "method": "炒める",
+   "ratio": "鶏ガラ小2:塩小1/3:酒大1:ごま油大1",
+   "seasonings": [
+    "鶏ガラ",
+    "塩",
+    "ごま油",
+    "酒"
+   ],
+   "ingredients": [
+    "鶏もも肉",
+    "厚揚げ"
+   ],
+   "batch": true,
+   "carryover": [
+    "丼にのせる",
+    "翌日は卵とじ"
+   ],
+   "toriwake": {
+    "kodomo": "そのまま",
+    "otona": "こしょう・ラー油"
+   },
+   "keep_ok": true,
+   "tpl": "umashio",
+   "point": "味の型「中華うま塩炒め」。主材と野菜は差し替えOK"
+  },
+  {
+   "id": "tpl-umashio-0-1",
+   "name": "鶏ももと小松菜の中華うま塩炒め",
+   "genre": "中",
+   "protein": "鶏もも",
+   "method": "炒める",
+   "ratio": "鶏ガラ小2:塩小1/3:酒大1:ごま油大1",
+   "seasonings": [
+    "鶏ガラ",
+    "塩",
+    "ごま油",
+    "酒"
+   ],
+   "ingredients": [
+    "鶏もも肉",
+    "小松菜"
+   ],
+   "batch": true,
+   "carryover": [
+    "丼にのせる",
+    "翌日は卵とじ"
+   ],
+   "toriwake": {
+    "kodomo": "そのまま",
+    "otona": "こしょう・ラー油"
+   },
+   "keep_ok": true,
+   "tpl": "umashio",
+   "point": "味の型「中華うま塩炒め」。主材と野菜は差し替えOK"
+  },
+  {
+   "id": "tpl-umashio-0-5",
+   "name": "鶏ももと白菜の中華うま塩炒め",
+   "genre": "中",
+   "protein": "鶏もも",
+   "method": "炒める",
+   "ratio": "鶏ガラ小2:塩小1/3:酒大1:ごま油大1",
+   "seasonings": [
+    "鶏ガラ",
+    "塩",
+    "ごま油",
+    "酒"
+   ],
+   "ingredients": [
+    "鶏もも肉",
+    "白菜"
+   ],
+   "batch": true,
+   "carryover": [
+    "丼にのせる",
+    "翌日は卵とじ"
+   ],
+   "toriwake": {
+    "kodomo": "そのまま",
+    "otona": "こしょう・ラー油"
+   },
+   "keep_ok": true,
+   "tpl": "umashio",
+   "point": "味の型「中華うま塩炒め」。主材と野菜は差し替えOK"
+  },
+  {
+   "id": "tpl-umashio-1-8",
+   "name": "鶏むねと厚揚げの中華うま塩炒め",
+   "genre": "中",
+   "protein": "鶏むね",
+   "method": "炒める",
+   "ratio": "鶏ガラ小2:塩小1/3:酒大1:ごま油大1",
+   "seasonings": [
+    "鶏ガラ",
+    "塩",
+    "ごま油",
+    "酒"
+   ],
+   "ingredients": [
+    "鶏むね肉",
+    "厚揚げ"
+   ],
+   "batch": true,
+   "carryover": [
+    "丼にのせる",
+    "翌日は卵とじ"
+   ],
+   "toriwake": {
+    "kodomo": "そのまま",
+    "otona": "こしょう・ラー油"
+   },
+   "keep_ok": true,
+   "tpl": "umashio",
+   "point": "味の型「中華うま塩炒め」。主材と野菜は差し替えOK"
+  },
+  {
+   "id": "tpl-umashio-1-1",
+   "name": "鶏むねと小松菜の中華うま塩炒め",
+   "genre": "中",
+   "protein": "鶏むね",
+   "method": "炒める",
+   "ratio": "鶏ガラ小2:塩小1/3:酒大1:ごま油大1",
+   "seasonings": [
+    "鶏ガラ",
+    "塩",
+    "ごま油",
+    "酒"
+   ],
+   "ingredients": [
+    "鶏むね肉",
+    "小松菜"
+   ],
+   "batch": true,
+   "carryover": [
+    "丼にのせる",
+    "翌日は卵とじ"
+   ],
+   "toriwake": {
+    "kodomo": "そのまま",
+    "otona": "こしょう・ラー油"
+   },
+   "keep_ok": true,
+   "tpl": "umashio",
+   "point": "味の型「中華うま塩炒め」。主材と野菜は差し替えOK"
+  },
+  {
+   "id": "tpl-umashio-1-5",
+   "name": "鶏むねと白菜の中華うま塩炒め",
+   "genre": "中",
+   "protein": "鶏むね",
+   "method": "炒める",
+   "ratio": "鶏ガラ小2:塩小1/3:酒大1:ごま油大1",
+   "seasonings": [
+    "鶏ガラ",
+    "塩",
+    "ごま油",
+    "酒"
+   ],
+   "ingredients": [
+    "鶏むね肉",
+    "白菜"
+   ],
+   "batch": true,
+   "carryover": [
+    "丼にのせる",
+    "翌日は卵とじ"
+   ],
+   "toriwake": {
+    "kodomo": "そのまま",
+    "otona": "こしょう・ラー油"
+   },
+   "keep_ok": true,
+   "tpl": "umashio",
+   "point": "味の型「中華うま塩炒め」。主材と野菜は差し替えOK"
+  },
+  {
+   "id": "tpl-umashio-2-8",
+   "name": "豚こまと厚揚げの中華うま塩炒め",
+   "genre": "中",
+   "protein": "豚こま",
+   "method": "炒める",
+   "ratio": "鶏ガラ小2:塩小1/3:酒大1:ごま油大1",
+   "seasonings": [
+    "鶏ガラ",
+    "塩",
+    "ごま油",
+    "酒"
+   ],
+   "ingredients": [
+    "豚こま",
+    "厚揚げ"
+   ],
+   "batch": true,
+   "carryover": [
+    "丼にのせる",
+    "翌日は卵とじ"
+   ],
+   "toriwake": {
+    "kodomo": "そのまま",
+    "otona": "こしょう・ラー油"
+   },
+   "keep_ok": true,
+   "tpl": "umashio",
+   "point": "味の型「中華うま塩炒め」。主材と野菜は差し替えOK"
+  },
+  {
+   "id": "tpl-umashio-2-1",
+   "name": "豚こまと小松菜の中華うま塩炒め",
+   "genre": "中",
+   "protein": "豚こま",
+   "method": "炒める",
+   "ratio": "鶏ガラ小2:塩小1/3:酒大1:ごま油大1",
+   "seasonings": [
+    "鶏ガラ",
+    "塩",
+    "ごま油",
+    "酒"
+   ],
+   "ingredients": [
+    "豚こま",
+    "小松菜"
+   ],
+   "batch": true,
+   "carryover": [
+    "丼にのせる",
+    "翌日は卵とじ"
+   ],
+   "toriwake": {
+    "kodomo": "そのまま",
+    "otona": "こしょう・ラー油"
+   },
+   "keep_ok": true,
+   "tpl": "umashio",
+   "point": "味の型「中華うま塩炒め」。主材と野菜は差し替えOK"
+  },
+  {
+   "id": "tpl-umashio-2-5",
+   "name": "豚こまと白菜の中華うま塩炒め",
+   "genre": "中",
+   "protein": "豚こま",
+   "method": "炒める",
+   "ratio": "鶏ガラ小2:塩小1/3:酒大1:ごま油大1",
+   "seasonings": [
+    "鶏ガラ",
+    "塩",
+    "ごま油",
+    "酒"
+   ],
+   "ingredients": [
+    "豚こま",
+    "白菜"
+   ],
+   "batch": true,
+   "carryover": [
+    "丼にのせる",
+    "翌日は卵とじ"
+   ],
+   "toriwake": {
+    "kodomo": "そのまま",
+    "otona": "こしょう・ラー油"
+   },
+   "keep_ok": true,
+   "tpl": "umashio",
+   "point": "味の型「中華うま塩炒め」。主材と野菜は差し替えOK"
+  },
+  {
+   "id": "tpl-umashio-3-8",
+   "name": "豚バラと厚揚げの中華うま塩炒め",
+   "genre": "中",
+   "protein": "豚バラ",
+   "method": "炒める",
+   "ratio": "鶏ガラ小2:塩小1/3:酒大1:ごま油大1",
+   "seasonings": [
+    "鶏ガラ",
+    "塩",
+    "ごま油",
+    "酒"
+   ],
+   "ingredients": [
+    "豚バラ薄切り",
+    "厚揚げ"
+   ],
+   "batch": true,
+   "carryover": [
+    "丼にのせる",
+    "翌日は卵とじ"
+   ],
+   "toriwake": {
+    "kodomo": "そのまま",
+    "otona": "こしょう・ラー油"
+   },
+   "keep_ok": true,
+   "tpl": "umashio",
+   "point": "味の型「中華うま塩炒め」。主材と野菜は差し替えOK"
+  },
+  {
+   "id": "tpl-umashio-3-1",
+   "name": "豚バラと小松菜の中華うま塩炒め",
+   "genre": "中",
+   "protein": "豚バラ",
+   "method": "炒める",
+   "ratio": "鶏ガラ小2:塩小1/3:酒大1:ごま油大1",
+   "seasonings": [
+    "鶏ガラ",
+    "塩",
+    "ごま油",
+    "酒"
+   ],
+   "ingredients": [
+    "豚バラ薄切り",
+    "小松菜"
+   ],
+   "batch": true,
+   "carryover": [
+    "丼にのせる",
+    "翌日は卵とじ"
+   ],
+   "toriwake": {
+    "kodomo": "そのまま",
+    "otona": "こしょう・ラー油"
+   },
+   "keep_ok": true,
+   "tpl": "umashio",
+   "point": "味の型「中華うま塩炒め」。主材と野菜は差し替えOK"
+  },
+  {
+   "id": "tpl-umashio-3-5",
+   "name": "豚バラと白菜の中華うま塩炒め",
+   "genre": "中",
+   "protein": "豚バラ",
+   "method": "炒める",
+   "ratio": "鶏ガラ小2:塩小1/3:酒大1:ごま油大1",
+   "seasonings": [
+    "鶏ガラ",
+    "塩",
+    "ごま油",
+    "酒"
+   ],
+   "ingredients": [
+    "豚バラ薄切り",
+    "白菜"
+   ],
+   "batch": true,
+   "carryover": [
+    "丼にのせる",
+    "翌日は卵とじ"
+   ],
+   "toriwake": {
+    "kodomo": "そのまま",
+    "otona": "こしょう・ラー油"
+   },
+   "keep_ok": true,
+   "tpl": "umashio",
+   "point": "味の型「中華うま塩炒め」。主材と野菜は差し替えOK"
+  },
+  {
+   "id": "tpl-toromi-0-5",
+   "name": "鶏ももと白菜のとろみ中華煮",
+   "genre": "中",
+   "protein": "鶏もも",
+   "method": "煮る",
+   "ratio": "水200:鶏ガラ小2:醤油小2:酒大1",
+   "seasonings": [
+    "鶏ガラ",
+    "醤油",
+    "酒",
+    "片栗粉",
+    "ごま油"
+   ],
+   "ingredients": [
+    "鶏もも肉",
+    "白菜"
+   ],
+   "batch": true,
+   "carryover": [
+    "丼にのせる",
+    "翌日は卵とじ"
+   ],
+   "toriwake": {
+    "kodomo": "そのまま",
+    "otona": "こしょう・生姜"
+   },
+   "keep_ok": true,
+   "tpl": "toromi",
+   "point": "味の型「とろみ中華煮」。主材と野菜は差し替えOK"
+  },
+  {
+   "id": "tpl-toromi-0-4",
+   "name": "鶏ももときのこのとろみ中華煮",
+   "genre": "中",
+   "protein": "鶏もも",
+   "method": "煮る",
+   "ratio": "水200:鶏ガラ小2:醤油小2:酒大1",
+   "seasonings": [
+    "鶏ガラ",
+    "醤油",
+    "酒",
+    "片栗粉",
+    "ごま油"
+   ],
+   "ingredients": [
+    "鶏もも肉",
+    "きのこ"
+   ],
+   "batch": true,
+   "carryover": [
+    "丼にのせる",
+    "翌日は卵とじ"
+   ],
+   "toriwake": {
+    "kodomo": "そのまま",
+    "otona": "こしょう・生姜"
+   },
+   "keep_ok": true,
+   "tpl": "toromi",
+   "point": "味の型「とろみ中華煮」。主材と野菜は差し替えOK"
+  },
+  {
+   "id": "tpl-toromi-0-6",
+   "name": "鶏ももとちんげん菜のとろみ中華煮",
+   "genre": "中",
+   "protein": "鶏もも",
+   "method": "煮る",
+   "ratio": "水200:鶏ガラ小2:醤油小2:酒大1",
+   "seasonings": [
+    "鶏ガラ",
+    "醤油",
+    "酒",
+    "片栗粉",
+    "ごま油"
+   ],
+   "ingredients": [
+    "鶏もも肉",
+    "ちんげん菜"
+   ],
+   "batch": true,
+   "carryover": [
+    "丼にのせる",
+    "翌日は卵とじ"
+   ],
+   "toriwake": {
+    "kodomo": "そのまま",
+    "otona": "こしょう・生姜"
+   },
+   "keep_ok": true,
+   "tpl": "toromi",
+   "point": "味の型「とろみ中華煮」。主材と野菜は差し替えOK"
+  },
+  {
+   "id": "tpl-toromi-1-5",
+   "name": "鶏むねと白菜のとろみ中華煮",
+   "genre": "中",
+   "protein": "鶏むね",
+   "method": "煮る",
+   "ratio": "水200:鶏ガラ小2:醤油小2:酒大1",
+   "seasonings": [
+    "鶏ガラ",
+    "醤油",
+    "酒",
+    "片栗粉",
+    "ごま油"
+   ],
+   "ingredients": [
+    "鶏むね肉",
+    "白菜"
+   ],
+   "batch": true,
+   "carryover": [
+    "丼にのせる",
+    "翌日は卵とじ"
+   ],
+   "toriwake": {
+    "kodomo": "そのまま",
+    "otona": "こしょう・生姜"
+   },
+   "keep_ok": true,
+   "tpl": "toromi",
+   "point": "味の型「とろみ中華煮」。主材と野菜は差し替えOK"
+  },
+  {
+   "id": "tpl-toromi-1-4",
+   "name": "鶏むねときのこのとろみ中華煮",
+   "genre": "中",
+   "protein": "鶏むね",
+   "method": "煮る",
+   "ratio": "水200:鶏ガラ小2:醤油小2:酒大1",
+   "seasonings": [
+    "鶏ガラ",
+    "醤油",
+    "酒",
+    "片栗粉",
+    "ごま油"
+   ],
+   "ingredients": [
+    "鶏むね肉",
+    "きのこ"
+   ],
+   "batch": true,
+   "carryover": [
+    "丼にのせる",
+    "翌日は卵とじ"
+   ],
+   "toriwake": {
+    "kodomo": "そのまま",
+    "otona": "こしょう・生姜"
+   },
+   "keep_ok": true,
+   "tpl": "toromi",
+   "point": "味の型「とろみ中華煮」。主材と野菜は差し替えOK"
+  },
+  {
+   "id": "tpl-toromi-1-6",
+   "name": "鶏むねとちんげん菜のとろみ中華煮",
+   "genre": "中",
+   "protein": "鶏むね",
+   "method": "煮る",
+   "ratio": "水200:鶏ガラ小2:醤油小2:酒大1",
+   "seasonings": [
+    "鶏ガラ",
+    "醤油",
+    "酒",
+    "片栗粉",
+    "ごま油"
+   ],
+   "ingredients": [
+    "鶏むね肉",
+    "ちんげん菜"
+   ],
+   "batch": true,
+   "carryover": [
+    "丼にのせる",
+    "翌日は卵とじ"
+   ],
+   "toriwake": {
+    "kodomo": "そのまま",
+    "otona": "こしょう・生姜"
+   },
+   "keep_ok": true,
+   "tpl": "toromi",
+   "point": "味の型「とろみ中華煮」。主材と野菜は差し替えOK"
+  },
+  {
+   "id": "tpl-toromi-2-5",
+   "name": "豚こまと白菜のとろみ中華煮",
+   "genre": "中",
+   "protein": "豚こま",
+   "method": "煮る",
+   "ratio": "水200:鶏ガラ小2:醤油小2:酒大1",
+   "seasonings": [
+    "鶏ガラ",
+    "醤油",
+    "酒",
+    "片栗粉",
+    "ごま油"
+   ],
+   "ingredients": [
+    "豚こま",
+    "白菜"
+   ],
+   "batch": true,
+   "carryover": [
+    "丼にのせる",
+    "翌日は卵とじ"
+   ],
+   "toriwake": {
+    "kodomo": "そのまま",
+    "otona": "こしょう・生姜"
+   },
+   "keep_ok": true,
+   "tpl": "toromi",
+   "point": "味の型「とろみ中華煮」。主材と野菜は差し替えOK"
+  },
+  {
+   "id": "tpl-toromi-2-4",
+   "name": "豚こまときのこのとろみ中華煮",
+   "genre": "中",
+   "protein": "豚こま",
+   "method": "煮る",
+   "ratio": "水200:鶏ガラ小2:醤油小2:酒大1",
+   "seasonings": [
+    "鶏ガラ",
+    "醤油",
+    "酒",
+    "片栗粉",
+    "ごま油"
+   ],
+   "ingredients": [
+    "豚こま",
+    "きのこ"
+   ],
+   "batch": true,
+   "carryover": [
+    "丼にのせる",
+    "翌日は卵とじ"
+   ],
+   "toriwake": {
+    "kodomo": "そのまま",
+    "otona": "こしょう・生姜"
+   },
+   "keep_ok": true,
+   "tpl": "toromi",
+   "point": "味の型「とろみ中華煮」。主材と野菜は差し替えOK"
+  },
+  {
+   "id": "tpl-toromi-2-6",
+   "name": "豚こまとちんげん菜のとろみ中華煮",
+   "genre": "中",
+   "protein": "豚こま",
+   "method": "煮る",
+   "ratio": "水200:鶏ガラ小2:醤油小2:酒大1",
+   "seasonings": [
+    "鶏ガラ",
+    "醤油",
+    "酒",
+    "片栗粉",
+    "ごま油"
+   ],
+   "ingredients": [
+    "豚こま",
+    "ちんげん菜"
+   ],
+   "batch": true,
+   "carryover": [
+    "丼にのせる",
+    "翌日は卵とじ"
+   ],
+   "toriwake": {
+    "kodomo": "そのまま",
+    "otona": "こしょう・生姜"
+   },
+   "keep_ok": true,
+   "tpl": "toromi",
+   "point": "味の型「とろみ中華煮」。主材と野菜は差し替えOK"
+  },
+  {
+   "id": "tpl-toromi-3-5",
+   "name": "豚バラと白菜のとろみ中華煮",
+   "genre": "中",
+   "protein": "豚バラ",
+   "method": "煮る",
+   "ratio": "水200:鶏ガラ小2:醤油小2:酒大1",
+   "seasonings": [
+    "鶏ガラ",
+    "醤油",
+    "酒",
+    "片栗粉",
+    "ごま油"
+   ],
+   "ingredients": [
+    "豚バラ薄切り",
+    "白菜"
+   ],
+   "batch": true,
+   "carryover": [
+    "丼にのせる",
+    "翌日は卵とじ"
+   ],
+   "toriwake": {
+    "kodomo": "そのまま",
+    "otona": "こしょう・生姜"
+   },
+   "keep_ok": true,
+   "tpl": "toromi",
+   "point": "味の型「とろみ中華煮」。主材と野菜は差し替えOK"
+  },
+  {
+   "id": "tpl-toromi-3-4",
+   "name": "豚バラときのこのとろみ中華煮",
+   "genre": "中",
+   "protein": "豚バラ",
+   "method": "煮る",
+   "ratio": "水200:鶏ガラ小2:醤油小2:酒大1",
+   "seasonings": [
+    "鶏ガラ",
+    "醤油",
+    "酒",
+    "片栗粉",
+    "ごま油"
+   ],
+   "ingredients": [
+    "豚バラ薄切り",
+    "きのこ"
+   ],
+   "batch": true,
+   "carryover": [
+    "丼にのせる",
+    "翌日は卵とじ"
+   ],
+   "toriwake": {
+    "kodomo": "そのまま",
+    "otona": "こしょう・生姜"
+   },
+   "keep_ok": true,
+   "tpl": "toromi",
+   "point": "味の型「とろみ中華煮」。主材と野菜は差し替えOK"
+  },
+  {
+   "id": "tpl-toromi-3-6",
+   "name": "豚バラとちんげん菜のとろみ中華煮",
+   "genre": "中",
+   "protein": "豚バラ",
+   "method": "煮る",
+   "ratio": "水200:鶏ガラ小2:醤油小2:酒大1",
+   "seasonings": [
+    "鶏ガラ",
+    "醤油",
+    "酒",
+    "片栗粉",
+    "ごま油"
+   ],
+   "ingredients": [
+    "豚バラ薄切り",
+    "ちんげん菜"
+   ],
+   "batch": true,
+   "carryover": [
+    "丼にのせる",
+    "翌日は卵とじ"
+   ],
+   "toriwake": {
+    "kodomo": "そのまま",
+    "otona": "こしょう・生姜"
+   },
+   "keep_ok": true,
+   "tpl": "toromi",
+   "point": "味の型「とろみ中華煮」。主材と野菜は差し替えOK"
+  },
+  {
+   "id": "tpl-miso-0-7",
+   "name": "鶏ももとなすの味噌炒め",
+   "genre": "和",
+   "protein": "鶏もも",
+   "method": "炒める",
+   "ratio": "味噌大2:みりん大2:砂糖小2:酒大1",
+   "seasonings": [
+    "味噌",
+    "みりん",
+    "砂糖",
+    "酒"
+   ],
+   "ingredients": [
+    "鶏もも肉",
+    "なす"
+   ],
+   "batch": true,
+   "carryover": [
+    "丼にのせる",
+    "翌日は卵とじ"
+   ],
+   "toriwake": {
+    "kodomo": "そのまま",
+    "otona": "七味"
+   },
+   "keep_ok": true,
+   "tpl": "miso",
+   "point": "味の型「味噌炒め」。主材と野菜は差し替えOK"
+  },
+  {
+   "id": "tpl-miso-0-3",
+   "name": "鶏ももとピーマンの味噌炒め",
+   "genre": "和",
+   "protein": "鶏もも",
+   "method": "炒める",
+   "ratio": "味噌大2:みりん大2:砂糖小2:酒大1",
+   "seasonings": [
+    "味噌",
+    "みりん",
+    "砂糖",
+    "酒"
+   ],
+   "ingredients": [
+    "鶏もも肉",
+    "ピーマン"
+   ],
+   "batch": true,
+   "carryover": [
+    "丼にのせる",
+    "翌日は卵とじ"
+   ],
+   "toriwake": {
+    "kodomo": "そのまま",
+    "otona": "七味"
+   },
+   "keep_ok": true,
+   "tpl": "miso",
+   "point": "味の型「味噌炒め」。主材と野菜は差し替えOK"
+  },
+  {
+   "id": "tpl-miso-0-0",
+   "name": "鶏ももとキャベツの味噌炒め",
+   "genre": "和",
+   "protein": "鶏もも",
+   "method": "炒める",
+   "ratio": "味噌大2:みりん大2:砂糖小2:酒大1",
+   "seasonings": [
+    "味噌",
+    "みりん",
+    "砂糖",
+    "酒"
+   ],
+   "ingredients": [
+    "鶏もも肉",
+    "キャベツ"
+   ],
+   "batch": true,
+   "carryover": [
+    "丼にのせる",
+    "翌日は卵とじ"
+   ],
+   "toriwake": {
+    "kodomo": "そのまま",
+    "otona": "七味"
+   },
+   "keep_ok": true,
+   "tpl": "miso",
+   "point": "味の型「味噌炒め」。主材と野菜は差し替えOK"
+  },
+  {
+   "id": "tpl-miso-1-7",
+   "name": "鶏むねとなすの味噌炒め",
+   "genre": "和",
+   "protein": "鶏むね",
+   "method": "炒める",
+   "ratio": "味噌大2:みりん大2:砂糖小2:酒大1",
+   "seasonings": [
+    "味噌",
+    "みりん",
+    "砂糖",
+    "酒"
+   ],
+   "ingredients": [
+    "鶏むね肉",
+    "なす"
+   ],
+   "batch": true,
+   "carryover": [
+    "丼にのせる",
+    "翌日は卵とじ"
+   ],
+   "toriwake": {
+    "kodomo": "そのまま",
+    "otona": "七味"
+   },
+   "keep_ok": true,
+   "tpl": "miso",
+   "point": "味の型「味噌炒め」。主材と野菜は差し替えOK"
+  },
+  {
+   "id": "tpl-miso-1-3",
+   "name": "鶏むねとピーマンの味噌炒め",
+   "genre": "和",
+   "protein": "鶏むね",
+   "method": "炒める",
+   "ratio": "味噌大2:みりん大2:砂糖小2:酒大1",
+   "seasonings": [
+    "味噌",
+    "みりん",
+    "砂糖",
+    "酒"
+   ],
+   "ingredients": [
+    "鶏むね肉",
+    "ピーマン"
+   ],
+   "batch": true,
+   "carryover": [
+    "丼にのせる",
+    "翌日は卵とじ"
+   ],
+   "toriwake": {
+    "kodomo": "そのまま",
+    "otona": "七味"
+   },
+   "keep_ok": true,
+   "tpl": "miso",
+   "point": "味の型「味噌炒め」。主材と野菜は差し替えOK"
+  },
+  {
+   "id": "tpl-miso-1-0",
+   "name": "鶏むねとキャベツの味噌炒め",
+   "genre": "和",
+   "protein": "鶏むね",
+   "method": "炒める",
+   "ratio": "味噌大2:みりん大2:砂糖小2:酒大1",
+   "seasonings": [
+    "味噌",
+    "みりん",
+    "砂糖",
+    "酒"
+   ],
+   "ingredients": [
+    "鶏むね肉",
+    "キャベツ"
+   ],
+   "batch": true,
+   "carryover": [
+    "丼にのせる",
+    "翌日は卵とじ"
+   ],
+   "toriwake": {
+    "kodomo": "そのまま",
+    "otona": "七味"
+   },
+   "keep_ok": true,
+   "tpl": "miso",
+   "point": "味の型「味噌炒め」。主材と野菜は差し替えOK"
+  },
+  {
+   "id": "tpl-miso-2-3",
+   "name": "豚こまとピーマンの味噌炒め",
+   "genre": "和",
+   "protein": "豚こま",
+   "method": "炒める",
+   "ratio": "味噌大2:みりん大2:砂糖小2:酒大1",
+   "seasonings": [
+    "味噌",
+    "みりん",
+    "砂糖",
+    "酒"
+   ],
+   "ingredients": [
+    "豚こま",
+    "ピーマン"
+   ],
+   "batch": true,
+   "carryover": [
+    "丼にのせる",
+    "翌日は卵とじ"
+   ],
+   "toriwake": {
+    "kodomo": "そのまま",
+    "otona": "七味"
+   },
+   "keep_ok": true,
+   "tpl": "miso",
+   "point": "味の型「味噌炒め」。主材と野菜は差し替えOK"
+  },
+  {
+   "id": "tpl-miso-3-7",
+   "name": "豚バラとなすの味噌炒め",
+   "genre": "和",
+   "protein": "豚バラ",
+   "method": "炒める",
+   "ratio": "味噌大2:みりん大2:砂糖小2:酒大1",
+   "seasonings": [
+    "味噌",
+    "みりん",
+    "砂糖",
+    "酒"
+   ],
+   "ingredients": [
+    "豚バラ薄切り",
+    "なす"
+   ],
+   "batch": true,
+   "carryover": [
+    "丼にのせる",
+    "翌日は卵とじ"
+   ],
+   "toriwake": {
+    "kodomo": "そのまま",
+    "otona": "七味"
+   },
+   "keep_ok": true,
+   "tpl": "miso",
+   "point": "味の型「味噌炒め」。主材と野菜は差し替えOK"
+  },
+  {
+   "id": "tpl-miso-3-3",
+   "name": "豚バラとピーマンの味噌炒め",
+   "genre": "和",
+   "protein": "豚バラ",
+   "method": "炒める",
+   "ratio": "味噌大2:みりん大2:砂糖小2:酒大1",
+   "seasonings": [
+    "味噌",
+    "みりん",
+    "砂糖",
+    "酒"
+   ],
+   "ingredients": [
+    "豚バラ薄切り",
+    "ピーマン"
+   ],
+   "batch": true,
+   "carryover": [
+    "丼にのせる",
+    "翌日は卵とじ"
+   ],
+   "toriwake": {
+    "kodomo": "そのまま",
+    "otona": "七味"
+   },
+   "keep_ok": true,
+   "tpl": "miso",
+   "point": "味の型「味噌炒め」。主材と野菜は差し替えOK"
+  },
+  {
+   "id": "tpl-miso-3-0",
+   "name": "豚バラとキャベツの味噌炒め",
+   "genre": "和",
+   "protein": "豚バラ",
+   "method": "炒める",
+   "ratio": "味噌大2:みりん大2:砂糖小2:酒大1",
+   "seasonings": [
+    "味噌",
+    "みりん",
+    "砂糖",
+    "酒"
+   ],
+   "ingredients": [
+    "豚バラ薄切り",
+    "キャベツ"
+   ],
+   "batch": true,
+   "carryover": [
+    "丼にのせる",
+    "翌日は卵とじ"
+   ],
+   "toriwake": {
+    "kodomo": "そのまま",
+    "otona": "七味"
+   },
+   "keep_ok": true,
+   "tpl": "miso",
+   "point": "味の型「味噌炒め」。主材と野菜は差し替えOK"
+  },
+  {
+   "id": "tpl-oroshiponzu-0-11",
+   "name": "鶏もものカリカリ焼き・おろしポン酢",
+   "genre": "和",
+   "protein": "鶏もも",
+   "method": "焼く",
+   "ratio": "ポン酢大3",
+   "seasonings": [
+    "塩",
+    "ポン酢"
+   ],
+   "ingredients": [
+    "鶏もも肉",
+    "大根"
+   ],
+   "batch": false,
+   "carryover": [
+    "ほぐしてサラダ",
+    "丼にのせる"
+   ],
+   "toriwake": {
+    "kodomo": "そのまま",
+    "otona": "七味・小ねぎ"
+   },
+   "keep_ok": false,
+   "tpl": "oroshiponzu",
+   "point": "味の型「カリカリ焼き・おろしポン酢」。主材と野菜は差し替えOK"
+  },
+  {
+   "id": "tpl-oroshiponzu-1-11",
+   "name": "鶏むねのカリカリ焼き・おろしポン酢",
+   "genre": "和",
+   "protein": "鶏むね",
+   "method": "焼く",
+   "ratio": "ポン酢大3",
+   "seasonings": [
+    "塩",
+    "ポン酢"
+   ],
+   "ingredients": [
+    "鶏むね肉",
+    "大根"
+   ],
+   "batch": false,
+   "carryover": [
+    "ほぐしてサラダ",
+    "丼にのせる"
+   ],
+   "toriwake": {
+    "kodomo": "そのまま",
+    "otona": "七味・小ねぎ"
+   },
+   "keep_ok": false,
+   "tpl": "oroshiponzu",
+   "point": "味の型「カリカリ焼き・おろしポン酢」。主材と野菜は差し替えOK"
+  },
+  {
+   "id": "tpl-ninnikushoyu-0-1",
+   "name": "鶏ももと小松菜のにんにく醤油炒め",
+   "genre": "和",
+   "protein": "鶏もも",
+   "method": "炒める",
+   "ratio": "醤油1:酒1:みりん1",
+   "seasonings": [
+    "醤油",
+    "酒",
+    "みりん",
+    "にんにく"
+   ],
+   "ingredients": [
+    "鶏もも肉",
+    "小松菜"
+   ],
+   "batch": true,
+   "carryover": [
+    "丼にのせる",
+    "翌日は卵とじ"
+   ],
+   "toriwake": {
+    "kodomo": "そのまま",
+    "otona": "黒こしょう"
+   },
+   "keep_ok": true,
+   "tpl": "ninnikushoyu",
+   "point": "味の型「にんにく醤油炒め」。主材と野菜は差し替えOK"
+  },
+  {
+   "id": "tpl-ninnikushoyu-0-10",
+   "name": "鶏ももとほうれん草のにんにく醤油炒め",
+   "genre": "和",
+   "protein": "鶏もも",
+   "method": "炒める",
+   "ratio": "醤油1:酒1:みりん1",
+   "seasonings": [
+    "醤油",
+    "酒",
+    "みりん",
+    "にんにく"
+   ],
+   "ingredients": [
+    "鶏もも肉",
+    "ほうれん草"
+   ],
+   "batch": true,
+   "carryover": [
+    "丼にのせる",
+    "翌日は卵とじ"
+   ],
+   "toriwake": {
+    "kodomo": "そのまま",
+    "otona": "黒こしょう"
+   },
+   "keep_ok": true,
+   "tpl": "ninnikushoyu",
+   "point": "味の型「にんにく醤油炒め」。主材と野菜は差し替えOK"
+  },
+  {
+   "id": "tpl-ninnikushoyu-0-0",
+   "name": "鶏ももとキャベツのにんにく醤油炒め",
+   "genre": "和",
+   "protein": "鶏もも",
+   "method": "炒める",
+   "ratio": "醤油1:酒1:みりん1",
+   "seasonings": [
+    "醤油",
+    "酒",
+    "みりん",
+    "にんにく"
+   ],
+   "ingredients": [
+    "鶏もも肉",
+    "キャベツ"
+   ],
+   "batch": true,
+   "carryover": [
+    "丼にのせる",
+    "翌日は卵とじ"
+   ],
+   "toriwake": {
+    "kodomo": "そのまま",
+    "otona": "黒こしょう"
+   },
+   "keep_ok": true,
+   "tpl": "ninnikushoyu",
+   "point": "味の型「にんにく醤油炒め」。主材と野菜は差し替えOK"
+  },
+  {
+   "id": "tpl-ninnikushoyu-1-1",
+   "name": "鶏むねと小松菜のにんにく醤油炒め",
+   "genre": "和",
+   "protein": "鶏むね",
+   "method": "炒める",
+   "ratio": "醤油1:酒1:みりん1",
+   "seasonings": [
+    "醤油",
+    "酒",
+    "みりん",
+    "にんにく"
+   ],
+   "ingredients": [
+    "鶏むね肉",
+    "小松菜"
+   ],
+   "batch": true,
+   "carryover": [
+    "丼にのせる",
+    "翌日は卵とじ"
+   ],
+   "toriwake": {
+    "kodomo": "そのまま",
+    "otona": "黒こしょう"
+   },
+   "keep_ok": true,
+   "tpl": "ninnikushoyu",
+   "point": "味の型「にんにく醤油炒め」。主材と野菜は差し替えOK"
+  },
+  {
+   "id": "tpl-ninnikushoyu-1-10",
+   "name": "鶏むねとほうれん草のにんにく醤油炒め",
+   "genre": "和",
+   "protein": "鶏むね",
+   "method": "炒める",
+   "ratio": "醤油1:酒1:みりん1",
+   "seasonings": [
+    "醤油",
+    "酒",
+    "みりん",
+    "にんにく"
+   ],
+   "ingredients": [
+    "鶏むね肉",
+    "ほうれん草"
+   ],
+   "batch": true,
+   "carryover": [
+    "丼にのせる",
+    "翌日は卵とじ"
+   ],
+   "toriwake": {
+    "kodomo": "そのまま",
+    "otona": "黒こしょう"
+   },
+   "keep_ok": true,
+   "tpl": "ninnikushoyu",
+   "point": "味の型「にんにく醤油炒め」。主材と野菜は差し替えOK"
+  },
+  {
+   "id": "tpl-ninnikushoyu-1-0",
+   "name": "鶏むねとキャベツのにんにく醤油炒め",
+   "genre": "和",
+   "protein": "鶏むね",
+   "method": "炒める",
+   "ratio": "醤油1:酒1:みりん1",
+   "seasonings": [
+    "醤油",
+    "酒",
+    "みりん",
+    "にんにく"
+   ],
+   "ingredients": [
+    "鶏むね肉",
+    "キャベツ"
+   ],
+   "batch": true,
+   "carryover": [
+    "丼にのせる",
+    "翌日は卵とじ"
+   ],
+   "toriwake": {
+    "kodomo": "そのまま",
+    "otona": "黒こしょう"
+   },
+   "keep_ok": true,
+   "tpl": "ninnikushoyu",
+   "point": "味の型「にんにく醤油炒め」。主材と野菜は差し替えOK"
+  },
+  {
+   "id": "tpl-ninnikushoyu-2-1",
+   "name": "豚こまと小松菜のにんにく醤油炒め",
+   "genre": "和",
+   "protein": "豚こま",
+   "method": "炒める",
+   "ratio": "醤油1:酒1:みりん1",
+   "seasonings": [
+    "醤油",
+    "酒",
+    "みりん",
+    "にんにく"
+   ],
+   "ingredients": [
+    "豚こま",
+    "小松菜"
+   ],
+   "batch": true,
+   "carryover": [
+    "丼にのせる",
+    "翌日は卵とじ"
+   ],
+   "toriwake": {
+    "kodomo": "そのまま",
+    "otona": "黒こしょう"
+   },
+   "keep_ok": true,
+   "tpl": "ninnikushoyu",
+   "point": "味の型「にんにく醤油炒め」。主材と野菜は差し替えOK"
+  },
+  {
+   "id": "tpl-ninnikushoyu-2-10",
+   "name": "豚こまとほうれん草のにんにく醤油炒め",
+   "genre": "和",
+   "protein": "豚こま",
+   "method": "炒める",
+   "ratio": "醤油1:酒1:みりん1",
+   "seasonings": [
+    "醤油",
+    "酒",
+    "みりん",
+    "にんにく"
+   ],
+   "ingredients": [
+    "豚こま",
+    "ほうれん草"
+   ],
+   "batch": true,
+   "carryover": [
+    "丼にのせる",
+    "翌日は卵とじ"
+   ],
+   "toriwake": {
+    "kodomo": "そのまま",
+    "otona": "黒こしょう"
+   },
+   "keep_ok": true,
+   "tpl": "ninnikushoyu",
+   "point": "味の型「にんにく醤油炒め」。主材と野菜は差し替えOK"
+  },
+  {
+   "id": "tpl-ninnikushoyu-2-0",
+   "name": "豚こまとキャベツのにんにく醤油炒め",
+   "genre": "和",
+   "protein": "豚こま",
+   "method": "炒める",
+   "ratio": "醤油1:酒1:みりん1",
+   "seasonings": [
+    "醤油",
+    "酒",
+    "みりん",
+    "にんにく"
+   ],
+   "ingredients": [
+    "豚こま",
+    "キャベツ"
+   ],
+   "batch": true,
+   "carryover": [
+    "丼にのせる",
+    "翌日は卵とじ"
+   ],
+   "toriwake": {
+    "kodomo": "そのまま",
+    "otona": "黒こしょう"
+   },
+   "keep_ok": true,
+   "tpl": "ninnikushoyu",
+   "point": "味の型「にんにく醤油炒め」。主材と野菜は差し替えOK"
+  },
+  {
+   "id": "tpl-ninnikushoyu-3-1",
+   "name": "豚バラと小松菜のにんにく醤油炒め",
+   "genre": "和",
+   "protein": "豚バラ",
+   "method": "炒める",
+   "ratio": "醤油1:酒1:みりん1",
+   "seasonings": [
+    "醤油",
+    "酒",
+    "みりん",
+    "にんにく"
+   ],
+   "ingredients": [
+    "豚バラ薄切り",
+    "小松菜"
+   ],
+   "batch": true,
+   "carryover": [
+    "丼にのせる",
+    "翌日は卵とじ"
+   ],
+   "toriwake": {
+    "kodomo": "そのまま",
+    "otona": "黒こしょう"
+   },
+   "keep_ok": true,
+   "tpl": "ninnikushoyu",
+   "point": "味の型「にんにく醤油炒め」。主材と野菜は差し替えOK"
+  },
+  {
+   "id": "tpl-ninnikushoyu-3-10",
+   "name": "豚バラとほうれん草のにんにく醤油炒め",
+   "genre": "和",
+   "protein": "豚バラ",
+   "method": "炒める",
+   "ratio": "醤油1:酒1:みりん1",
+   "seasonings": [
+    "醤油",
+    "酒",
+    "みりん",
+    "にんにく"
+   ],
+   "ingredients": [
+    "豚バラ薄切り",
+    "ほうれん草"
+   ],
+   "batch": true,
+   "carryover": [
+    "丼にのせる",
+    "翌日は卵とじ"
+   ],
+   "toriwake": {
+    "kodomo": "そのまま",
+    "otona": "黒こしょう"
+   },
+   "keep_ok": true,
+   "tpl": "ninnikushoyu",
+   "point": "味の型「にんにく醤油炒め」。主材と野菜は差し替えOK"
+  },
+  {
+   "id": "tpl-ninnikushoyu-3-0",
+   "name": "豚バラとキャベツのにんにく醤油炒め",
+   "genre": "和",
+   "protein": "豚バラ",
+   "method": "炒める",
+   "ratio": "醤油1:酒1:みりん1",
+   "seasonings": [
+    "醤油",
+    "酒",
+    "みりん",
+    "にんにく"
+   ],
+   "ingredients": [
+    "豚バラ薄切り",
+    "キャベツ"
+   ],
+   "batch": true,
+   "carryover": [
+    "丼にのせる",
+    "翌日は卵とじ"
+   ],
+   "toriwake": {
+    "kodomo": "そのまま",
+    "otona": "黒こしょう"
+   },
+   "keep_ok": true,
+   "tpl": "ninnikushoyu",
+   "point": "味の型「にんにく醤油炒め」。主材と野菜は差し替えOK"
+  },
+  {
+   "id": "tpl-umani-0-9",
+   "name": "鶏ももと豆腐の和風うま煮",
+   "genre": "和",
+   "protein": "鶏もも",
+   "method": "煮る",
+   "ratio": "だし300:醤油大2:みりん大2:砂糖小1",
+   "seasonings": [
+    "だし",
+    "醤油",
+    "みりん",
+    "砂糖"
+   ],
+   "ingredients": [
+    "鶏もも肉",
+    "豆腐",
+    "長ねぎ"
+   ],
+   "batch": true,
+   "carryover": [
+    "丼にのせる",
+    "翌日は卵とじ"
+   ],
+   "toriwake": {
+    "kodomo": "そのまま",
+    "otona": "七味・生姜"
+   },
+   "keep_ok": true,
+   "tpl": "umani",
+   "point": "味の型「和風うま煮」。主材と野菜は差し替えOK"
+  },
+  {
+   "id": "tpl-umani-0-5",
+   "name": "鶏ももと白菜の和風うま煮",
+   "genre": "和",
+   "protein": "鶏もも",
+   "method": "煮る",
+   "ratio": "だし300:醤油大2:みりん大2:砂糖小1",
+   "seasonings": [
+    "だし",
+    "醤油",
+    "みりん",
+    "砂糖"
+   ],
+   "ingredients": [
+    "鶏もも肉",
+    "白菜",
+    "長ねぎ"
+   ],
+   "batch": true,
+   "carryover": [
+    "丼にのせる",
+    "翌日は卵とじ"
+   ],
+   "toriwake": {
+    "kodomo": "そのまま",
+    "otona": "七味・生姜"
+   },
+   "keep_ok": true,
+   "tpl": "umani",
+   "point": "味の型「和風うま煮」。主材と野菜は差し替えOK"
+  },
+  {
+   "id": "tpl-umani-0-4",
+   "name": "鶏ももときのこの和風うま煮",
+   "genre": "和",
+   "protein": "鶏もも",
+   "method": "煮る",
+   "ratio": "だし300:醤油大2:みりん大2:砂糖小1",
+   "seasonings": [
+    "だし",
+    "醤油",
+    "みりん",
+    "砂糖"
+   ],
+   "ingredients": [
+    "鶏もも肉",
+    "きのこ",
+    "長ねぎ"
+   ],
+   "batch": true,
+   "carryover": [
+    "丼にのせる",
+    "翌日は卵とじ"
+   ],
+   "toriwake": {
+    "kodomo": "そのまま",
+    "otona": "七味・生姜"
+   },
+   "keep_ok": true,
+   "tpl": "umani",
+   "point": "味の型「和風うま煮」。主材と野菜は差し替えOK"
+  },
+  {
+   "id": "tpl-umani-1-9",
+   "name": "鶏むねと豆腐の和風うま煮",
+   "genre": "和",
+   "protein": "鶏むね",
+   "method": "煮る",
+   "ratio": "だし300:醤油大2:みりん大2:砂糖小1",
+   "seasonings": [
+    "だし",
+    "醤油",
+    "みりん",
+    "砂糖"
+   ],
+   "ingredients": [
+    "鶏むね肉",
+    "豆腐",
+    "長ねぎ"
+   ],
+   "batch": true,
+   "carryover": [
+    "丼にのせる",
+    "翌日は卵とじ"
+   ],
+   "toriwake": {
+    "kodomo": "そのまま",
+    "otona": "七味・生姜"
+   },
+   "keep_ok": true,
+   "tpl": "umani",
+   "point": "味の型「和風うま煮」。主材と野菜は差し替えOK"
+  },
+  {
+   "id": "tpl-umani-1-5",
+   "name": "鶏むねと白菜の和風うま煮",
+   "genre": "和",
+   "protein": "鶏むね",
+   "method": "煮る",
+   "ratio": "だし300:醤油大2:みりん大2:砂糖小1",
+   "seasonings": [
+    "だし",
+    "醤油",
+    "みりん",
+    "砂糖"
+   ],
+   "ingredients": [
+    "鶏むね肉",
+    "白菜",
+    "長ねぎ"
+   ],
+   "batch": true,
+   "carryover": [
+    "丼にのせる",
+    "翌日は卵とじ"
+   ],
+   "toriwake": {
+    "kodomo": "そのまま",
+    "otona": "七味・生姜"
+   },
+   "keep_ok": true,
+   "tpl": "umani",
+   "point": "味の型「和風うま煮」。主材と野菜は差し替えOK"
+  },
+  {
+   "id": "tpl-umani-1-4",
+   "name": "鶏むねときのこの和風うま煮",
+   "genre": "和",
+   "protein": "鶏むね",
+   "method": "煮る",
+   "ratio": "だし300:醤油大2:みりん大2:砂糖小1",
+   "seasonings": [
+    "だし",
+    "醤油",
+    "みりん",
+    "砂糖"
+   ],
+   "ingredients": [
+    "鶏むね肉",
+    "きのこ",
+    "長ねぎ"
+   ],
+   "batch": true,
+   "carryover": [
+    "丼にのせる",
+    "翌日は卵とじ"
+   ],
+   "toriwake": {
+    "kodomo": "そのまま",
+    "otona": "七味・生姜"
+   },
+   "keep_ok": true,
+   "tpl": "umani",
+   "point": "味の型「和風うま煮」。主材と野菜は差し替えOK"
+  },
+  {
+   "id": "tpl-umani-2-9",
+   "name": "豚こまと豆腐の和風うま煮",
+   "genre": "和",
+   "protein": "豚こま",
+   "method": "煮る",
+   "ratio": "だし300:醤油大2:みりん大2:砂糖小1",
+   "seasonings": [
+    "だし",
+    "醤油",
+    "みりん",
+    "砂糖"
+   ],
+   "ingredients": [
+    "豚こま",
+    "豆腐",
+    "長ねぎ"
+   ],
+   "batch": true,
+   "carryover": [
+    "丼にのせる",
+    "翌日は卵とじ"
+   ],
+   "toriwake": {
+    "kodomo": "そのまま",
+    "otona": "七味・生姜"
+   },
+   "keep_ok": true,
+   "tpl": "umani",
+   "point": "味の型「和風うま煮」。主材と野菜は差し替えOK"
+  },
+  {
+   "id": "tpl-umani-2-5",
+   "name": "豚こまと白菜の和風うま煮",
+   "genre": "和",
+   "protein": "豚こま",
+   "method": "煮る",
+   "ratio": "だし300:醤油大2:みりん大2:砂糖小1",
+   "seasonings": [
+    "だし",
+    "醤油",
+    "みりん",
+    "砂糖"
+   ],
+   "ingredients": [
+    "豚こま",
+    "白菜",
+    "長ねぎ"
+   ],
+   "batch": true,
+   "carryover": [
+    "丼にのせる",
+    "翌日は卵とじ"
+   ],
+   "toriwake": {
+    "kodomo": "そのまま",
+    "otona": "七味・生姜"
+   },
+   "keep_ok": true,
+   "tpl": "umani",
+   "point": "味の型「和風うま煮」。主材と野菜は差し替えOK"
+  },
+  {
+   "id": "tpl-umani-2-4",
+   "name": "豚こまときのこの和風うま煮",
+   "genre": "和",
+   "protein": "豚こま",
+   "method": "煮る",
+   "ratio": "だし300:醤油大2:みりん大2:砂糖小1",
+   "seasonings": [
+    "だし",
+    "醤油",
+    "みりん",
+    "砂糖"
+   ],
+   "ingredients": [
+    "豚こま",
+    "きのこ",
+    "長ねぎ"
+   ],
+   "batch": true,
+   "carryover": [
+    "丼にのせる",
+    "翌日は卵とじ"
+   ],
+   "toriwake": {
+    "kodomo": "そのまま",
+    "otona": "七味・生姜"
+   },
+   "keep_ok": true,
+   "tpl": "umani",
+   "point": "味の型「和風うま煮」。主材と野菜は差し替えOK"
+  },
+  {
+   "id": "tpl-umani-3-9",
+   "name": "豚バラと豆腐の和風うま煮",
+   "genre": "和",
+   "protein": "豚バラ",
+   "method": "煮る",
+   "ratio": "だし300:醤油大2:みりん大2:砂糖小1",
+   "seasonings": [
+    "だし",
+    "醤油",
+    "みりん",
+    "砂糖"
+   ],
+   "ingredients": [
+    "豚バラ薄切り",
+    "豆腐",
+    "長ねぎ"
+   ],
+   "batch": true,
+   "carryover": [
+    "丼にのせる",
+    "翌日は卵とじ"
+   ],
+   "toriwake": {
+    "kodomo": "そのまま",
+    "otona": "七味・生姜"
+   },
+   "keep_ok": true,
+   "tpl": "umani",
+   "point": "味の型「和風うま煮」。主材と野菜は差し替えOK"
+  },
+  {
+   "id": "tpl-umani-3-5",
+   "name": "豚バラと白菜の和風うま煮",
+   "genre": "和",
+   "protein": "豚バラ",
+   "method": "煮る",
+   "ratio": "だし300:醤油大2:みりん大2:砂糖小1",
+   "seasonings": [
+    "だし",
+    "醤油",
+    "みりん",
+    "砂糖"
+   ],
+   "ingredients": [
+    "豚バラ薄切り",
+    "白菜",
+    "長ねぎ"
+   ],
+   "batch": true,
+   "carryover": [
+    "丼にのせる",
+    "翌日は卵とじ"
+   ],
+   "toriwake": {
+    "kodomo": "そのまま",
+    "otona": "七味・生姜"
+   },
+   "keep_ok": true,
+   "tpl": "umani",
+   "point": "味の型「和風うま煮」。主材と野菜は差し替えOK"
+  },
+  {
+   "id": "tpl-umani-3-4",
+   "name": "豚バラときのこの和風うま煮",
+   "genre": "和",
+   "protein": "豚バラ",
+   "method": "煮る",
+   "ratio": "だし300:醤油大2:みりん大2:砂糖小1",
+   "seasonings": [
+    "だし",
+    "醤油",
+    "みりん",
+    "砂糖"
+   ],
+   "ingredients": [
+    "豚バラ薄切り",
+    "きのこ",
+    "長ねぎ"
+   ],
+   "batch": true,
+   "carryover": [
+    "丼にのせる",
+    "翌日は卵とじ"
+   ],
+   "toriwake": {
+    "kodomo": "そのまま",
+    "otona": "七味・生姜"
+   },
+   "keep_ok": true,
+   "tpl": "umani",
+   "point": "味の型「和風うま煮」。主材と野菜は差し替えOK"
+  },
+  {
+   "id": "tpl2-negishio-0-0",
+   "name": "鶏ももと小松菜・にんじんのねぎ塩炒め",
+   "genre": "中",
+   "protein": "鶏もも",
+   "method": "炒める",
+   "ratio": "鶏ガラ小2:塩小1/3:ごま油大1:レモン小2",
+   "seasonings": [
+    "ごま油",
+    "鶏ガラ",
+    "塩",
+    "レモン"
+   ],
+   "ingredients": [
+    "鶏もも肉",
+    "小松菜",
+    "にんじん",
+    "長ねぎ"
+   ],
+   "batch": true,
+   "carryover": [
+    "丼にのせる",
+    "翌日は卵とじ"
+   ],
+   "toriwake": {
+    "kodomo": "そのまま",
+    "otona": "黒こしょう"
+   },
+   "keep_ok": true,
+   "tpl": "negishio",
+   "point": "味の型「ねぎ塩炒め」×野菜の対「小松菜とにんじん」（緑×橙・葉物と薄切り根菜で火の通りをそろえる）。根菜は薄く切ると火の通りが葉物とそろいます"
+  },
+  {
+   "id": "tpl2-negishio-0-1",
+   "name": "鶏ももとちんげん菜・大根のねぎ塩炒め",
+   "genre": "中",
+   "protein": "鶏もも",
+   "method": "炒める",
+   "ratio": "鶏ガラ小2:塩小1/3:ごま油大1:レモン小2",
+   "seasonings": [
+    "ごま油",
+    "鶏ガラ",
+    "塩",
+    "レモン"
+   ],
+   "ingredients": [
+    "鶏もも肉",
+    "ちんげん菜",
+    "大根",
+    "長ねぎ"
+   ],
+   "batch": true,
+   "carryover": [
+    "丼にのせる",
+    "翌日は卵とじ"
+   ],
+   "toriwake": {
+    "kodomo": "そのまま",
+    "otona": "黒こしょう"
+   },
+   "keep_ok": true,
+   "tpl": "negishio",
+   "point": "味の型「ねぎ塩炒め」×野菜の対「ちんげん菜と大根」（葉物×いちょう切りの根菜で食感に差）。根菜は薄く切ると火の通りが葉物とそろいます"
+  },
+  {
+   "id": "tpl2-negishio-0-2",
+   "name": "鶏ももとキャベツ・ピーマンのねぎ塩炒め",
+   "genre": "中",
+   "protein": "鶏もも",
+   "method": "炒める",
+   "ratio": "鶏ガラ小2:塩小1/3:ごま油大1:レモン小2",
+   "seasonings": [
+    "ごま油",
+    "鶏ガラ",
+    "塩",
+    "レモン"
+   ],
+   "ingredients": [
+    "鶏もも肉",
+    "キャベツ",
+    "ピーマン",
+    "長ねぎ"
+   ],
+   "batch": true,
+   "carryover": [
+    "丼にのせる",
+    "翌日は卵とじ"
+   ],
+   "toriwake": {
+    "kodomo": "そのまま",
+    "otona": "黒こしょう"
+   },
+   "keep_ok": true,
+   "tpl": "negishio",
+   "point": "味の型「ねぎ塩炒め」×野菜の対「キャベツとピーマン」（甘みと苦みの対・緑2色）。根菜は薄く切ると火の通りが葉物とそろいます"
+  },
+  {
+   "id": "tpl2-negishio-1-0",
+   "name": "豚こまと小松菜・にんじんのねぎ塩炒め",
+   "genre": "中",
+   "protein": "豚こま",
+   "method": "炒める",
+   "ratio": "鶏ガラ小2:塩小1/3:ごま油大1:レモン小2",
+   "seasonings": [
+    "ごま油",
+    "鶏ガラ",
+    "塩",
+    "レモン"
+   ],
+   "ingredients": [
+    "豚こま",
+    "小松菜",
+    "にんじん",
+    "長ねぎ"
+   ],
+   "batch": true,
+   "carryover": [
+    "丼にのせる",
+    "翌日は卵とじ"
+   ],
+   "toriwake": {
+    "kodomo": "そのまま",
+    "otona": "黒こしょう"
+   },
+   "keep_ok": true,
+   "tpl": "negishio",
+   "point": "味の型「ねぎ塩炒め」×野菜の対「小松菜とにんじん」（緑×橙・葉物と薄切り根菜で火の通りをそろえる）。根菜は薄く切ると火の通りが葉物とそろいます"
+  },
+  {
+   "id": "tpl2-negishio-1-1",
+   "name": "豚こまとちんげん菜・大根のねぎ塩炒め",
+   "genre": "中",
+   "protein": "豚こま",
+   "method": "炒める",
+   "ratio": "鶏ガラ小2:塩小1/3:ごま油大1:レモン小2",
+   "seasonings": [
+    "ごま油",
+    "鶏ガラ",
+    "塩",
+    "レモン"
+   ],
+   "ingredients": [
+    "豚こま",
+    "ちんげん菜",
+    "大根",
+    "長ねぎ"
+   ],
+   "batch": true,
+   "carryover": [
+    "丼にのせる",
+    "翌日は卵とじ"
+   ],
+   "toriwake": {
+    "kodomo": "そのまま",
+    "otona": "黒こしょう"
+   },
+   "keep_ok": true,
+   "tpl": "negishio",
+   "point": "味の型「ねぎ塩炒め」×野菜の対「ちんげん菜と大根」（葉物×いちょう切りの根菜で食感に差）。根菜は薄く切ると火の通りが葉物とそろいます"
+  },
+  {
+   "id": "tpl2-negishio-1-2",
+   "name": "豚こまとキャベツ・ピーマンのねぎ塩炒め",
+   "genre": "中",
+   "protein": "豚こま",
+   "method": "炒める",
+   "ratio": "鶏ガラ小2:塩小1/3:ごま油大1:レモン小2",
+   "seasonings": [
+    "ごま油",
+    "鶏ガラ",
+    "塩",
+    "レモン"
+   ],
+   "ingredients": [
+    "豚こま",
+    "キャベツ",
+    "ピーマン",
+    "長ねぎ"
+   ],
+   "batch": true,
+   "carryover": [
+    "丼にのせる",
+    "翌日は卵とじ"
+   ],
+   "toriwake": {
+    "kodomo": "そのまま",
+    "otona": "黒こしょう"
+   },
+   "keep_ok": true,
+   "tpl": "negishio",
+   "point": "味の型「ねぎ塩炒め」×野菜の対「キャベツとピーマン」（甘みと苦みの対・緑2色）。根菜は薄く切ると火の通りが葉物とそろいます"
+  },
+  {
+   "id": "tpl2-oyster-0-0",
+   "name": "鶏ももと小松菜・にんじんのオイスター炒め",
+   "genre": "中",
+   "protein": "鶏もも",
+   "method": "炒める",
+   "ratio": "オイスター大2:酒大1:醤油小1:砂糖小1",
+   "seasonings": [
+    "オイスター",
+    "酒",
+    "醤油",
+    "砂糖"
+   ],
+   "ingredients": [
+    "鶏もも肉",
+    "小松菜",
+    "にんじん"
+   ],
+   "batch": true,
+   "carryover": [
+    "丼にのせる",
+    "翌日は卵とじ"
+   ],
+   "toriwake": {
+    "kodomo": "そのまま",
+    "otona": "黒こしょう"
+   },
+   "keep_ok": true,
+   "tpl": "oyster",
+   "point": "味の型「オイスター炒め」×野菜の対「小松菜とにんじん」（緑×橙・葉物と薄切り根菜で火の通りをそろえる）。根菜は薄く切ると火の通りが葉物とそろいます"
+  },
+  {
+   "id": "tpl2-oyster-0-1",
+   "name": "鶏ももとちんげん菜・大根のオイスター炒め",
+   "genre": "中",
+   "protein": "鶏もも",
+   "method": "炒める",
+   "ratio": "オイスター大2:酒大1:醤油小1:砂糖小1",
+   "seasonings": [
+    "オイスター",
+    "酒",
+    "醤油",
+    "砂糖"
+   ],
+   "ingredients": [
+    "鶏もも肉",
+    "ちんげん菜",
+    "大根"
+   ],
+   "batch": true,
+   "carryover": [
+    "丼にのせる",
+    "翌日は卵とじ"
+   ],
+   "toriwake": {
+    "kodomo": "そのまま",
+    "otona": "黒こしょう"
+   },
+   "keep_ok": true,
+   "tpl": "oyster",
+   "point": "味の型「オイスター炒め」×野菜の対「ちんげん菜と大根」（葉物×いちょう切りの根菜で食感に差）。根菜は薄く切ると火の通りが葉物とそろいます"
+  },
+  {
+   "id": "tpl2-oyster-0-2",
+   "name": "鶏ももとキャベツ・ピーマンのオイスター炒め",
+   "genre": "中",
+   "protein": "鶏もも",
+   "method": "炒める",
+   "ratio": "オイスター大2:酒大1:醤油小1:砂糖小1",
+   "seasonings": [
+    "オイスター",
+    "酒",
+    "醤油",
+    "砂糖"
+   ],
+   "ingredients": [
+    "鶏もも肉",
+    "キャベツ",
+    "ピーマン"
+   ],
+   "batch": true,
+   "carryover": [
+    "丼にのせる",
+    "翌日は卵とじ"
+   ],
+   "toriwake": {
+    "kodomo": "そのまま",
+    "otona": "黒こしょう"
+   },
+   "keep_ok": true,
+   "tpl": "oyster",
+   "point": "味の型「オイスター炒め」×野菜の対「キャベツとピーマン」（甘みと苦みの対・緑2色）。根菜は薄く切ると火の通りが葉物とそろいます"
+  },
+  {
+   "id": "tpl2-oyster-1-0",
+   "name": "豚こまと小松菜・にんじんのオイスター炒め",
+   "genre": "中",
+   "protein": "豚こま",
+   "method": "炒める",
+   "ratio": "オイスター大2:酒大1:醤油小1:砂糖小1",
+   "seasonings": [
+    "オイスター",
+    "酒",
+    "醤油",
+    "砂糖"
+   ],
+   "ingredients": [
+    "豚こま",
+    "小松菜",
+    "にんじん"
+   ],
+   "batch": true,
+   "carryover": [
+    "丼にのせる",
+    "翌日は卵とじ"
+   ],
+   "toriwake": {
+    "kodomo": "そのまま",
+    "otona": "黒こしょう"
+   },
+   "keep_ok": true,
+   "tpl": "oyster",
+   "point": "味の型「オイスター炒め」×野菜の対「小松菜とにんじん」（緑×橙・葉物と薄切り根菜で火の通りをそろえる）。根菜は薄く切ると火の通りが葉物とそろいます"
+  },
+  {
+   "id": "tpl2-oyster-1-1",
+   "name": "豚こまとちんげん菜・大根のオイスター炒め",
+   "genre": "中",
+   "protein": "豚こま",
+   "method": "炒める",
+   "ratio": "オイスター大2:酒大1:醤油小1:砂糖小1",
+   "seasonings": [
+    "オイスター",
+    "酒",
+    "醤油",
+    "砂糖"
+   ],
+   "ingredients": [
+    "豚こま",
+    "ちんげん菜",
+    "大根"
+   ],
+   "batch": true,
+   "carryover": [
+    "丼にのせる",
+    "翌日は卵とじ"
+   ],
+   "toriwake": {
+    "kodomo": "そのまま",
+    "otona": "黒こしょう"
+   },
+   "keep_ok": true,
+   "tpl": "oyster",
+   "point": "味の型「オイスター炒め」×野菜の対「ちんげん菜と大根」（葉物×いちょう切りの根菜で食感に差）。根菜は薄く切ると火の通りが葉物とそろいます"
+  },
+  {
+   "id": "tpl2-oyster-1-2",
+   "name": "豚こまとキャベツ・ピーマンのオイスター炒め",
+   "genre": "中",
+   "protein": "豚こま",
+   "method": "炒める",
+   "ratio": "オイスター大2:酒大1:醤油小1:砂糖小1",
+   "seasonings": [
+    "オイスター",
+    "酒",
+    "醤油",
+    "砂糖"
+   ],
+   "ingredients": [
+    "豚こま",
+    "キャベツ",
+    "ピーマン"
+   ],
+   "batch": true,
+   "carryover": [
+    "丼にのせる",
+    "翌日は卵とじ"
+   ],
+   "toriwake": {
+    "kodomo": "そのまま",
+    "otona": "黒こしょう"
+   },
+   "keep_ok": true,
+   "tpl": "oyster",
+   "point": "味の型「オイスター炒め」×野菜の対「キャベツとピーマン」（甘みと苦みの対・緑2色）。根菜は薄く切ると火の通りが葉物とそろいます"
+  },
+  {
+   "id": "tpl2-ninnikushoyu-0-0",
+   "name": "鶏ももと小松菜・にんじんのにんにく醤油炒め",
+   "genre": "和",
+   "protein": "鶏もも",
+   "method": "炒める",
+   "ratio": "醤油1:酒1:みりん1",
+   "seasonings": [
+    "醤油",
+    "酒",
+    "みりん",
+    "にんにく"
+   ],
+   "ingredients": [
+    "鶏もも肉",
+    "小松菜",
+    "にんじん"
+   ],
+   "batch": true,
+   "carryover": [
+    "丼にのせる",
+    "翌日は卵とじ"
+   ],
+   "toriwake": {
+    "kodomo": "そのまま",
+    "otona": "黒こしょう"
+   },
+   "keep_ok": true,
+   "tpl": "ninnikushoyu",
+   "point": "味の型「にんにく醤油炒め」×野菜の対「小松菜とにんじん」（緑×橙・葉物と薄切り根菜で火の通りをそろえる）。根菜は薄く切ると火の通りが葉物とそろいます"
+  },
+  {
+   "id": "tpl2-ninnikushoyu-0-1",
+   "name": "鶏ももとちんげん菜・大根のにんにく醤油炒め",
+   "genre": "和",
+   "protein": "鶏もも",
+   "method": "炒める",
+   "ratio": "醤油1:酒1:みりん1",
+   "seasonings": [
+    "醤油",
+    "酒",
+    "みりん",
+    "にんにく"
+   ],
+   "ingredients": [
+    "鶏もも肉",
+    "ちんげん菜",
+    "大根"
+   ],
+   "batch": true,
+   "carryover": [
+    "丼にのせる",
+    "翌日は卵とじ"
+   ],
+   "toriwake": {
+    "kodomo": "そのまま",
+    "otona": "黒こしょう"
+   },
+   "keep_ok": true,
+   "tpl": "ninnikushoyu",
+   "point": "味の型「にんにく醤油炒め」×野菜の対「ちんげん菜と大根」（葉物×いちょう切りの根菜で食感に差）。根菜は薄く切ると火の通りが葉物とそろいます"
+  },
+  {
+   "id": "tpl2-ninnikushoyu-0-2",
+   "name": "鶏ももとキャベツ・ピーマンのにんにく醤油炒め",
+   "genre": "和",
+   "protein": "鶏もも",
+   "method": "炒める",
+   "ratio": "醤油1:酒1:みりん1",
+   "seasonings": [
+    "醤油",
+    "酒",
+    "みりん",
+    "にんにく"
+   ],
+   "ingredients": [
+    "鶏もも肉",
+    "キャベツ",
+    "ピーマン"
+   ],
+   "batch": true,
+   "carryover": [
+    "丼にのせる",
+    "翌日は卵とじ"
+   ],
+   "toriwake": {
+    "kodomo": "そのまま",
+    "otona": "黒こしょう"
+   },
+   "keep_ok": true,
+   "tpl": "ninnikushoyu",
+   "point": "味の型「にんにく醤油炒め」×野菜の対「キャベツとピーマン」（甘みと苦みの対・緑2色）。根菜は薄く切ると火の通りが葉物とそろいます"
+  },
+  {
+   "id": "tpl2-ninnikushoyu-1-0",
+   "name": "豚こまと小松菜・にんじんのにんにく醤油炒め",
+   "genre": "和",
+   "protein": "豚こま",
+   "method": "炒める",
+   "ratio": "醤油1:酒1:みりん1",
+   "seasonings": [
+    "醤油",
+    "酒",
+    "みりん",
+    "にんにく"
+   ],
+   "ingredients": [
+    "豚こま",
+    "小松菜",
+    "にんじん"
+   ],
+   "batch": true,
+   "carryover": [
+    "丼にのせる",
+    "翌日は卵とじ"
+   ],
+   "toriwake": {
+    "kodomo": "そのまま",
+    "otona": "黒こしょう"
+   },
+   "keep_ok": true,
+   "tpl": "ninnikushoyu",
+   "point": "味の型「にんにく醤油炒め」×野菜の対「小松菜とにんじん」（緑×橙・葉物と薄切り根菜で火の通りをそろえる）。根菜は薄く切ると火の通りが葉物とそろいます"
+  },
+  {
+   "id": "tpl2-ninnikushoyu-1-1",
+   "name": "豚こまとちんげん菜・大根のにんにく醤油炒め",
+   "genre": "和",
+   "protein": "豚こま",
+   "method": "炒める",
+   "ratio": "醤油1:酒1:みりん1",
+   "seasonings": [
+    "醤油",
+    "酒",
+    "みりん",
+    "にんにく"
+   ],
+   "ingredients": [
+    "豚こま",
+    "ちんげん菜",
+    "大根"
+   ],
+   "batch": true,
+   "carryover": [
+    "丼にのせる",
+    "翌日は卵とじ"
+   ],
+   "toriwake": {
+    "kodomo": "そのまま",
+    "otona": "黒こしょう"
+   },
+   "keep_ok": true,
+   "tpl": "ninnikushoyu",
+   "point": "味の型「にんにく醤油炒め」×野菜の対「ちんげん菜と大根」（葉物×いちょう切りの根菜で食感に差）。根菜は薄く切ると火の通りが葉物とそろいます"
+  },
+  {
+   "id": "tpl2-ninnikushoyu-1-2",
+   "name": "豚こまとキャベツ・ピーマンのにんにく醤油炒め",
+   "genre": "和",
+   "protein": "豚こま",
+   "method": "炒める",
+   "ratio": "醤油1:酒1:みりん1",
+   "seasonings": [
+    "醤油",
+    "酒",
+    "みりん",
+    "にんにく"
+   ],
+   "ingredients": [
+    "豚こま",
+    "キャベツ",
+    "ピーマン"
+   ],
+   "batch": true,
+   "carryover": [
+    "丼にのせる",
+    "翌日は卵とじ"
+   ],
+   "toriwake": {
+    "kodomo": "そのまま",
+    "otona": "黒こしょう"
+   },
+   "keep_ok": true,
+   "tpl": "ninnikushoyu",
+   "point": "味の型「にんにく醤油炒め」×野菜の対「キャベツとピーマン」（甘みと苦みの対・緑2色）。根菜は薄く切ると火の通りが葉物とそろいます"
+  },
+  {
+   "id": "tpl2-amazu-0-0",
+   "name": "鶏ももと小松菜・にんじんの甘酢あん炒め",
+   "genre": "中",
+   "protein": "鶏もも",
+   "method": "炒める",
+   "ratio": "酢大2:砂糖大2:醤油大1:ケチャップ大1",
+   "seasonings": [
+    "酢",
+    "砂糖",
+    "醤油",
+    "ケチャップ",
+    "片栗粉"
+   ],
+   "ingredients": [
+    "鶏もも肉",
+    "小松菜",
+    "にんじん"
+   ],
+   "batch": true,
+   "carryover": [
+    "丼にのせる",
+    "翌日は卵とじ"
+   ],
+   "toriwake": {
+    "kodomo": "そのまま",
+    "otona": "黒酢少々"
+   },
+   "keep_ok": true,
+   "tpl": "amazu",
+   "point": "味の型「甘酢あん炒め」×野菜の対「小松菜とにんじん」（緑×橙・葉物と薄切り根菜で火の通りをそろえる）。根菜は薄く切ると火の通りが葉物とそろいます"
+  },
+  {
+   "id": "tpl2-amazu-0-1",
+   "name": "鶏ももとちんげん菜・大根の甘酢あん炒め",
+   "genre": "中",
+   "protein": "鶏もも",
+   "method": "炒める",
+   "ratio": "酢大2:砂糖大2:醤油大1:ケチャップ大1",
+   "seasonings": [
+    "酢",
+    "砂糖",
+    "醤油",
+    "ケチャップ",
+    "片栗粉"
+   ],
+   "ingredients": [
+    "鶏もも肉",
+    "ちんげん菜",
+    "大根"
+   ],
+   "batch": true,
+   "carryover": [
+    "丼にのせる",
+    "翌日は卵とじ"
+   ],
+   "toriwake": {
+    "kodomo": "そのまま",
+    "otona": "黒酢少々"
+   },
+   "keep_ok": true,
+   "tpl": "amazu",
+   "point": "味の型「甘酢あん炒め」×野菜の対「ちんげん菜と大根」（葉物×いちょう切りの根菜で食感に差）。根菜は薄く切ると火の通りが葉物とそろいます"
+  },
+  {
+   "id": "tpl2-amazu-1-0",
+   "name": "豚こまと小松菜・にんじんの甘酢あん炒め",
+   "genre": "中",
+   "protein": "豚こま",
+   "method": "炒める",
+   "ratio": "酢大2:砂糖大2:醤油大1:ケチャップ大1",
+   "seasonings": [
+    "酢",
+    "砂糖",
+    "醤油",
+    "ケチャップ",
+    "片栗粉"
+   ],
+   "ingredients": [
+    "豚こま",
+    "小松菜",
+    "にんじん"
+   ],
+   "batch": true,
+   "carryover": [
+    "丼にのせる",
+    "翌日は卵とじ"
+   ],
+   "toriwake": {
+    "kodomo": "そのまま",
+    "otona": "黒酢少々"
+   },
+   "keep_ok": true,
+   "tpl": "amazu",
+   "point": "味の型「甘酢あん炒め」×野菜の対「小松菜とにんじん」（緑×橙・葉物と薄切り根菜で火の通りをそろえる）。根菜は薄く切ると火の通りが葉物とそろいます"
+  },
+  {
+   "id": "tpl2-amazu-1-1",
+   "name": "豚こまとちんげん菜・大根の甘酢あん炒め",
+   "genre": "中",
+   "protein": "豚こま",
+   "method": "炒める",
+   "ratio": "酢大2:砂糖大2:醤油大1:ケチャップ大1",
+   "seasonings": [
+    "酢",
+    "砂糖",
+    "醤油",
+    "ケチャップ",
+    "片栗粉"
+   ],
+   "ingredients": [
+    "豚こま",
+    "ちんげん菜",
+    "大根"
+   ],
+   "batch": true,
+   "carryover": [
+    "丼にのせる",
+    "翌日は卵とじ"
+   ],
+   "toriwake": {
+    "kodomo": "そのまま",
+    "otona": "黒酢少々"
+   },
+   "keep_ok": true,
+   "tpl": "amazu",
+   "point": "味の型「甘酢あん炒め」×野菜の対「ちんげん菜と大根」（葉物×いちょう切りの根菜で食感に差）。根菜は薄く切ると火の通りが葉物とそろいます"
+  },
+  {
+   "id": "tpl2-shiolemon-0-0",
+   "name": "鶏ももと小松菜・にんじんの塩レモン炒め",
+   "genre": "洋",
+   "protein": "鶏もも",
+   "method": "炒める",
+   "ratio": "塩小1/2:レモン大1:オリーブ油大1",
+   "seasonings": [
+    "塩",
+    "レモン",
+    "オリーブ油",
+    "にんにく"
+   ],
+   "ingredients": [
+    "鶏もも肉",
+    "小松菜",
+    "にんじん"
+   ],
+   "batch": true,
+   "carryover": [
+    "丼にのせる",
+    "翌日は卵とじ"
+   ],
+   "toriwake": {
+    "kodomo": "そのまま",
+    "otona": "黒こしょう・粉チーズ"
+   },
+   "keep_ok": true,
+   "tpl": "shiolemon",
+   "point": "味の型「塩レモン炒め」×野菜の対「小松菜とにんじん」（緑×橙・葉物と薄切り根菜で火の通りをそろえる）。根菜は薄く切ると火の通りが葉物とそろいます"
+  },
+  {
+   "id": "tpl2-shiolemon-0-1",
+   "name": "鶏ももとちんげん菜・大根の塩レモン炒め",
+   "genre": "洋",
+   "protein": "鶏もも",
+   "method": "炒める",
+   "ratio": "塩小1/2:レモン大1:オリーブ油大1",
+   "seasonings": [
+    "塩",
+    "レモン",
+    "オリーブ油",
+    "にんにく"
+   ],
+   "ingredients": [
+    "鶏もも肉",
+    "ちんげん菜",
+    "大根"
+   ],
+   "batch": true,
+   "carryover": [
+    "丼にのせる",
+    "翌日は卵とじ"
+   ],
+   "toriwake": {
+    "kodomo": "そのまま",
+    "otona": "黒こしょう・粉チーズ"
+   },
+   "keep_ok": true,
+   "tpl": "shiolemon",
+   "point": "味の型「塩レモン炒め」×野菜の対「ちんげん菜と大根」（葉物×いちょう切りの根菜で食感に差）。根菜は薄く切ると火の通りが葉物とそろいます"
+  },
+  {
+   "id": "tpl2-shiolemon-1-0",
+   "name": "豚こまと小松菜・にんじんの塩レモン炒め",
+   "genre": "洋",
+   "protein": "豚こま",
+   "method": "炒める",
+   "ratio": "塩小1/2:レモン大1:オリーブ油大1",
+   "seasonings": [
+    "塩",
+    "レモン",
+    "オリーブ油",
+    "にんにく"
+   ],
+   "ingredients": [
+    "豚こま",
+    "小松菜",
+    "にんじん"
+   ],
+   "batch": true,
+   "carryover": [
+    "丼にのせる",
+    "翌日は卵とじ"
+   ],
+   "toriwake": {
+    "kodomo": "そのまま",
+    "otona": "黒こしょう・粉チーズ"
+   },
+   "keep_ok": true,
+   "tpl": "shiolemon",
+   "point": "味の型「塩レモン炒め」×野菜の対「小松菜とにんじん」（緑×橙・葉物と薄切り根菜で火の通りをそろえる）。根菜は薄く切ると火の通りが葉物とそろいます"
+  },
+  {
+   "id": "tpl2-shiolemon-1-1",
+   "name": "豚こまとちんげん菜・大根の塩レモン炒め",
+   "genre": "洋",
+   "protein": "豚こま",
+   "method": "炒める",
+   "ratio": "塩小1/2:レモン大1:オリーブ油大1",
+   "seasonings": [
+    "塩",
+    "レモン",
+    "オリーブ油",
+    "にんにく"
+   ],
+   "ingredients": [
+    "豚こま",
+    "ちんげん菜",
+    "大根"
+   ],
+   "batch": true,
+   "carryover": [
+    "丼にのせる",
+    "翌日は卵とじ"
+   ],
+   "toriwake": {
+    "kodomo": "そのまま",
+    "otona": "黒こしょう・粉チーズ"
+   },
+   "keep_ok": true,
+   "tpl": "shiolemon",
+   "point": "味の型「塩レモン炒め」×野菜の対「ちんげん菜と大根」（葉物×いちょう切りの根菜で食感に差）。根菜は薄く切ると火の通りが葉物とそろいます"
+  },
+  {
+   "id": "tpl2-curry-0-0",
+   "name": "鶏ももと小松菜・にんじんのカレー炒め",
+   "genre": "洋",
+   "protein": "鶏もも",
+   "method": "炒める",
+   "ratio": "カレー粉小2:醤油小2:塩小1/3:ケチャップ大1",
+   "seasonings": [
+    "カレー粉",
+    "醤油",
+    "塩",
+    "ケチャップ"
+   ],
+   "ingredients": [
+    "鶏もも肉",
+    "小松菜",
+    "にんじん"
+   ],
+   "batch": true,
+   "carryover": [
+    "丼にのせる",
+    "翌日は卵とじ"
+   ],
+   "toriwake": {
+    "kodomo": "カレー粉ひかえめ",
+    "otona": "黒こしょう"
+   },
+   "keep_ok": true,
+   "tpl": "curry",
+   "point": "味の型「カレー炒め」×野菜の対「小松菜とにんじん」（緑×橙・葉物と薄切り根菜で火の通りをそろえる）。根菜は薄く切ると火の通りが葉物とそろいます"
+  },
+  {
+   "id": "tpl2-curry-0-1",
+   "name": "鶏ももとちんげん菜・大根のカレー炒め",
+   "genre": "洋",
+   "protein": "鶏もも",
+   "method": "炒める",
+   "ratio": "カレー粉小2:醤油小2:塩小1/3:ケチャップ大1",
+   "seasonings": [
+    "カレー粉",
+    "醤油",
+    "塩",
+    "ケチャップ"
+   ],
+   "ingredients": [
+    "鶏もも肉",
+    "ちんげん菜",
+    "大根"
+   ],
+   "batch": true,
+   "carryover": [
+    "丼にのせる",
+    "翌日は卵とじ"
+   ],
+   "toriwake": {
+    "kodomo": "カレー粉ひかえめ",
+    "otona": "黒こしょう"
+   },
+   "keep_ok": true,
+   "tpl": "curry",
+   "point": "味の型「カレー炒め」×野菜の対「ちんげん菜と大根」（葉物×いちょう切りの根菜で食感に差）。根菜は薄く切ると火の通りが葉物とそろいます"
+  },
+  {
+   "id": "tpl2-curry-1-0",
+   "name": "豚こまと小松菜・にんじんのカレー炒め",
+   "genre": "洋",
+   "protein": "豚こま",
+   "method": "炒める",
+   "ratio": "カレー粉小2:醤油小2:塩小1/3:ケチャップ大1",
+   "seasonings": [
+    "カレー粉",
+    "醤油",
+    "塩",
+    "ケチャップ"
+   ],
+   "ingredients": [
+    "豚こま",
+    "小松菜",
+    "にんじん"
+   ],
+   "batch": true,
+   "carryover": [
+    "丼にのせる",
+    "翌日は卵とじ"
+   ],
+   "toriwake": {
+    "kodomo": "カレー粉ひかえめ",
+    "otona": "黒こしょう"
+   },
+   "keep_ok": true,
+   "tpl": "curry",
+   "point": "味の型「カレー炒め」×野菜の対「小松菜とにんじん」（緑×橙・葉物と薄切り根菜で火の通りをそろえる）。根菜は薄く切ると火の通りが葉物とそろいます"
+  },
+  {
+   "id": "tpl2-curry-1-1",
+   "name": "豚こまとちんげん菜・大根のカレー炒め",
+   "genre": "洋",
+   "protein": "豚こま",
+   "method": "炒める",
+   "ratio": "カレー粉小2:醤油小2:塩小1/3:ケチャップ大1",
+   "seasonings": [
+    "カレー粉",
+    "醤油",
+    "塩",
+    "ケチャップ"
+   ],
+   "ingredients": [
+    "豚こま",
+    "ちんげん菜",
+    "大根"
+   ],
+   "batch": true,
+   "carryover": [
+    "丼にのせる",
+    "翌日は卵とじ"
+   ],
+   "toriwake": {
+    "kodomo": "カレー粉ひかえめ",
+    "otona": "黒こしょう"
+   },
+   "keep_ok": true,
+   "tpl": "curry",
+   "point": "味の型「カレー炒め」×野菜の対「ちんげん菜と大根」（葉物×いちょう切りの根菜で食感に差）。根菜は薄く切ると火の通りが葉物とそろいます"
+  },
+  {
+   "id": "tpl2-shoga-0-0",
+   "name": "鶏ももと小松菜・にんじんの生姜醤油炒め",
+   "genre": "和",
+   "protein": "鶏もも",
+   "method": "炒める",
+   "ratio": "醤油2:酒1:みりん1:生姜",
+   "seasonings": [
+    "生姜",
+    "醤油",
+    "酒",
+    "みりん"
+   ],
+   "ingredients": [
+    "鶏もも肉",
+    "小松菜",
+    "にんじん"
+   ],
+   "batch": true,
+   "carryover": [
+    "丼にのせる",
+    "翌日は卵とじ"
+   ],
+   "toriwake": {
+    "kodomo": "そのまま",
+    "otona": "七味"
+   },
+   "keep_ok": true,
+   "tpl": "shoga",
+   "point": "味の型「生姜醤油炒め」×野菜の対「小松菜とにんじん」（緑×橙・葉物と薄切り根菜で火の通りをそろえる）。根菜は薄く切ると火の通りが葉物とそろいます"
+  },
+  {
+   "id": "tpl2-shoga-0-1",
+   "name": "鶏ももとちんげん菜・大根の生姜醤油炒め",
+   "genre": "和",
+   "protein": "鶏もも",
+   "method": "炒める",
+   "ratio": "醤油2:酒1:みりん1:生姜",
+   "seasonings": [
+    "生姜",
+    "醤油",
+    "酒",
+    "みりん"
+   ],
+   "ingredients": [
+    "鶏もも肉",
+    "ちんげん菜",
+    "大根"
+   ],
+   "batch": true,
+   "carryover": [
+    "丼にのせる",
+    "翌日は卵とじ"
+   ],
+   "toriwake": {
+    "kodomo": "そのまま",
+    "otona": "七味"
+   },
+   "keep_ok": true,
+   "tpl": "shoga",
+   "point": "味の型「生姜醤油炒め」×野菜の対「ちんげん菜と大根」（葉物×いちょう切りの根菜で食感に差）。根菜は薄く切ると火の通りが葉物とそろいます"
+  },
+  {
+   "id": "tpl2-shoga-1-0",
+   "name": "豚こまと小松菜・にんじんの生姜醤油炒め",
+   "genre": "和",
+   "protein": "豚こま",
+   "method": "炒める",
+   "ratio": "醤油2:酒1:みりん1:生姜",
+   "seasonings": [
+    "生姜",
+    "醤油",
+    "酒",
+    "みりん"
+   ],
+   "ingredients": [
+    "豚こま",
+    "小松菜",
+    "にんじん"
+   ],
+   "batch": true,
+   "carryover": [
+    "丼にのせる",
+    "翌日は卵とじ"
+   ],
+   "toriwake": {
+    "kodomo": "そのまま",
+    "otona": "七味"
+   },
+   "keep_ok": true,
+   "tpl": "shoga",
+   "point": "味の型「生姜醤油炒め」×野菜の対「小松菜とにんじん」（緑×橙・葉物と薄切り根菜で火の通りをそろえる）。根菜は薄く切ると火の通りが葉物とそろいます"
+  },
+  {
+   "id": "tpl2-shoga-1-1",
+   "name": "豚こまとちんげん菜・大根の生姜醤油炒め",
+   "genre": "和",
+   "protein": "豚こま",
+   "method": "炒める",
+   "ratio": "醤油2:酒1:みりん1:生姜",
+   "seasonings": [
+    "生姜",
+    "醤油",
+    "酒",
+    "みりん"
+   ],
+   "ingredients": [
+    "豚こま",
+    "ちんげん菜",
+    "大根"
+   ],
+   "batch": true,
+   "carryover": [
+    "丼にのせる",
+    "翌日は卵とじ"
+   ],
+   "toriwake": {
+    "kodomo": "そのまま",
+    "otona": "七味"
+   },
+   "keep_ok": true,
+   "tpl": "shoga",
+   "point": "味の型「生姜醤油炒め」×野菜の対「ちんげん菜と大根」（葉物×いちょう切りの根菜で食感に差）。根菜は薄く切ると火の通りが葉物とそろいます"
   }
  ],
  "side": [
@@ -6101,6 +9717,24 @@
    "ingredients": [
     "コーン缶",
     "ツナ缶"
+   ],
+   "keep_ok": true
+  },
+  {
+   "id": "s-tamori-piman",
+   "name": "ピーマンのくたくた煮(タモリ流)",
+   "genre": "和",
+   "makeahead": true,
+   "seasonings": [
+    "ごま油",
+    "醤油",
+    "みりん",
+    "酒",
+    "ほんだし"
+   ],
+   "ingredients": [
+    "ピーマン",
+    "鰹節"
    ],
    "keep_ok": true
   }
@@ -7380,6 +11014,48 @@
    "toriwake": {
     "kodomo": "そのまま",
     "otona": "七味"
+   }
+  },
+  {
+   "id": "tan-tamori-omurice",
+   "name": "タモリ流オムライス(混ぜて焼く)",
+   "genre": "洋",
+   "type": "飯",
+   "protein": "卵",
+   "seasonings": [
+    "ケチャップ",
+    "塩"
+   ],
+   "ingredients": [
+    "ごはん",
+    "たまご",
+    "ミックスベジタブル"
+   ],
+   "toriwake": {
+    "kodomo": "ケチャップ",
+    "otona": "黒こしょう・タバスコ"
+   }
+  },
+  {
+   "id": "tan-tamori-tofudon",
+   "name": "タモリさんの豆腐丼",
+   "genre": "和",
+   "type": "丼",
+   "protein": "豆腐",
+   "seasonings": [
+    "醤油",
+    "白ごま"
+   ],
+   "ingredients": [
+    "豆腐",
+    "たくあん",
+    "長ネギ",
+    "たまご",
+    "ごはん"
+   ],
+   "toriwake": {
+    "kodomo": "そのまま",
+    "otona": "ラー油・七味"
    }
   }
  ]
