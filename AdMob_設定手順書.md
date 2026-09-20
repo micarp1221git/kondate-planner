@@ -1,6 +1,14 @@
-# 献立アプリ バナー広告（AdMob）設定手順書（2026-08-07準備完了）
+# 献立アプリ バナー広告（AdMob）設定手順書（2026-08-07準備完了・2026-09-20 iOS本番投入）
 
-## いまの状態
+## 2026-09-20 の現在地（iOS＝本番ID投入済み／Android＝未着手）
+
+- ✅ AdMobアカウント開設・iOSアプリ登録・バナーユニット発行（みかさん 9/20）。発行者ID `pub-6657198955886954`
+- ✅ iOS本番IDを3か所に投入（`index.html` の `ADMOB_CONFIG`・`Info.plist` の `GADApplicationIdentifier`）、プラグイン `@capacitor-community/admob@8.1.0` を再追加、v1.8(build22) として `native/release_v1.8.sh` でビルド→アップロード
+- ✅ `app-ads.txt` を公開: https://micarp1221git.github.io/app-ads.txt （リポ `micarp1221git/micarp1221git.github.io`。AdMobの「アプリの確認」はApp Store側の「マーケティングURL」＝ `https://micarp1221git.github.io/` が反映されてから「確認」を押し直す。再クロールは最長24時間）
+- ⏳ Android: Play Storeに出していないので未着手。出すときに AdMobでAndroidアプリ追加→アプリID＋バナーユニットIDを `AndroidManifest.xml` と `ADMOB_CONFIG.bannerIdAndroid` に入れる
+- 🔧 次回以降のリリースは `native/release_v1.8.sh` をコピーしてバージョン番号を変える（署名鍵を使うのでAIからは実行できない＝みかさんが `! bash ~/git/kondate-planner/native/release_v1.X.sh`）
+
+## 2026-08-07時点の状態（経緯として残す）
 
 - アプリ下部の小さいバナー広告のコードは**組み込み済み**（ネイティブアプリ版のみ表示・Web版には出ない）
 - いまは**Google公式のテスト広告ID**が入っている。このままビルドするとテスト広告が出る
