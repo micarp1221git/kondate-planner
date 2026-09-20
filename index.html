@@ -2290,10 +2290,10 @@ setTimeout(setupDailyReminder, 2500);
 //    npa:true（非パーソナライズ広告）にしてあるのは、追跡許可ダイアログ(ATT)なしで
 //    審査を通せる構成にするため。パーソナライズに変えるならATT実装が必要。
 const ADMOB_CONFIG = {
-  enabled: false,   // 🚨 v1.3では広告を出さない（テストIDのまま本番に出せない）。本番IDが取れたら true に＋ID差し替え
-  bannerIdIos: 'ca-app-pub-3940256099942544/2934735716',      // テスト用(iOSバナー)
-  bannerIdAndroid: 'ca-app-pub-3940256099942544/6300978111',  // テスト用(Androidバナー)
-  isTesting: true
+  enabled: true,    // 2026-09-20 本番ID投入（iOS）。Androidは未リリースのためテストIDのまま（Play提出時に差し替え）
+  bannerIdIos: 'ca-app-pub-6657198955886954/3051733341',      // 本番(iOSバナー・2026-09-20 みかさん発行)
+  bannerIdAndroid: 'ca-app-pub-3940256099942544/6300978111',  // テスト用(Androidバナー)・Android版を出すときに差し替え
+  isTesting: false
 };
 async function setupBannerAd(){
   if(!ADMOB_CONFIG.enabled) return;
