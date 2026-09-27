@@ -8,7 +8,7 @@ export DEVELOPER_DIR=/Applications/Xcode.app/Contents/Developer
 KEYDIR="$HOME/.appstoreconnect/private_keys"; KEY="$(ls "$KEYDIR"/AuthKey_*.p8 | head -1)"; KID="$(basename "$KEY" .p8 | sed 's/AuthKey_//')"
 ISS="$(grep -o 'authenticationKeyIssuerID [0-9a-f-]*' README.md | head -1 | awk '{print $2}')"
 [ -f "$KEY" ] && [ -n "$ISS" ] || { echo "❌ 鍵かIssuerIDが見つからない"; exit 1; }
-LOG="$HOME/Desktop/献立v1.8_ビルドログ.txt"; : > "$LOG"
+LOG="$HOME/.mika-bin-logs/献立v1.8_ビルドログ.txt"; : > "$LOG"
 # バージョンは既に 1.8/22 に上げ済み（2026-09-20）
 echo "① バージョン: $(grep -m1 MARKETING_VERSION ios/App/App.xcodeproj/project.pbxproj) / $(grep -m1 CURRENT_PROJECT_VERSION ios/App/App.xcodeproj/project.pbxproj)"
 ./copy-www.sh >>"$LOG" 2>&1; echo "② www同期: 本番バナーID=$(grep -c 3051733341 www/index.html) / admobプラグイン=$(grep -c admob package.json)"

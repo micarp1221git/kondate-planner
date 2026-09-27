@@ -8,7 +8,7 @@ export DEVELOPER_DIR=/Applications/Xcode.app/Contents/Developer
 KEYDIR="$HOME/.appstoreconnect/private_keys"; KEY="$(ls "$KEYDIR"/AuthKey_*.p8 | head -1)"; KID="$(basename "$KEY" .p8 | sed 's/AuthKey_//')"
 ISS="$(grep -o 'authenticationKeyIssuerID [0-9a-f-]*' README.md | head -1 | awk '{print $2}')"
 [ -f "$KEY" ] && [ -n "$ISS" ] || { echo "❌ 鍵かIssuerIDが見つからない"; exit 1; }
-LOG="$HOME/Desktop/献立v1.7_ビルドログ.txt"; : > "$LOG"
+LOG="$HOME/.mika-bin-logs/献立v1.7_ビルドログ.txt"; : > "$LOG"
 sed -i '' 's/CURRENT_PROJECT_VERSION = 20;/CURRENT_PROJECT_VERSION = 21;/g; s/MARKETING_VERSION = 1.6;/MARKETING_VERSION = 1.7;/g' ios/App/App.xcodeproj/project.pbxproj
 echo "① バージョン: $(grep -m1 MARKETING_VERSION ios/App/App.xcodeproj/project.pbxproj) / $(grep -m1 CURRENT_PROJECT_VERSION ios/App/App.xcodeproj/project.pbxproj)"
 ./copy-www.sh >>"$LOG" 2>&1; echo "② www同期: 1画面1ステップの痕跡=$(grep -c 'ui=classic' www/index.html)"
