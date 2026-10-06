@@ -413,6 +413,19 @@ body.stepui main.container>*:not(#stepui){display:none}
   background:var(--primary,#e08a5b);color:#fff;cursor:pointer}
 .step-next:disabled{background:#ded7cd;color:#fff;cursor:default}
 .step-foot .regen-btn{margin-top:8px}
+/* 決定して閉じる → たたんだ欄（2026-10-06） */
+.step-summary{display:none}
+.step-open.step-collapsed>*:not(h2):not(.step-summary){display:none}
+.step-open.step-collapsed .step-summary{display:flex;gap:10px;align-items:center;justify-content:space-between}
+.step-open.step-collapsed{padding-bottom:12px}
+.step-summary-text{font-size:.85rem;line-height:1.5;color:var(--text-mid,#7a7268);min-width:0}
+.step-summary-edit{flex:none;padding:8px 14px;border:1.5px solid var(--primary,#e08a5b);background:#fff;color:var(--primary,#e08a5b);border-radius:999px;font-size:.85rem;font-weight:700;cursor:pointer}
+/* 候補のページ送り（2026-10-06） */
+.cand-nav{display:flex;gap:8px;margin-top:8px}
+#step-grid{scroll-margin-top:80px}
+.cand-nav .regen-btn{flex:1;margin-top:0}
+.cand-nav .regen-btn:disabled{opacity:.45;cursor:default}
+.cand-page{font-size:.78rem;color:var(--text-mid,#7a7268);text-align:center;margin-top:6px}
 
 
 /* 広告バナー（アプリ版のみ・画面の下の安全域の上に出る）が出ている間は、その高さぶん持ち上げる（2026-09-24） */
@@ -485,7 +498,7 @@ body.has-ad .panel{bottom:calc(var(--ad-h,0px) + env(safe-area-inset-bottom,0px)
     <h2>🧊 冷蔵庫の中身</h2>
     <p class="section-desc">今あるものにチェック。この食材だけで献立を組みます。</p>
     <div id="ingredient-groups"></div>
-    <button class="panel-close" onclick="closeSheet()">✅ 決定して閉じる</button>
+    <button class="panel-close" onclick="closeSheet(this)">✅ 決定して閉じる</button>
   </section>
   <section class="section panel hidden" id="seasoning-section">
     <div class="sheet-grip" onclick="closeSheet()"></div>
@@ -493,7 +506,7 @@ body.has-ad .panel{bottom:calc(var(--ad-h,0px) + env(safe-area-inset-bottom,0px)
     <h2>🧂 手持ちの調味料</h2>
     <p class="section-desc">あるものにチェック。ここで作れる料理が決まります。</p>
     <div id="seasoning-groups"></div>
-    <button class="panel-close" onclick="closeSheet()">✅ 決定して閉じる</button>
+    <button class="panel-close" onclick="closeSheet(this)">✅ 決定して閉じる</button>
   </section>
   <p class="save-hint">💡 チェック内容はブラウザに自動保存。次に開いてもそのまま使えます。</p>
 
@@ -596,7 +609,7 @@ const ING_GROUPS = [
   // 2026-08-19 みかさん「ハンバーグないのなんで？」→ パン粉が冷蔵庫扱いで止めていた。
   //   買い置きが当たり前のもの（棚にあるもの）は PANTRY へ移し、チェック不要にした。
   //   ⚠️ここに残すのは「無ければ本当に作れない」もの。
-  {name:"ストック", items:["トマト缶","ツナ缶","コーン缶","サバ缶","さば水煮缶","さば味噌煮缶","いわし蒲焼き缶","焼き鳥缶","大豆水煮缶","ミックスビーンズ","ウィンナー","ハム","ベーコン","餃子の皮","ワンタン","はんぺん","ちくわ","かに風味かまぼこ","納豆","キムチ","大葉","ヨーグルト","焼きそば麺","中華麺","マカロニ"]}
+  {name:"ストック", items:["トマト缶","ツナ缶","コーン缶","サバ缶","さば水煮缶","さば味噌煮缶","いわし蒲焼き缶","焼き鳥缶","大豆水煮缶","ミックスビーンズ","ウィンナー","ハム","ベーコン","餃子の皮","ワンタン","はんぺん","ちくわ","かに風味かまぼこ","納豆","キムチ","大葉","ヨーグルト","焼きそば麺","中華麺","マカロニ","春雨"]}
 ];
 
 const st = {
@@ -908,7 +921,14 @@ function initSheetSwipe(){
   });
 }
 
-function closeSheet(){
+function closeSheet(btn){
+  // 🚨 2026-10-06 みかさん「冷蔵庫のものを入れて決定して、閉じる押しても開いたまま閉じませんでした」
+  //   1画面1ステップ（既定）では、冷蔵庫・調味料は引き出しでなく画面に直接並べている（.panel を外している）。
+  //   ここは .panel だけを閉じる作りだったので、押しても何も起きなかった。→ その欄をたたんで要約1行にする。
+  if(window.__stepUI&&btn){
+    const sec=btn.closest('.step-open');
+    if(sec){stepCollapse(sec,true);return;}
+  }
   document.querySelectorAll('.panel:not(.hidden)').forEach(x=>x.classList.add('hidden'));
   closeSheetChrome();
 }
@@ -1104,7 +1124,9 @@ function updateBadges(){
 // ⚠️ここに入れた食材は「いつも持っている」扱いになる。無いと本当に困るものは入れない。
 const PANTRY = new Set([
   // 乾物・粉もの（棚にある）
-  "パン粉","春雨","そうめん","うどん","パスタ","切り干し大根","高野豆腐","わかめ","ひじき","大豆","小麦粉","片栗粉",
+  // 2026-10-06 みかさん「献立アプリに春雨入れといてください」→ 春雨はここ（いつも持っている扱い）にあって
+  //   チェックリストに出ず、選べなかった。ストックへ移した（春雨の料理は、春雨にチェックした人に出る）
+  "パン粉","そうめん","うどん","パスタ","切り干し大根","高野豆腐","わかめ","ひじき","大豆","小麦粉","片栗粉",
   // 主食・調味に近いもの
   "ごはん","米少々","牛乳","チーズ","粉チーズ","モッツァレラ","にんにく","レモン","黒ごま","刻み海苔","かつお節",
   "ちりめんじゃこ","塩麹","わさび","三つ葉","みょうが","かいわれ",
@@ -1934,8 +1956,13 @@ function flowPools(){
   return {mains,sides,soups,nearMains,opts};
 }
 
-function newCandList(step, avoid){
-  const {mains,sides,soups,nearMains,opts}=flowPools();
+// exclude: これまでに見せた候補（このidは二度と出さない。1画面1ステップの「別の候補を見る」用）
+function newCandList(step, avoid, exclude){
+  let {mains,sides,soups,nearMains,opts}=flowPools();
+  if(exclude&&exclude.size){
+    const ok=x=>!exclude.has(x.id);
+    mains=mains.filter(ok);sides=sides.filter(ok);soups=soups.filter(ok);nearMains=nearMains.filter(ok);
+  }
   let pool,fill=[];
   if(step===1){
     pool=avoidRecent(mains);
@@ -2400,6 +2427,7 @@ function stepScreenIng(body,foot){
     if(!el)return;
     el.classList.remove('panel','hidden');
     el.classList.add('step-open');
+    stepCollapse(el,false); // 入力しなおしに来たときは開いた状態から
     body.appendChild(el);
   });
   const bar=document.querySelector('.status-bar');
@@ -2413,7 +2441,7 @@ function stepScreenIng(body,foot){
       alert('いまのチェックだと、作れるメインが見つかりませんでした。冷蔵庫か調味料のチェックを増やしてみてください。');
       return;
     }
-    stepState.extra=[]; stepState.pickIdx=-1;
+    stepState.extra=[]; stepState.pickIdx=-1; stepState.pages=null; // 食材が変わったら候補は出し直し
     stepGo(2);
   };
   foot.appendChild(next);
@@ -2432,27 +2460,71 @@ function stepScreenMain(body,foot){
   const grid=document.createElement('div');
   grid.className='cand-grid'; grid.id='step-grid';
   body.appendChild(grid);
-  const again=document.createElement('button');
-  again.className='regen-btn';
-  again.textContent='🔄 別の候補を見る';
-  again.onclick=()=>{stepState.cands=null;stepState.pickIdx=-1;stepRenderCands(true);};
-  body.appendChild(again);
-  stepRenderCands(false);
+  const nav=document.createElement('div');
+  nav.id='cand-nav';
+  body.appendChild(nav);
   const go=document.createElement('button');
   go.className='step-next'; go.id='step-confirm'; go.disabled=true;
   go.textContent='✅ これで作ってみる';
   go.onclick=()=>{ if(stepState.pickIdx>=0)stepGo(3); };
   foot.appendChild(go);
   foot.appendChild(stepBackBtn());
+  // 献立から「メインを選び直す」で戻ってきたときは、さっき見ていたページと選んだものをそのまま出す
+  if(!stepState.pages||!stepState.pages.length){stepState.pickIdx=-1;stepNewPage(true);}
+  stepRenderCands();
+  if(stepState.pickIdx>=0&&stepState.cands[stepState.pickIdx])stepPick(stepState.pickIdx);
 }
 
-function stepRenderCands(reshuffle){
-  const avoid=reshuffle&&stepState.lastIds?new Set(stepState.lastIds):null;
-  const list=newCandList(1,avoid);
-  const seen=new Set(list.map(x=>x.id));
-  const extra=(stepState.extra||[]).filter(x=>!seen.has(x.id));
-  stepState.cands=[...extra,...list];
-  stepState.lastIds=stepState.cands.map(x=>x.id);
+/* 🚨 2026-10-06 みかさん「別の候補を見るを押しても順番が入れ替わるだけなので、まだ出していない候補だけを
+   出してほしい。一度見た候補に戻れるように」
+   → 前は「直前と同じものを後ろへ回す」だけで、候補が少ないと同じ料理が並び替わって出ていた。
+   ⭐ 見せた候補はページとして取っておき、「別の候補を見る」は**まだ一度も出していないもの**だけで次のページを作る。
+      「← 前の候補」で、見たページにそのまま戻れる。出していないものが無くなったら、そう表示する。 */
+function stepShownIds(){
+  return new Set((stepState.pages||[]).flat().map(x=>x.id));
+}
+function stepNewPage(reset){
+  if(reset){stepState.pages=[];stepState.pageIdx=-1;}
+  const list=newCandList(1,null,stepShownIds());
+  if(list.length===0)return false;
+  stepState.pages.push(list);
+  stepState.pageIdx=stepState.pages.length-1;
+  return true;
+}
+function stepHasMore(){
+  return newCandList(1,null,stepShownIds()).length>0;
+}
+function stepPageMove(dir){
+  if(dir>0){
+    if(stepState.pageIdx<stepState.pages.length-1)stepState.pageIdx++;
+    else if(!stepNewPage(false))return;
+  }else{
+    if(stepState.pageIdx<=0)return;
+    stepState.pageIdx--;
+  }
+  stepState.pickIdx=-1;
+  const btn=document.getElementById('step-confirm');
+  if(btn){btn.disabled=true;btn.textContent='✅ これで作ってみる';}
+  stepRenderCands();
+  const grid=document.getElementById('step-grid');
+  if(grid)grid.scrollIntoView({behavior:'smooth',block:'start'});
+}
+function stepRenderNav(){
+  const nav=document.getElementById('cand-nav');
+  if(!nav)return;
+  const i=stepState.pageIdx, n=stepState.pages.length;
+  const canNext=i<n-1||stepHasMore();
+  nav.innerHTML='<div class="cand-nav">'
+    +'<button class="regen-btn" id="cand-prev" '+(i<=0?'disabled':'')+' onclick="stepPageMove(-1)">← 前の候補</button>'
+    +'<button class="regen-btn" id="cand-more" '+(canNext?'':'disabled')+' onclick="stepPageMove(1)">'
+    +(canNext?(i<n-1?'次の候補 →':'🔄 別の候補を見る'):'これで全部です')+'</button></div>'
+    +(n>1||!canNext?'<div class="cand-page">'+(i+1)+' / '+n+' ページ目'
+      +(canNext?'':'（まだ出していない候補はありません）')+'</div>':'');
+}
+
+function stepRenderCands(){
+  stepState.cands=(stepState.pages&&stepState.pages[stepState.pageIdx])||[];
+  stepRenderNav();
   const grid=document.getElementById('step-grid');
   grid.innerHTML=stepState.cands.map((c,i)=>{
     const miss=missingIngredients(c), sub=substitutions(c);
@@ -2496,20 +2568,21 @@ function stepSearch(q){
 }
 
 function stepAdd(kind,key){
-  if(kind==='ing'){
-    (D.main||[]).filter(m=>usesIng(m,key)).slice(0,8).forEach(m=>{
-      if(!stepState.extra.some(x=>x.id===m.id))stepState.extra.push(m);
-    });
-  }else{
-    const m=(D.main||[]).find(x=>x.id===key);
-    if(m&&!stepState.extra.some(x=>x.id===m.id))stepState.extra.unshift(m);
-  }
+  // 検索で足したものは、いま見ているページの先頭に入れる（見せた候補として数えるので、次のページには出ない）
+  const page=stepState.pages[stepState.pageIdx]||[];
+  const add=kind==='ing'
+    ?(D.main||[]).filter(m=>usesIng(m,key)).slice(0,8)
+    :[(D.main||[]).find(x=>x.id===key)].filter(Boolean);
+  const addIds=new Set(add.map(m=>m.id));
+  // 前のページに出ていたものは、そこから外してこのページへ移す（同じ料理が2ページに出ないように）
+  stepState.pages=stepState.pages.map((pg,i)=>i===stepState.pageIdx?pg:pg.filter(x=>!addIds.has(x.id)));
+  stepState.pages[stepState.pageIdx]=[...add,...page.filter(x=>!addIds.has(x.id))];
   document.getElementById('step-q').value='';
   document.getElementById('step-sugg').style.display='none';
   stepState.pickIdx=-1;
   const btn=document.getElementById('step-confirm');
   btn.disabled=true; btn.textContent='✅ これで作ってみる';
-  stepRenderCands(false);
+  stepRenderCands();
 }
 
 /* ---- STEP 3 / 献立 ---- */
@@ -2538,6 +2611,32 @@ function stepBackBtn(){
     stepGo(1);
   };
   return b;
+}
+
+/* 「✅ 決定して閉じる」でその欄をたたむ。中身は消さない（チェックはそのまま）。✏️ 変える でまた開く */
+function stepCollapse(sec,on){
+  let sum=sec.querySelector(':scope > .step-summary');
+  if(!sum){
+    sum=document.createElement('div');
+    sum.className='step-summary';
+    sum.innerHTML='<div class="step-summary-text"></div><button type="button" class="step-summary-edit">✏️ 変える</button>';
+    sum.querySelector('button').onclick=()=>stepCollapse(sec,false);
+    const h=sec.querySelector(':scope > h2');
+    if(h)h.after(sum);else sec.prepend(sum);
+  }
+  sec.classList.toggle('step-collapsed',on);
+  if(!on)return;
+  const isIng=sec.id==='ingredient-section';
+  const set=isIng?st.ingredients:st.seasonings;
+  const names=[...set];
+  sum.querySelector('.step-summary-text').textContent=names.length===0
+    ?(isIng?'まだ何も選んでいません':'調味料が選ばれていません')
+    :'✓ '+names.slice(0,5).join('・')+(names.length>5?' ほか'+(names.length-5)+(isIng?'品':'種類'):'')+'（全'+names.length+(isIng?'品':'種類')+'）';
+  // 次にやることの場所へ（冷蔵庫の次は調味料、調味料の次は「次へ」ボタン）
+  const next=sec.nextElementSibling&&sec.nextElementSibling.classList.contains('step-open')&&!sec.nextElementSibling.classList.contains('step-collapsed')
+    ?sec.nextElementSibling:document.getElementById('step-foot');
+  const target=next&&next.id==='step-foot'?sec:next;
+  if(target)target.scrollIntoView({behavior:'smooth',block:'start'});
 }
 
 function stepLead(a,b){

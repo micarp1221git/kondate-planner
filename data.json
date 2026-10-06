@@ -9737,6 +9737,99 @@
     "鰹節"
    ],
    "keep_ok": true
+  },
+  {
+   "id": "s-jaga-cheese",
+   "name": "じゃがいものチーズ焼き",
+   "genre": "洋",
+   "makeahead": false,
+   "seasonings": [
+    "塩",
+    "こしょう",
+    "チーズ",
+    "オリーブ油"
+   ],
+   "ingredients": [
+    "じゃがいも"
+   ],
+   "point": "薄めに切ってふたをすれば、レンジなしでフライパンだけで火が通る"
+  },
+  {
+   "id": "s-moyashi-butter",
+   "name": "もやしのバター醤油炒め",
+   "genre": "和",
+   "makeahead": false,
+   "seasonings": [
+    "バター",
+    "醤油",
+    "こしょう"
+   ],
+   "ingredients": [
+    "もやし"
+   ],
+   "point": "強めの火でさっと。炒めすぎないのがシャキッと仕上げるコツ"
+  },
+  {
+   "id": "s-cabbage-pepe",
+   "name": "キャベツのペペロンチーノ炒め",
+   "genre": "洋",
+   "makeahead": false,
+   "seasonings": [
+    "にんにく",
+    "オリーブ油",
+    "塩",
+    "こしょう"
+   ],
+   "ingredients": [
+    "キャベツ"
+   ],
+   "point": "にんにくは弱火から。焦がさないと香りがやさしく出る"
+  },
+  {
+   "id": "s-nasu-shoga-yaki",
+   "name": "なすの生姜醤油焼き",
+   "genre": "和",
+   "makeahead": false,
+   "seasonings": [
+    "ごま油",
+    "醤油",
+    "みりん"
+   ],
+   "ingredients": [
+    "なす",
+    "生姜"
+   ],
+   "point": "生姜はチューブでもOK。焼いてからめるだけ"
+  },
+  {
+   "id": "s-horenso-corn",
+   "name": "ほうれん草とコーンのバターソテー",
+   "genre": "洋",
+   "makeahead": false,
+   "seasonings": [
+    "バター",
+    "醤油",
+    "こしょう"
+   ],
+   "ingredients": [
+    "ほうれん草",
+    "コーン缶"
+   ],
+   "point": "茎から先に炒めると、葉がくたっとしすぎない"
+  },
+  {
+   "id": "s-tamanegi-steak",
+   "name": "玉ねぎのバター醤油ステーキ",
+   "genre": "洋",
+   "makeahead": false,
+   "seasonings": [
+    "バター",
+    "醤油"
+   ],
+   "ingredients": [
+    "玉ねぎ"
+   ],
+   "point": "楊枝を刺しておくと、返してもばらけない"
   }
  ],
  "soup": [
