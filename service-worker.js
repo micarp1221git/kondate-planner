@@ -1,4 +1,4 @@
-const CACHE_NAME = 'kondate-planner-v13';
+const CACHE_NAME = 'kondate-planner-v14';
 const ASSETS = [
   './',
   './index.html',

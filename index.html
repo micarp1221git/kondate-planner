@@ -432,6 +432,32 @@ body.stepui main.container>*:not(#stepui){display:none}
 body.has-ad{padding-bottom:calc(var(--ad-h,0px) + env(safe-area-inset-bottom,0px))}
 body.has-ad .panel{bottom:calc(var(--ad-h,0px) + env(safe-area-inset-bottom,0px))}
 </style>
+<style id="kintsugi-repair">
+/* 金継ぎの直し（読みにくい文字・極小文字・色のずれ）2026-10-08 みかさんOK */
+/* 金継ぎ 修理デモ（献立プランナー・2026-10-07）
+   本体は無改変。<head> の最後に貼れば同じ見た目になる。
+   色は元栓（:root）で当てる。いまはダークモードが無いが、将来足しても崩れないようライト表示のときだけ効かせる。 */
+
+@media (prefers-color-scheme: light), (prefers-color-scheme: no-preference) {
+  /* ① 煉瓦色を一段だけ深く（白抜きの文字 比4.23→5.04・薄い地の上の文字 3.87→4.62）。色味は同じ煉瓦のまま */
+  :root { --primary: #B35231; }
+  .day1 .day-label, .single-label { background: var(--primary); }
+
+  /* ② 補足の灰色を、同じ茶系のまま一段濃く（比3.26〜3.66→4.85以上） */
+  :root { --text-light: #716861; }
+}
+
+/* ③ 食材のチェック枠を 16px → 24px に（指で押しやすい大きさ。押せる範囲は札全体のまま） */
+.cb-label input { width: 24px; height: 24px; min-width: 24px; flex-shrink: 0; margin: 0; }
+.group-toggle { min-height: 24px; }
+
+/* ④ 文字サイズの割れを寄せる（足元の注記を説明文と同じ段へ・下の状態表示を食材名と同じ段へ） */
+.footer { font-size: .8rem; }
+.status-bar { font-size: .85rem; }
+
+/* ⑤ 角丸 4種→3種（6px を 8px へ。ボタン・面は8、カードは12、丸は999のまま） */
+.feature, .cb-label, .fav-item { border-radius: 8px; }
+</style>
 </head>
 <body>
 <button id="help-fab" onclick="showFirstTimeGuide()" title="使い方を見る" aria-label="使い方を見る">？</button>
